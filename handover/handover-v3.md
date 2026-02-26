@@ -1,7 +1,7 @@
 # AADS 프로젝트 인수인계서 v3.0
 
-**작성일**: 2026-02-26 20:20 KST  
-**작성자**: Claude Opus 4.6  
+**작성일**: 2026-02-26 20:20 KST
+**작성자**: Claude Opus 4.6
 **프로젝트**: AADS (AI Autonomous Development System)
 
 ---
