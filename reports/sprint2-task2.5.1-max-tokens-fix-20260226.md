@@ -1,43 +1,39 @@
-# Sprint 2 Task 2.5.1 — max_tokens 이슈 수정
+# Sprint 2 Task 2.5.1 — max_tokens 수정
 
-**일시**: 2026-02-26 18:55 KST  
-**이슈**: 파이프라인 Planning 단계에서 API 400 에러 — `max_tokens: 200000 > 128000` (Claude Opus 4.6 출력 한도 초과)  
-**원인**: `model_router.py`의 `max_tokens`가 컨텍스트 창 크기(200000 등)로 설정되어 있는데, 에이전트가 이를 API **출력 토큰 한도**로 그대로 전달함.  
-**수정**: API 호출용 출력 한도를 tier별 적정값으로 변경. 컨텍스트 창은 `context_window` 필드로 분리.
+**일시**: 2026-02-26 19:30 KST  
+**작업**: max_tokens Tier별 적정값 변경 (기존 4096/2048/1024 → 8192/4096/2048)
 
-## 변경 파일
+## 변경 내역
 
-- `core/model_router.py` (1파일)
+| 대상 | 이전 | 이후 | 사유 |
+|------|------|------|------|
+| core/model_router.py tier1 (Opus) | 4096 | 8192 | 기획/설계 긴 출력 |
+| core/model_router.py tier2 (Sonnet) | 4096 | 8192 | 코드 생성 |
+| core/model_router.py tier3 (Gemini) | 2048 | 4096 | 반복/모니터링 |
+| core/model_router.py tier4 (Haiku) | 1024 | 2048 | 분류/폴백 |
+| core/llm_client.py | 4096 | 8192 | 기본값 |
+| agents/base_agent.py | 4096 | 8192 | execute 기본값 |
+| Planner, Designer, Developer, QA, DevOps, Ops, Cost | model["max_tokens"] | (model_router 반영) | 에이전트는 라우터 값 사용 |
 
-## 변경 내용
+**참고**: 코드베이스에 `max_tokens=400`은 없었으며, 기존 값(4096/2048/1024)을 Tier별 목표값으로 수정함. pipeline.py는 에이전트를 호출만 하므로 별도 수정 없음.
 
-| Tier | 용도 | max_tokens (출력 한도) | context_window (참고) |
-|------|------|------------------------|------------------------|
-| tier1 | Planner/Designer (Opus) | 4096 | 200000 |
-| tier2 | Developer/QA/DevOps (Sonnet) | 4096 | 1000000 |
-| tier3 | Ops (Gemini) | 2048 | 1048576 |
-| tier4 | Cost (Haiku) | 1024 | 200000 |
+## 수정 파일 (3건)
 
-- `MODEL_CONFIG`에 `context_window` 필드 추가(기존 max_tokens 값 이관).
-- `max_tokens`를 API 출력 한도(4096/2048/1024)로 재정의.
-- 에이전트(`agents/*/agent.py`)는 기존대로 `model["max_tokens"]` 사용 → 수정 없음.
+- `core/model_router.py` — MODEL_CONFIG tier1~4 max_tokens
+- `core/llm_client.py` — call_anthropic, call_google, call_llm 기본 인자
+- `agents/base_agent.py` — execute() max_tokens 기본값
 
-## 테스트
+## 테스트 결과
 
-```text
-python tests/test_pipeline.py
-```
-
-- **수정 전**: Planning 단계에서 `Error code: 400 - max_tokens: 200000 > 128000` 발생.
-- **수정 후**: Ideation → Planning 완료, Design 단계로 진행. exit 0.  
-  - 예: 모델 Claude Opus 4.6, output 4096 토큰, 비용 $0.1043.
+- **test_llm_models.py**: 5/6 통과 (Tier3 Gemini 403 API key 이슈 — max_tokens와 무관)
+- **test_pipeline.py**: 실행 확인 (파이프라인 엔진은 model_router/에이전트 값 사용)
 
 ## 적용·배포
 
-- 적용: ✅ `core/model_router.py` 반영.
-- 배포: 로컬/CI만 해당, 별도 서버 배포 없음.
+- 적용: ✅ 소스 반영
+- 배포: aads-core Git push 완료 시 반영 (API/서비스 재시작 불필요)
 
-## 진행/체크사항
+## 체크사항
 
-- [ ] 필요 시 Tier별 출력 한도(4096/2048/1024) 재조정.
-- ⚠️ `context_window`를 참조하는 다른 코드가 있으면 해당 경로에서 사용처 확인.
+- [ ] Tier3 API 키 교체 후 test_llm_models.py 6/6 재확인
+- [ ] 실제 파이프라인 실행 시 출력 길이/토큰 사용량 모니터링
