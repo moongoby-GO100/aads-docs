@@ -5,10 +5,10 @@
 ## LLM 모델별 비용 (per 1M tokens)
 | Tier | 모델 | API ID | Input | Output | 용도 |
 |------|------|--------|-------|--------|------|
-| 1 | Claude Opus 4.6 | claude-opus-4-6-20260205 | $5.00 | $25.00 | 기획·설계·복잡 판단 |
-| 2 | Claude Sonnet 4.6 | claude-sonnet-4-6-20260217 | $3.00 | $15.00 | 코드 생성·리뷰·일반 |
+| 1 | Claude Opus 4.6 | claude-opus-4-6 | $5.00 | $25.00 | 기획·설계·복잡 판단 |
+| 2 | Claude Sonnet 4.6 | claude-sonnet-4-6 | $3.00 | $15.00 | 코드 생성·리뷰·일반 |
 | 3 | Gemini 2.5 Flash | gemini-2.5-flash | $0.15 | $0.60 | 반복·대량·저비용 |
-| 4 | Claude Haiku 4.5 | claude-haiku-4-5-20251001 | $1.00 | $5.00 | 폴백·로깅·분류 |
+| 4 | Claude Haiku 4.5 | claude-haiku-4-5 | $1.00 | $5.00 | 폴백·로깅·분류 |
 
 ## 3-Tier 라우팅 비용 절감 효과
 - Tier 1 (Opus) 사용 비율: 10~15% → 기획/설계 단계만

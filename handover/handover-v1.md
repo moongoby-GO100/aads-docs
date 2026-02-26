@@ -81,9 +81,9 @@ POST /projects/{id}/approve, POST /projects/{id}/reject, GET /models
 ```bash
 cd /root/aads/aads-core && source .venv/bin/activate
 pip install --upgrade anthropic
-sed -i 's|DEFAULT_TIER1_MODEL=claude-opus-4-6-20260205|DEFAULT_TIER1_MODEL=claude-opus-4-6|' .env
-sed -i 's|DEFAULT_TIER2_MODEL=claude-sonnet-4-6-20260217|DEFAULT_TIER2_MODEL=claude-sonnet-4-6|' .env
-sed -i 's|DEFAULT_TIER4_MODEL=claude-haiku-4-5-20251001|DEFAULT_TIER4_MODEL=claude-haiku-4-5|' .env
+sed -i 's|DEFAULT_TIER1_MODEL=claude-opus-4-6|DEFAULT_TIER1_MODEL=claude-opus-4-6|' .env
+sed -i 's|DEFAULT_TIER2_MODEL=claude-sonnet-4-6|DEFAULT_TIER2_MODEL=claude-sonnet-4-6|' .env
+sed -i 's|DEFAULT_TIER4_MODEL=claude-haiku-4-5|DEFAULT_TIER4_MODEL=claude-haiku-4-5|' .env
 # model_router.py에서도 동일하게 alias로 변경
 python tests/test_llm_models.py
 git add -A && git commit -m "🔧 Fix: SDK + alias (404 해결)" && git push origin main

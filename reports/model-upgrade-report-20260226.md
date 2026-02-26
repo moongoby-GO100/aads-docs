@@ -11,8 +11,8 @@
 ## 테스트 결과 (python tests/test_llm_models.py)
 | 항목 | 결과 | 비고 |
 |------|------|------|
-| Opus 4.6 (claude-opus-4-6-20260205) | ❌ | API 404 – 모델 ID 미지원 또는 계정/플랜 제한 |
-| Sonnet 4.6 (claude-sonnet-4-6-20260217) | ❌ | API 404 – 동일 |
+| Opus 4.6 (claude-opus-4-6) | ❌ | API 404 – 모델 ID 미지원 또는 계정/플랜 제한 |
+| Sonnet 4.6 (claude-sonnet-4-6) | ❌ | API 404 – 동일 |
 | Gemini 2.5 Flash | ✅ | AADS_TIER3_OK |
 | Haiku 4.5 | ✅ | AADS_TIER4_OK |
 | Redis 6380 | ✅ | read=OK |

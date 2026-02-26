@@ -29,8 +29,8 @@
 | Claude Sonnet 4 | ✅ 호출 성공 |
 | Gemini 2.5 Flash | ✅ 호출 성공 |
 | OpenAI | ⚠️ 429 Quota (백업용, 현재 불필요) |
-| Claude Opus 4.6 | ✅ 호출 성공 (claude-opus-4-6-20260205) |
-| Claude Haiku 4.5 | ✅ 호출 성공 (claude-haiku-4-5-20251001) |
+| Claude Opus 4.6 | ✅ 호출 성공 (claude-opus-4-6) |
+| Claude Haiku 4.5 | ✅ 호출 성공 (claude-haiku-4-5) |
 
 ## 생성된 코어 모듈
 | 파일 | 줄수 | 역할 |

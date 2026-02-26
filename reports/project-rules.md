@@ -37,7 +37,7 @@
 ## AI 모델 설정 (2026-02-26 최신)
 | Tier | 모델 | API ID | 용도 |
 |------|------|--------|------|
-| 1 | Claude Opus 4.6 | claude-opus-4-6-20260205 | 기획·설계 |
-| 2 | Claude Sonnet 4.6 | claude-sonnet-4-6-20260217 | 코드·리뷰 |
+| 1 | Claude Opus 4.6 | claude-opus-4-6 | 기획·설계 |
+| 2 | Claude Sonnet 4.6 | claude-sonnet-4-6 | 코드·리뷰 |
 | 3 | Gemini 2.5 Flash | gemini-2.5-flash | 반복·대량 |
-| 4 | Claude Haiku 4.5 | claude-haiku-4-5-20251001 | 폴백 |
+| 4 | Claude Haiku 4.5 | claude-haiku-4-5 | 폴백 |
