@@ -11,8 +11,8 @@
 ## 모델 라우팅 v2.0 (2026-02-26 확정)
 | Tier | 모델 | API ID | Input/1M | Output/1M | 상태 | 비중 |
 |------|------|--------|----------|-----------|------|------|
-| 1 | Claude Opus 4.5 | claude-opus-4-5-20251101 | $5.00 | $25.00 | GA | 10-15% |
-| 2 | Claude Sonnet 4 | claude-sonnet-4-20250514 | $3.00 | $15.00 | GA | 50-60% |
+| 1 | Claude Opus 4.6 | claude-opus-4-6-20260205 | $5.00 | $25.00 | GA | 10-15% |
+| 2 | Claude Sonnet 4.6 | claude-sonnet-4-6-20260217 | $3.00 | $15.00 | GA | 50-60% |
 | 3 | Gemini 2.5 Flash | gemini-2.5-flash | $0.15 | $0.60 | Stable | 25-30% |
 | 4 | Claude Haiku 4.5 | claude-haiku-4-5-20251001 | $1.00 | $5.00 | GA | 5-10% |
 
@@ -23,12 +23,13 @@
 | Claude 3.7 Sonnet | ❌ Retired 2026-02 | → Sonnet 4 |
 | Claude 3 Opus | ❌ Retired 2026-01 | → Opus 4.5 |
 
-## 참고: 최신 모델 (사용 가능, 현재 미적용)
+## 참고: 최신 모델 (현재 적용 완료 2026-02-26)
 | 모델 | API ID | 비고 |
 |------|--------|------|
-| Claude Opus 4.6 | claude-opus-4-6-20250205 | 2026-02-05 출시, MAX 플랜 |
-| Claude Sonnet 4.6 | claude-sonnet-4-6-20250514 | 최신 Sonnet |
-| Claude Sonnet 4.5 | claude-sonnet-4-5-20250929 | GA 안정 |
+| Claude Opus 4.6 | claude-opus-4-6-20260205 | 2026-02-05 출시, GA |
+| Claude Sonnet 4.6 | claude-sonnet-4-6-20260217 | 2026-02-17 출시, GA |
+| Claude Haiku 4.5 | claude-haiku-4-5-20251001 | GA |
+| Claude Sonnet 4.5 | claude-sonnet-4-5-20250929 | GA 안정 (이전) |
 
 ## 서버 포트
 | 포트 | 서비스 | 상태 |
