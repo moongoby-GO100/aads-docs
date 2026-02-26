@@ -28,6 +28,7 @@
 
 ## 체크사항
 
+- [ ] **GitHub PAT에 `workflow` 스코프 추가** 후 aads-core 푸시 재시도 (현재 푸시 거부됨)
 - [ ] GitHub Secrets(DO_HOST, DO_SSH_KEY) 등록
 - [ ] main 푸시 시 test → deploy 순서 확인
 - [ ] dashboard 변경 시 dashboard 빌드 워크플로우 동작 확인
