@@ -1,56 +1,49 @@
-# Sprint 2 진행 보고서
-- 기간: 2026-02-26 ~
-- 최종 수정: 2026-02-26 18:05 KST
+# Sprint 2 최종 보고서
+- 기간: 2026-02-26
+- 최종 수정: 2026-02-26 19:40 KST
+- 상태: ✅ 완료 (대시보드 제외 → Sprint 3 이관)
 
 ## 태스크 현황
 
 | # | 태스크 | 상태 | 비용 |
 |---|--------|------|------|
-| 2.0 | 모델 ID 수정 + 4모델 테스트 | ✅ 완료 | ~$0.02 |
-| 2.0.1 | 최신 모델 전면 교체 (Opus 4.6, Sonnet 4.6, Haiku 4.5) | ✅ 완료 | $0 |
-| 2.0.2 | SDK 업그레이드 + alias 전환 | ✅ 완료 | ~$0.01 |
-| 2.0.3 | aads-docs 문서 모델 ID alias 통일 | ✅ 완료 | $0 |
-| 2.0.4 | Anthropic 콘솔 진단 (Tier2 확인) | ✅ 완료 | $0 |
-| 2.0.5 | curl 직접 테스트 (HTTP 200 확인) | ✅ 완료 | ~$0.01 |
-| 2.0.6 | 코드 레벨 404 해결 + 전체 테스트 통과 | ✅ 완료 | ~$0.02 |
-| 2.1 | LangGraph 오케스트레이션 (graph.py) | ✅ 완료 | $0 |
-| 2.2 | 에이전트 7종 | ✅ 완료 | $0 |
-| 2.3 | 파이프라인 실행 엔진 (pipeline.py) | ✅ 완료 | $0 |
-| 2.4 | FastAPI 엔드포인트 (api/main.py) | ✅ 완료 | $0 |
-| 2.5 | 파이프라인 통합 테스트 | ✅ 완료 | ~$0.05 |
-| 2.6 | 대시보드 (Next.js) | ⏳ 대기 | - |
-| 2.7 | 서버 디스크 정리 | 🔄 진행중 | $0 |
+| 2.0 | 모델 ID 수정 + 4모델 테스트 | ✅ | ~$0.02 |
+| 2.0.1 | 최신 모델 전면 교체 | ✅ | $0 |
+| 2.0.2 | SDK 업그레이드 + alias 전환 | ✅ | ~$0.01 |
+| 2.0.3 | 문서 모델 ID alias 통일 | ✅ | $0 |
+| 2.0.4 | Anthropic 콘솔 진단 | ✅ | $0 |
+| 2.0.5 | curl 직접 테스트 (HTTP 200) | ✅ | ~$0.01 |
+| 2.0.6 | 코드 레벨 404 해결 | ✅ | ~$0.02 |
+| 2.1 | LangGraph 오케스트레이션 | ✅ | $0 |
+| 2.2 | 에이전트 7종 | ✅ | $0 |
+| 2.3 | 파이프라인 엔진 | ✅ | $0 |
+| 2.4 | FastAPI 엔드포인트 | ✅ | $0 |
+| 2.5 | 파이프라인 통합 테스트 | ✅ | ~$0.05 |
+| 2.5.1 | max_tokens Tier별 수정 | ✅ | $0 |
+| 2.6 | Next.js 대시보드 | ➡️ Sprint 3 이관 | - |
+| 2.7 | 서버 디스크 정리 (96%→82%) | ✅ | $0 |
+| 2.7.1 | Spaces 이중 백업 | ✅ | $0 |
+| 2.7.2 | Volume 50GB 연결 ($5/월) | ✅ | $0 |
+| 2.8 | FastAPI systemd 서비스 등록 | ✅ | $0 |
+| 2.9 | 헬스체크 + 모니터링 cron | ✅ | $0 |
+| 2.10 | .env 암호화 + 보안 점검 | ✅ | $0 |
+| 2.11 | Sprint 2 최종 보고 | ✅ | $0 |
 
-## 404 이슈 해결 타임라인
-1. SDK 업그레이드 + alias 전환 시도 → 여전히 404
-2. Anthropic 콘솔 확인 → Tier 2, 잔액 $98.95, 모델 접근 가능
-3. curl 직접 테스트 → HTTP 200 (API 정상)
-4. 코드 레벨 점검 → model_router.py MODEL_CONFIG alias 통일로 해결
-5. test_llm_models.py 6/6 통과, test_pipeline.py exit 0
+## 비용 합계
+- LLM API: ~$0.11
+- 인프라: Volume $5/월 추가
+- 총 누적: ~$3.41
 
-## API 엔드포인트
+## 주요 성과
+1. Opus 4.6 + Sonnet 4.6 404 오류 완전 해결
+2. 7단계 파이프라인 + 7 에이전트 완성
+3. FastAPI API 서버 (10개 엔드포인트)
+4. 서버 안정화 (디스크 82%, Volume, systemd, 모니터링)
+5. 보안 점검 + .env 암호화 백업
 
-| Method | Path | 기능 |
-|--------|------|------|
-| GET | / | 서비스 정보 |
-| GET | /health | 헬스체크 |
-| POST | /projects | 프로젝트 생성 |
-| GET | /projects | 프로젝트 목록 |
-| GET | /projects/{id} | 상태 조회 |
-| POST | /projects/{id}/run | 현재 단계 실행 |
-| POST | /projects/{id}/run-all | 자동 전체 실행 |
-| POST | /projects/{id}/approve | 게이트 승인 |
-| POST | /projects/{id}/reject | 게이트 거부 |
-| GET | /models | 모델 목록 |
-
-## 에이전트 구성
-
-| 에이전트 | 파일 | Tier | 역할 |
-|----------|------|------|------|
-| Planner | agents/planner/agent.py | 1 (Opus 4.6) | 아이디어 → 기획서 |
-| Designer | agents/designer/agent.py | 1 (Opus 4.6) | 기획서 → 설계서 |
-| Developer | agents/developer/agent.py | 2 (Sonnet 4.6) | 설계서 → 코드 |
-| QA | agents/qa/agent.py | 2 (Sonnet 4.6) | 코드 리뷰 + 테스트 |
-| DevOps | agents/devops/agent.py | 2 (Sonnet 4.6) | 배포 설정 생성 |
-| Ops | agents/ops/agent.py | 3 (Gemini) | 모니터링 + 개선 |
-| Cost | agents/cost/agent.py | 4 (Haiku 4.5) | 비용 추적 + 경고 |
+## 404 해결 타임라인
+1. SDK 0.84.0 업그레이드 + snapshot→alias 전환
+2. Anthropic 콘솔: Tier 2, 잔액 $98.95
+3. curl 직접 테스트: HTTP 200 확인
+4. 코드 레벨: model_router.py MODEL_CONFIG 통일 → 해결
+5. 전체 테스트 통과 (6/6)
