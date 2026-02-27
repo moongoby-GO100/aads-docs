@@ -1,0 +1,31 @@
+# AADS-Docs Cursor Rules v2.0
+# 최종 수정: 2026-02-27
+
+## 필수 규칙 (MUST)
+
+### Git 커밋/푸시 — 모든 작업 완료 시 반드시 실행
+1. 파일 생성·수정 후 반드시 `git add -A && git commit -m "메시지" && git push` 실행
+2. push 없이 작업 완료 보고 금지
+3. push 실패 시 에러 메시지를 보고서에 기록하고 재시도
+4. 커밋 메시지 형식: `이모지 작업내용 - 상세설명`
+   예: `📝 Sprint 3 완료 - Task 4.3 보완 + Handover v4.1`
+
+### 보고서 작성
+5. 보고서 경로: `reports/sprint{N}-task{N.M}-{설명}-{YYYYMMDD}.md`
+6. 보고서에 반드시 포함: 일시, 변경사항, 결과(실제 실행 결과), 검증 방법
+7. 결과란에 "[실행 후 기록]" 등 placeholder 금지 — 실제 결과를 채울 것
+8. phase-reports/, handover/ 문서는 태스크 완료 시 즉시 최신 상태로 업데이트
+
+### 작업 완료 체크리스트 (매 작업 종료 전 확인)
+- [ ] 보고서 작성 완료 (placeholder 없음)
+- [ ] phase-reports 최신화 (진행률, 상태)
+- [ ] handover 최신화 (해당 시)
+- [ ] git add -A
+- [ ] git commit -m "이모지 메시지"
+- [ ] git push (성공 확인)
+- [ ] push 결과 출력에서 에러 없음 확인
+
+## 금지 사항 (MUST NOT)
+- git push 없이 "완료" 보고 금지
+- 보고서 결과란 비우기 금지
+- phase-reports를 이전 상태로 방치 금지
