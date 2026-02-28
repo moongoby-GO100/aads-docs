@@ -34,9 +34,9 @@
 | WORKFLOW-SCOPE | 02-28 | — | — | CEO가 PAT에 workflow scope 추가 완료 |
 | PROCESS-SETUP | 02-28 | — | — | CEO 업무 프로세스 표준 지침 수립(웹Claude↔Cursor/ClaudeCode 3자 협업 체계) |
 | INIT-DOCS | 02-28 | 6145a6c | 200 | HANDOVER.md + CEO-DIRECTIVES.md v1.0 생성 및 push, raw URL HTTP 200 확인 |
-| DIRECTIVES-UPDATE | 2026-02-28 | — | — | CEO-DIRECTIVES v1.1 — 브라우저 URL 보고 규칙 (R-NEW-1, R-NEW-2) 추가 |
-| ARCH-DESIGN-DRAFT | 2026-02-28 | — | — | Phase 1 아키텍처 설계서 v1.0-draft 작성 (design/aads-architecture-v1.md) |
-| REPORT-PUSH | 2026-02-28 | — | — | 보고서 placeholder 3건 생성 (reports/) |
+| DIRECTIVES-UPDATE | 2026-02-28 | 3778986 | — | CEO-DIRECTIVES v1.1 — 브라우저 URL 보고 규칙 (R-NEW-1, R-NEW-2) 추가 |
+| ARCH-DESIGN-DRAFT | 2026-02-28 | 3778986 | — | Phase 1 아키텍처 설계서 v1.0-draft 작성 (design/aads-architecture-v1.md) |
+| REPORT-PUSH | 2026-02-28 | 3778986 | — | 보고서 placeholder 3건 생성 (reports/) |
 
 ---
 
