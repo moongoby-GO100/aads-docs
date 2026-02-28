@@ -22,7 +22,7 @@
 | 모델 | PRD 생성만 Opus → Sonnet (`claude-sonnet-4-6`), max_tokens 8192→4096 |
 | async | `interview_routes.py`는 이미 `await generate_prd()` 사용 중 (변경 없음) |
 
-**변경 파일**: `aads-core/core/agents/interview_engine.py`  
+**변경 파일**: `aads-core/core/agents/interview_engine.py`
 **커밋**: `0b993bb` — 🔧 PRD 생성 버그픽스 (타임아웃 300s + 컨텍스트 축소 + Sonnet)
 
 ## PRD 재테스트 결과
