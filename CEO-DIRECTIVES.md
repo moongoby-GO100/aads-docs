@@ -1,5 +1,5 @@
 # CEO DIRECTIVES – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-02-28 (v1.0)
+> 최종 업데이트: 2026-02-28 (v1.1)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션에서 필수 읽기. 이 문서의 지시를 위반하는 설계/분석은 무효.
 
@@ -121,6 +121,23 @@
 - CEO-DIRECTIVES.md의 지시를 무시하는 설계/분석은 전부 무효
 - 기존 서비스(aads-server 파이프라인) 중단/변경 시 반드시 CEO 승인
 
+### R-NEW-1: 보고 시 브라우저 URL 사용 필수
+- CEO에게 파일을 보고할 때는 반드시 GitHub **브라우저 경로**를 사용한다.
+- 형식: `https://github.com/moongoby-GO100/aads-docs/blob/main/{파일경로}`
+- `raw.githubusercontent.com` URL은 HTTP 200 검증 용도로만 내부적으로 사용하며, CEO 보고에는 절대 포함하지 않는다.
+- 예시:
+  - ✅ `https://github.com/moongoby-GO100/aads-docs/blob/main/design/aads-architecture-v1.md`
+  - ❌ `https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/design/aads-architecture-v1.md`
+
+### R-NEW-2: 완료 보고 형식
+- 작업 완료 후 CEO에게 보고할 때 아래 형식을 따른다:
+```
+푸시 완료했습니다.
+- [파일명]: https://github.com/moongoby-GO100/aads-docs/blob/main/{경로}
+- HANDOVER: https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md
+```
+- 모든 생성·수정된 파일의 브라우저 URL을 빠짐없이 나열한다.
+
 ---
 
 ## 4. 버전 이력
@@ -128,3 +145,4 @@
 | 버전 | 날짜 | 변경 |
 |------|------|------|
 | v1.0 | 2026-02-28 | 초판 — D-001~D-008, T-001~T-006, 절대 규칙 |
+| v1.1 | 2026-02-28 | 절대 규칙 추가: R-NEW-1 브라우저 URL 보고 필수, R-NEW-2 완료 보고 형식 |
