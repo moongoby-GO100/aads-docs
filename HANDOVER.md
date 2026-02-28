@@ -37,7 +37,7 @@
 | DIRECTIVES-v1.1 | 02-28 | 3778986 | 200 | CEO-DIRECTIVES v1.1 (브라우저 URL 보고 규칙) |
 | ARCH-v1.0-DRAFT | 02-28 | 3778986 | 200 | Phase 1 설계서 v1.0-draft |
 | REPORT-PLACEHOLDER | 02-28 | 3778986 | 200 | 보고서 placeholder 3건 |
-| **PUSH-006** | **02-28** | **{커밋해시}** | **200** | **CEO-DIRECTIVES v2.0 + 설계서 v1.1-final (21건 수정) + 보고서 3건 실제 내용 + HANDOVER v2.0** |
+| **PUSH-006** | **02-28** | **7dfd454** | **200** | **CEO-DIRECTIVES v2.0 + 설계서 v1.1-final (21건 수정) + 보고서 3건 실제 내용 + HANDOVER v2.0** |
 
 ---
 

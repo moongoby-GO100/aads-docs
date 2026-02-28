@@ -76,4 +76,4 @@ Phase 1은 LangChain/LangGraph + pgvector(Supabase) + LangSmith Free. 오픈소�
 
 ---
 
-*HANDOVER.md 업데이트 완료: {커밋해시}*
+*HANDOVER.md 업데이트 완료: 7dfd454*

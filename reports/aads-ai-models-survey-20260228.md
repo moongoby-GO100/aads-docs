@@ -82,4 +82,4 @@ AADS 최적 혼합: Claude Opus(설계) + Sonnet(개발/PM/QA/Judge) + GPT-5 min
 
 ---
 
-*HANDOVER.md 업데이트 완료: {커밋해시}*
+*HANDOVER.md 업데이트 완료: 7dfd454*
