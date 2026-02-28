@@ -33,6 +33,7 @@
 | PIPELINE-CHECK | 02-26 | — | — | 서버 파이프라인 실행 중 확인, 대시보드 URL 확인 |
 | WORKFLOW-SCOPE | 02-28 | — | — | CEO가 PAT에 workflow scope 추가 완료 |
 | PROCESS-SETUP | 02-28 | — | — | CEO 업무 프로세스 표준 지침 수립(웹Claude↔Cursor/ClaudeCode 3자 협업 체계) |
+| INIT-DOCS | 02-28 | 6145a6c | 200 | HANDOVER.md + CEO-DIRECTIVES.md v1.0 생성 및 push, raw URL HTTP 200 확인 |
 
 ---
 
@@ -40,8 +41,7 @@
 
 | Task ID | 상태 | 내용 |
 |---------|------|------|
-| INIT-DOCS | **실행중** | HANDOVER.md + CEO-DIRECTIVES.md 파일 생성 및 push (본 작업) |
-| REPORT-PUSH | **대기** | 보고서 3건 마크다운 push 대기 (INIT-DOCS 완료 후) |
+| REPORT-PUSH | **다음** | 보고서 3건 마크다운 push (INIT-DOCS 완료 후) |
 | ARCH-DESIGN | **착수** | AADS Phase 1 아키텍처 최종 설계문서 — 에이전트 구성, 모델 배정, MCP 서버, 샌드박스, 배포 인프라, 데이터 흐름 확정 |
 
 ---
@@ -100,20 +100,20 @@
 ## 6. 웹 Claude 인수인계 사항
 
 ### 6-1. 최신 상태
+- 인계서 시스템 구축 완료, 보고서 push 대기
 - 리서치 Phase 완료 (AI 모델, 오픈소스, 샌드박스, MCP, 앱빌더, 코딩에이전트)
 - CEO 업무 프로세스 표준 지침 수립 완료
-- HANDOVER.md + CEO-DIRECTIVES.md 초안 CEO 승인됨 → Cursor/Claude Code push 진행 중
+- HANDOVER.md + CEO-DIRECTIVES.md push 완료 (raw URL HTTP 200)
 - 아키텍처 설계문서 착수 단계 (LangGraph Supervisor 2단계 계층 방향 CEO 승인)
 - **AADS 자체가 프로덕트, HealthMate는 AADS 완성 후 첫 프로젝트**
 
 ### 6-2. 웹 Claude가 해야 할 일
-1. INIT-DOCS push 완료 확인 (raw URL HTTP 200)
-2. 보고서 3건 push 지시서 작성 → Cursor/Claude Code 실행
-3. AADS Phase 1 아키텍처 최종 설계문서 작성 (design/aads-architecture-v1.md)
-4. 설계문서 CEO 승인 후 → AADS 코어 구현 지시서 작성
+1. 보고서 3건 push 지시서 작성 → Cursor/Claude Code 실행
+2. AADS Phase 1 아키텍처 최종 설계문서 작성 (design/aads-architecture-v1.md)
+3. 설계문서 CEO 승인 후 → AADS 코어 구현 지시서 작성
 
 ### 6-3. 대표님 확인 필요 사항
-- [ ] INIT-DOCS push 완료 보고 대기
+- [x] INIT-DOCS push 완료 (2026-02-28, 6145a6c, HTTP 200)
 - [ ] 아키텍처 설계문서 방향 최종 승인
 - [ ] AADS가 생성할 프로젝트의 범위 정의 (웹앱? 모바일? API?)
 
