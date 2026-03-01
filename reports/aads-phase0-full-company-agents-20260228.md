@@ -80,11 +80,11 @@ class AgentFactory:
         agent_card = await self.supervisor.generate_agent_card(
             prompt=f"""
             다음 역량이 필요한 새로운 에이전트를 설계하세요.
-            
+
             필요 역량: {requirement.specialty_needed}
             프로젝트 컨텍스트: {requirement.context}
             참고 에이전트: {requirement.reference_agents}
-            
+
             다음 JSON 형식으로 에이전트 카드를 출력하세요:
             {{
                 "agent_id": "자동생성 (역할-전문분야-번호)",
