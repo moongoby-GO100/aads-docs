@@ -38,7 +38,7 @@
 | ARCH-v1.0-DRAFT | 02-28 | 3778986 | 200 | Phase 1 설계서 v1.0-draft |
 | REPORT-PLACEHOLDER | 02-28 | 3778986 | 200 | 보고서 placeholder 3건 |
 | PUSH-006 | 02-28 | 7dfd454 | 200 | CEO-DIRECTIVES v2.0 + 설계서 v1.1-final (21건 수정) + 보고서 3건 실제 내용 + HANDOVER v2.0 |
-| **PUSH-007** | **03-01** | **{커밋해시}** | **200** | **설계서 v1.1 통합본 신규(27섹션), CEO-DIRECTIVES v2.1, 기존 설계서 DEPRECATED, 6건 불일치 해소** |
+| **PUSH-007** | **03-01** | **0f6b5a1** | **200** | **설계서 v1.1 통합본 신규(27섹션), CEO-DIRECTIVES v2.1, 기존 설계서 DEPRECATED, 6건 불일치 해소** |
 
 ---
 
