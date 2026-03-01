@@ -146,3 +146,4 @@
 | v1.0 | 2026-02-28 | 초판 — 리서치 완료, 인계서 구축 |
 | v2.0 | 2026-02-28 | 대규모 개정 — CEO-DIRECTIVES v2.0, 설계서 v1.1-final, 보고서 3건 완성, 21건 수정 반영 |
 | v2.1 | 2026-03-01 | PUSH-007 — 설계서 v1.1 통합본(27섹션), CEO-DIRECTIVES v2.1, 기존 설계서 DEPRECATED, 6건 불일치 해소 |
+| v2.2 | 2026-03-02 | PUSH-008 — Phase 1 Week 1 구현 완료: aads-server 3-agent chain, 6/6 테스트 |
