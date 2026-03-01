@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-02-28 (v2.0 — 21건 수정 반영, 설계서 v1.1-final 확정, 보고서 완성)
+> 최종 업데이트: 2026-03-01 (v2.1 — 설계서 v1.1 통합본, CEO-DIRECTIVES v2.1, 6건 불일치 해소)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -37,7 +37,8 @@
 | DIRECTIVES-v1.1 | 02-28 | 3778986 | 200 | CEO-DIRECTIVES v1.1 (브라우저 URL 보고 규칙) |
 | ARCH-v1.0-DRAFT | 02-28 | 3778986 | 200 | Phase 1 설계서 v1.0-draft |
 | REPORT-PLACEHOLDER | 02-28 | 3778986 | 200 | 보고서 placeholder 3건 |
-| **PUSH-006** | **02-28** | **7dfd454** | **200** | **CEO-DIRECTIVES v2.0 + 설계서 v1.1-final (21건 수정) + 보고서 3건 실제 내용 + HANDOVER v2.0** |
+| PUSH-006 | 02-28 | 7dfd454 | 200 | CEO-DIRECTIVES v2.0 + 설계서 v1.1-final (21건 수정) + 보고서 3건 실제 내용 + HANDOVER v2.0 |
+| **PUSH-007** | **03-01** | **{커밋해시}** | **200** | **설계서 v1.1 통합본 신규(27섹션), CEO-DIRECTIVES v2.1, 기존 설계서 DEPRECATED, 6건 불일치 해소** |
 
 ---
 
@@ -45,7 +46,7 @@
 
 | Task ID | 상태 | 내용 |
 |---------|------|------|
-| PHASE1-IMPL | **착수 가능** | Phase 1 코어 구현 (12일 예상). 설계서 v1.1-final 확정 완료. |
+| PHASE1-IMPL | **착수 가능** | Phase 1 코어 구현 (15일/3주 예상). 설계서 v1.1 통합본 확정 완료. |
 
 ---
 
@@ -67,48 +68,55 @@
 ### AI 모델 (2026-02-28, 검증 가격)
 - Claude Opus 4.6: $5/$25, Sonnet 4.6: $3/$15, Haiku 4.5: $1/$5
 - GPT-5.3 Codex: $1.75/$14, GPT-5 mini: $0.25/$2, GPT-5 nano: $0.05/$0.40
-- Gemini 3.1 Pro: $2/$12, Gemini 2.5 Flash: $0.30/$2.50
+- Gemini 3.1 Pro Preview: $2/$12, Gemini 2.5 Flash: $0.30/$2.50
 - GPT-5.2 Pro: $21/$168 (극고가, 사용 비추천)
 - AADS 최적 혼합 캐싱 후 월 ~$55
 
 ### MCP 에코시스템
 - 8,600+ 서버, Phase 1 필수 7개
-- MultiServerMCPClient lifespan 초기화, 상시 4개 + 온디맨드 3개
+- MultiServerMCPClient, supervisord 프로세스 관리, SSE transport (localhost)
 - langgraph-supervisor MCP 루프 버그 #249 → Native StateGraph 사용
 
 ### 인프라
 - E2B $150-250/mo, Fly.io 2GB RAM $20-50/mo, Supabase Direct:5432 $25-40/mo
-- Fly.io 60초 idle timeout → 15초 SSE heartbeat
+- Fly.io 60초 idle timeout → 20초 SSE keepalive
 - 월 예상 $320 (D-004 $500 내)
 
-### 아키텍처 핵심 결정 (21건 수정 완료)
-- LangGraph >= 1.0.8, Native Tool-Based Supervisor
+### 아키텍처 핵심 결정 (21건 수정 + 6건 불일치 해소)
+- LangGraph >= 1.0.10, Native Tool-Based Supervisor
 - 8 에이전트: Supervisor, PM, Architect, Developer, QA, Judge, DevOps, Researcher
 - 6단계 사용자 체크포인트 (경쟁사 차별점)
-- 구조화 JSON TaskSpec 통신 (자유 텍스트 금지)
+- 구조화 JSON TaskSpec 통신 (Pydantic BaseModel, 12필드)
 - Judge Agent 독립 검증 (정확도 ~10%→~70%)
 - 점진적 자율성 게이트 (90% 자동승인, 70% 재활성화)
 - Graceful Degradation: LLM fallback, E2B "코드만" 모드, Supabase InMemory 임시
 - 동시성: thread 10, E2B 5, DB 15, Redis 글로벌 비용 카운터
+- 작업당 LLM 호출 최대 15회 (R-012)
+- MCP SSE transport (supervisord 환경)
+- SaaS 4-tier 과금: Starter(무료)/Pro($49)/Business($149)/Enterprise(커스텀)
+- BEP 15~20명, 안정기 마진 85~90%
 
 ---
 
 ## 6. 웹 Claude 인수인계 사항
 
 ### 6-1. 최신 상태
-- CEO-DIRECTIVES v2.0 확정
-- 설계서 v1.1-final 확정 (21건 수정 반영)
-- 보고서 3건 실제 내용 작성
+- CEO-DIRECTIVES v2.1 확정 (LangGraph 1.0.10, MCP SSE, LLM 15회 한도, R-012 추가)
+- 설계서 v1.1 통합본(27섹션) 신규 생성: `design/aads-architecture-v1.1.md`
+- 기존 설계서 `design/aads-architecture-v1.md` DEPRECATED 처리
+- 6건 불일치 해소 완료 (가격 3건, MCP transport, LangGraph 버전, LLM 호출 한도)
 - **Phase 1 구현 즉시 착수 가능**
 
 ### 6-2. 웹 Claude가 해야 할 일
-1. Phase 1.1 구현 지시서 발행 (12일 로드맵)
+1. Phase 1 Week 1 구현 지시서 발행 (3-agent 최소 체인)
 2. 구현 진행 중 교차검증 및 이슈 대응
 
 ### 6-3. 대표님 확인 사항
 - [x] INIT-DOCS push 완료
 - [x] 설계서 v1.1-final 확정
 - [x] 21건 수정사항 반영
+- [x] 설계서 v1.1 통합본(27섹션) 확정
+- [x] 6건 불일치 해소
 - [ ] Phase 1 구현 착수 최종 승인
 - [ ] AADS 생성 프로젝트 범위 (웹앱? 모바일? API?)
 
@@ -117,6 +125,7 @@
 - 웹 Claude 서버 접근 불가 → Cursor/Claude Code 경유
 - `langgraph-supervisor` 프로덕션 사용 금지 (R-010)
 - Supabase Supavisor 경유 금지 (R-011)
+- 작업당 LLM 호출 최대 15회 (R-012)
 
 ---
 
@@ -134,3 +143,4 @@
 |------|------|------|
 | v1.0 | 2026-02-28 | 초판 — 리서치 완료, 인계서 구축 |
 | v2.0 | 2026-02-28 | 대규모 개정 — CEO-DIRECTIVES v2.0, 설계서 v1.1-final, 보고서 3건 완성, 21건 수정 반영 |
+| v2.1 | 2026-03-01 | PUSH-007 — 설계서 v1.1 통합본(27섹션), CEO-DIRECTIVES v2.1, 기존 설계서 DEPRECATED, 6건 불일치 해소 |

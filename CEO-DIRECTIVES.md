@@ -1,5 +1,5 @@
 # CEO DIRECTIVES – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-02-28 (v2.0)
+> 최종 업데이트: 2026-03-01 (v2.1)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션에서 필수 읽기. 이 문서의 지시를 위반하는 설계/분석은 무효.
 
@@ -70,7 +70,7 @@
 ## 2. 기술적 지시
 
 ### T-001 멀티 에이전트 아키텍처
-- **프레임워크**: LangGraph >= 1.0.8 (최신 1.0.8, 2026-02-19 릴리스)
+- **프레임워크**: LangGraph >= 1.0.10 (최신 1.0.10, 2026-02-27 릴리스)
 - **패턴**: **Native Tool-Based Supervisor** (LangGraph StateGraph 직접 구현)
 - `langgraph-supervisor` 라이브러리는 MCP 루프 버그(GitHub #249, 미해결)로 프로덕션 사용 금지. 프로토타입 참고만 허용
 - **상태 관리**: PostgreSQL AsyncPostgresSaver + Supabase 직접 연결(port 5432)
@@ -96,10 +96,10 @@
 ### T-003 MCP 서버 스택
 - **Phase 1 필수 (7개)**: Filesystem, Git/GitHub, PostgreSQL, Brave Search, Memory, Supabase, Fetch
 - **Phase 2 확장 (3개)**: Puppeteer(브라우저 자동화), Sentry(에러 추적), Slack(팀 알림)
-- **프로세스 관리**: FastAPI lifespan에서 `MultiServerMCPClient` 1회 초기화, 앱 수명 내내 유지
+- **프로세스 관리**: supervisord로 MCP 서버 프로세스 관리, FastAPI lifespan에서 `MultiServerMCPClient` 초기화
 - **상시 가동 4개**: Filesystem, Git, Memory, PostgreSQL (~200-400MB)
 - **온디맨드 3개**: GitHub, Brave Search, Fetch (필요 시만 스폰, 메모리 절약)
-- **전송 방식**: stdio 기본, SSE/HTTP는 원격 MCP 서버에만 사용
+- **전송 방식**: supervisord 환경에서는 SSE transport (localhost), 직접 호출 시 stdio. 원격 MCP 서버는 SSE/HTTP
 - **인증**: 환경 변수로 토큰 주입
 
 ### T-004 샌드박스 & 배포 인프라
@@ -114,7 +114,7 @@
 | MCP 서버 | Fly.io 동일 컨테이너 내 | 포함 |
 
 ### T-005 AADS 기술 스택
-- **오케스트레이션**: LangGraph >= 1.0.8 (Native StateGraph, `langgraph-supervisor` 사용 금지)
+- **오케스트레이션**: LangGraph >= 1.0.10 (Native StateGraph, `langgraph-supervisor` 사용 금지)
 - **AI API**: Anthropic Claude API (메인), OpenAI API (보조), Google Gemini API (데이터)
 - **MCP**: `langchain-mcp-adapters` + `MultiServerMCPClient`
 - **샌드박스**: E2B (Sandbox-as-Tool 패턴)
@@ -122,7 +122,7 @@
 - **캐싱**: Upstash Redis
 - **관측성**: LangSmith Free Tier (5K traces/월) — 초과 시 Langfuse OSS 전환 검토
 - **프론트엔드**: Next.js (latest stable) + React + Tailwind CSS
-- **백엔드 API**: FastAPI (Python 3.11+) + uvloop
+- **백엔드 API**: FastAPI (Python 3.12+) + Uvicorn
 - **배포**: Fly.io (API) + Vercel (프론트)
 - **CI/CD**: GitHub Actions → Fly.io 자동 배포 + health-check rollback
 
@@ -141,7 +141,7 @@
 ### T-007 에이전트 간 통신 프로토콜
 - 에이전트 간 작업 위임은 **구조화 JSON 태스크 스펙(TaskSpec)**으로 수행
 - PM Agent가 CEO 고수준 명령을 구조화 JSON으로 변환
-- TaskSpec 필수 필드: `task_id`, `description`, `assigned_agent`, `dependencies`, `success_criteria`, `constraints`, `max_iterations`
+- TaskSpec 필수 필드: `task_id`, `parent_task_id`, `description`, `assigned_agent`, `success_criteria`, `constraints`, `input_artifacts`, `output_artifacts`, `max_iterations`, `max_llm_calls`, `budget_limit_usd`, `status`
 - 자연어 메시지는 히스토리에 보존하되, 핵심 지시는 TaskSpec으로 전달
 
 ### T-008 Judge Agent 및 품질 게이트
@@ -171,13 +171,12 @@
 - R-007: 기존 서비스(aads-server 파이프라인) 중단/변경 시 반드시 CEO 승인
 - R-008: CEO에게 파일을 보고할 때는 반드시 GitHub **브라우저 경로** 사용. 형식: `https://github.com/moongoby-GO100/aads-docs/blob/main/{파일경로}`. `raw.githubusercontent.com` URL은 HTTP 200 검증 용도로만 내부 사용, CEO 보고에는 절대 포함 금지.
 - R-009: 작업 완료 후 CEO 보고 형식:
-```
 푸시 완료했습니다.
-- [파일명]: https://github.com/moongoby-GO100/aads-docs/blob/main/{경로}
-- HANDOVER: https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md
-```
+
+HANDOVER: https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md
 - R-010: `langgraph-supervisor` 라이브러리는 MCP 루프 버그(GitHub #249)로 프로덕션 코드에 사용 금지. 프로토타입 참고만 허용.
 - R-011: Supabase 연결 시 반드시 직접 연결(port 5432) 사용. Supavisor/PgBouncer(port 6543) 경유 금지 (AsyncPostgresSaver pipeline 충돌).
+- R-012: 작업당 LLM 호출 최대 15회. 초과 시 자동 중단 후 Supervisor에 에스컬레이션.
 
 ---
 
@@ -188,3 +187,4 @@
 | v1.0 | 2026-02-28 | 초판 — D-001~D-008, T-001~T-006, 절대 규칙 |
 | v1.1 | 2026-02-28 | 절대 규칙 추가: R-NEW-1 브라우저 URL 보고, R-NEW-2 완료 보고 형식 |
 | v2.0 | 2026-02-28 | 대규모 개정 — 21건 수정사항 반영. D-009/D-010 추가, T-001~T-006 전면 수정(가격 정정, LangGraph 1.0.8, Native Supervisor, Judge Agent, 구조화 JSON, 점진적 자율성), T-007~T-009 신규, R-001~R-011 정리 |
+| v2.1 | 2026-03-01 | LangGraph 1.0.10 상향, MCP SSE transport 반영, LLM 호출 한도 15회 명시(R-012), T-007 TaskSpec 필드 12개로 확장, 6건 불일치 해소 |

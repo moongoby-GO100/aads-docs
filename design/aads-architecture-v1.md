@@ -1,3 +1,6 @@
+> ⚠️ **DEPRECATED** — 이 문서는 `design/aads-architecture-v1.1.md`로 대체되었습니다.
+> 최신 설계서: [aads-architecture-v1.1.md](./aads-architecture-v1.1.md)
+
 # AADS Phase 1 Architecture Design Document
 > Version: 1.1-final | Date: 2026-02-28 | Author: CEO-AI (web Claude)
 > Status: **확정** — CEO 승인 완료, 구현 착수 가능
