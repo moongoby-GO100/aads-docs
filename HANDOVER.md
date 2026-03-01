@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-01 (v2.1 — 설계서 v1.1 통합본, CEO-DIRECTIVES v2.1, 6건 불일치 해소)
+> 최종 업데이트: 2026-03-02 (v2.2 — Phase 1 Week 1 구현 완료, aads-server 신규 저장소)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -39,6 +39,7 @@
 | REPORT-PLACEHOLDER | 02-28 | 3778986 | 200 | 보고서 placeholder 3건 |
 | PUSH-006 | 02-28 | 7dfd454 | 200 | CEO-DIRECTIVES v2.0 + 설계서 v1.1-final (21건 수정) + 보고서 3건 실제 내용 + HANDOVER v2.0 |
 | **PUSH-007** | **03-01** | **0f6b5a1** | **200** | **설계서 v1.1 통합본 신규(27섹션), CEO-DIRECTIVES v2.1, 기존 설계서 DEPRECATED, 6건 불일치 해소** |
+| **PUSH-008** | **03-02** | **ac0c85f** | **200** | **Phase 1 Week 1 구현 완료: aads-server 신규 저장소, 3-agent chain (PM→Supervisor→Developer), LangGraph 1.0.10 StateGraph, AsyncPostgresSaver 3.0.4, FastAPI 0.134.0, E2B AsyncSandbox, R-012 비용추적, 6/6 단위테스트 통과** |
 
 ---
 
@@ -46,7 +47,8 @@
 
 | Task ID | 상태 | 내용 |
 |---------|------|------|
-| PHASE1-IMPL | **착수 가능** | Phase 1 코어 구현 (15일/3주 예상). 설계서 v1.1 통합본 확정 완료. |
+| PHASE1-W1 | **완료** | aads-server Week 1: 3-agent chain, StateGraph, FastAPI 엔드포인트, 단위테스트 6/6 |
+| PHASE1-W2 | **착수 가능** | Week 2: QA/Judge 에이전트 추가, MCP 연결, Fly.io 배포, E2B 실제 API 키 연동 |
 
 ---
 
