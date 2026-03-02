@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-02 (v3.0 — PHASE15-CICD-002 GitHub Actions CI/CD)
+> 최종 업데이트: 2026-03-02 (v3.1 — PHASE15-INTEGRATION-003 8-agent 통합 검증 + SSE 스트리밍)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -50,7 +50,8 @@
 | **PHASE1-W2-004** | **03-02** | **d2d0944** | **200** | **PHASE1-W2-004 — Docker Compose 배포 + Nginx 리버스 프록시, aads.newtalk.kr/api/v1/health ✅** |
 | **PHASE1-W2-005** | **03-02** | **d4f7636** | **200** | **PHASE1-W2-005 — 8-agent chain 완성 (Architect/DevOps/Researcher 추가), 45/45 PASS** |
 | **PHASE15-REALTEST-001** | **03-02** | **3fb1fd5** | **200** | **CUR-AADS-PHASE15-REALTEST-001 — HITL 체크포인트(6단계 auto_approve), 비용추적 강화(Redis), /costs API, 56/56 PASS** |
-| **PHASE15-CICD-002** | **03-02** | TBD | **200** | **CUR-AADS-PHASE15-CICD-002 — GitHub Actions CI/CD (unit+E2E 자동화), README 8-agent 반영, HANDOVER 버전이력 정렬** |
+| **PHASE15-CICD-002** | **03-02** | **2f92c1d** | **200** | **CUR-AADS-PHASE15-CICD-002 — GitHub Actions CI/CD (unit+E2E 자동화), README 8-agent 반영, HANDOVER 버전이력 정렬** |
+| **PHASE15-INTEGRATION-003** | **03-02** | **8f6838d** | **200** | **CUR-AADS-PHASE15-INTEGRATION-003 — 8-agent 통합 E2E 테스트(3 시나리오), SSE 스트리밍(/stream), 프로젝트 상태 API(/status), CI Python 3.12, 63/63 PASS** |
 
 ---
 
@@ -175,3 +176,4 @@
 | v2.8 | 2026-03-02 | PHASE1-W2-005 8-agent chain 완성: Architect/DevOps/Researcher 추가, 45/45 PASS |
 | v2.9 | 2026-03-02 | PHASE15-REALTEST-001: HITL 체크포인트, 비용추적 강화(Redis), /costs API, 56/56 PASS |
 | v3.0 | 2026-03-02 | PHASE15-CICD-002: GitHub Actions CI/CD, README 8-agent 반영, 버전이력 정렬 |
+| v3.1 | 2026-03-02 | PHASE15-INTEGRATION-003: 8-agent 통합 E2E 테스트(3 시나리오), SSE 스트리밍, 프로젝트 상태 API, CI Python 3.12, 63/63 PASS |
