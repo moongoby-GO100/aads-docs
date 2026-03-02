@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-02 (v2.2 — Phase 1 Week 1 구현 완료, aads-server 신규 저장소)
+> 최종 업데이트: 2026-03-02 (v2.3 — CAPABILITY-MAP/INFRA-STRATEGY 추가, CEO 확정사항 반영)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -40,6 +40,9 @@
 | PUSH-006 | 02-28 | 7dfd454 | 200 | CEO-DIRECTIVES v2.0 + 설계서 v1.1-final (21건 수정) + 보고서 3건 실제 내용 + HANDOVER v2.0 |
 | **PUSH-007** | **03-01** | **0f6b5a1** | **200** | **설계서 v1.1 통합본 신규(27섹션), CEO-DIRECTIVES v2.1, 기존 설계서 DEPRECATED, 6건 불일치 해소** |
 | **PUSH-008** | **03-02** | **ac0c85f** | **200** | **Phase 1 Week 1 구현 완료: aads-server 신규 저장소, 3-agent chain (PM→Supervisor→Developer), LangGraph 1.0.10 StateGraph, AsyncPostgresSaver 3.0.4, FastAPI 0.134.0, E2B AsyncSandbox, R-012 비용추적, 6/6 단위테스트 통과** |
+| **PUSH-009** | **03-02** | **26aad5f** | **200** | **model_router T-002 가격/모델 정정 (10건), sandbox.py tenacity retry 추가** |
+| **CAPABILITY-MAP-001~004** | **03-02** | **42e2e1b** | **200** | **AADS 능력 확장 전방위 검토: 12개 영역 분석, 9개 자체구축+3개 외부API 확정** |
+| **INFRA-STRATEGY-001** | **03-02** | **42e2e1b** | **200** | **인프라 전략: DO→Contabo 이전 계획, 월 $64~$172 목표, DO Droplet 리사이즈 승인** |
 
 ---
 
@@ -98,6 +101,13 @@
 - SaaS 4-tier 과금: Starter(무료)/Pro($49)/Business($149)/Enterprise(커스텀)
 - BEP 15~20명, 안정기 마진 85~90%
 
+### CEO 확정 사항 (2026-03-02)
+- **능력 확장**: 12개 영역 중 9개 자체구축 + 3개 외부API (Groq Whisper/Google TTS/DALL-E 3)
+- **인프라 전략**: DO→Contabo VPS 30 이전 (2026-04-01 목표), 월 $84 절감 (88%)
+- **월 운영비 목표**: Contabo $12 + LLM $50~150 + 외부API $2~10 = **$64~172/월**
+- **GPU 구매 안 함**: 외부 API 활용으로 12개월 $1,936~$2,540 절감
+
+
 ---
 
 ## 6. 웹 Claude 인수인계 사항
@@ -147,3 +157,4 @@
 | v2.0 | 2026-02-28 | 대규모 개정 — CEO-DIRECTIVES v2.0, 설계서 v1.1-final, 보고서 3건 완성, 21건 수정 반영 |
 | v2.1 | 2026-03-01 | PUSH-007 — 설계서 v1.1 통합본(27섹션), CEO-DIRECTIVES v2.1, 기존 설계서 DEPRECATED, 6건 불일치 해소 |
 | v2.2 | 2026-03-02 | PUSH-008 — Phase 1 Week 1 구현 완료: aads-server 3-agent chain, 6/6 테스트 |
+| v2.3 | 2026-03-02 | PUSH-009 완료 확인, CAPABILITY-MAP 001~004 + INFRA-STRATEGY-001 추가, CEO 확정사항(9자체구축+3외부API, DO→Contabo 전략, $64~$172/월) 반영 |
