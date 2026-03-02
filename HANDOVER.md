@@ -9,7 +9,8 @@
 
 - **AADS (Autonomous AI Development System)**: 멀티 AI 에이전트가 조직처럼 협업하여 소프트웨어를 자율 개발하는 시스템
 - **AADS 자체가 프로덕트** — 먼저 AADS를 완성하여 서비스 배포, 이후 첫 프로젝트 HealthMate
-- 저장소: github.com/moongoby-GO100/aads-docs (문서), github.com/moongoby-GO100/aads-server (서버)
+- 저장소: github.com/moongoby-GO100/aads-docs (문서), github.com/moongoby-GO100/aads-server (서버), github.com/moongoby-GO100/aads-dashboard (Phase 2 대시보드)
+- **대시보드**: https://aads.newtalk.kr/ (Next.js 16, React, Tailwind CSS)
 - 서버: aads.newtalk.kr
 - 파이프라인 대시보드: https://aads.newtalk.kr/projects/2a0647ca
 - GitHub PAT 'aads-server': 권한 repo + workflow, 만료 2026-05-27
@@ -64,7 +65,8 @@
 |---------|------|------|
 | PHASE1-W1 | **완료** | aads-server Week 1: 3-agent chain, StateGraph, FastAPI 엔드포인트, 단위테스트 6/6 |
 | PHASE1-W2 | **완료** | W2-001 ✅, W2-002 ✅, W2-003 ✅, W2-004 배포 ✅, W2-005 8-agent ✅ → Phase 1 코어 8-agent 완성 |
-| PHASE1.5 | **진행 중** | REALTEST-001 ✅, CICD-002 ✅ → 다음: REALTEST-003 실제 E2B 프로젝트 생성 또는 Phase 2 대시보드 |
+| PHASE1.5 | **완료** | REALTEST-001 ✅, CICD-002 ✅, INTEGRATION-003 ✅ |
+| PHASE2 | **진행 중** | DASHBOARD-001 ✅, DASHBOARD-002 ✅ → 다음: E2B 실전 연동 테스트 또는 대시보드 추가 기능 |
 
 ---
 
@@ -75,7 +77,7 @@
 | AADS 코어 구현 (LangGraph Native Supervisor + 8 에이전트) | 설계서 확정 ✅ | ★★★★★ |
 | AADS 서비스 배포 (Fly.io + Vercel) | 코어 완료 | ★★★★★ |
 | CI/CD (.github/workflows) | 코어 완료 | ★★★★ |
-| AADS 대시보드 (Phase 2) | 코어 배포 후 | ★★★ |
+| AADS 대시보드 (Phase 2) | ✅ DASHBOARD-001 완료 | ★★★ |
 | MCP 서버 구성 가이드 | 코어 구현 시 동시 | ★★★ |
 | HealthMate | AADS 완성 후 | ★★ |
 
@@ -126,25 +128,30 @@
 
 ## 6. 웹 Claude 인수인계 사항
 
-### 6-1. 최신 상태
-- CEO-DIRECTIVES v2.1 확정 (LangGraph 1.0.10, MCP SSE, LLM 15회 한도, R-012 추가)
-- 설계서 v1.1 통합본(27섹션) 신규 생성: `design/aads-architecture-v1.1.md`
-- 기존 설계서 `design/aads-architecture-v1.md` DEPRECATED 처리
-- 6건 불일치 해소 완료 (가격 3건, MCP transport, LangGraph 버전, LLM 호출 한도)
-- **Phase 1 구현 즉시 착수 가능**
+### 6-1. 최신 상태 (v3.3 기준)
+- **Phase 1 완료**: 8-agent chain, LangGraph 1.0.10, FastAPI, MCP 7개, HITL 체크포인트
+- **Phase 1.5 완료**: REALTEST-001, CICD-002, INTEGRATION-003 — 63/63 테스트 PASS
+- **Phase 2 진행 중**: aads-dashboard (Next.js 16, https://aads.newtalk.kr/), JWT 인증, SSE 모니터
+- CEO-DIRECTIVES v2.2 확정 (Genspark 통합지휘 규칙 포함)
+- 설계서 v1.1 통합본(27섹션): `design/aads-architecture-v1.1.md`
+- GitHub: aads-server (a79d67e), aads-dashboard (8805203), aads-docs (최신)
 
 ### 6-2. 웹 Claude가 해야 할 일
-1. Phase 1 Week 1 구현 지시서 발행 (3-agent 최소 체인)
-2. 구현 진행 중 교차검증 및 이슈 대응
+1. Phase 2 대시보드 고도화 지시 (E2B 실전 연동, 대시보드 추가 기능)
+2. Phase 3 기획 시작 (SaaS 멀티유저, 결제 연동, HealthMate 첫 프로젝트)
+3. 구현 진행 중 교차검증 및 이슈 대응
 
 ### 6-3. 대표님 확인 사항
 - [x] INIT-DOCS push 완료
 - [x] 설계서 v1.1-final 확정
-- [x] 21건 수정사항 반영
-- [x] 설계서 v1.1 통합본(27섹션) 확정
-- [x] 6건 불일치 해소
-- [ ] Phase 1 구현 착수 최종 승인
-- [ ] AADS 생성 프로젝트 범위 (웹앱? 모바일? API?)
+- [x] Phase 1 코어 8-agent 완성 (45/45 PASS)
+- [x] Phase 1.5 실전 검증 완료 (63/63 PASS)
+- [x] GitHub Actions CI/CD 구축
+- [x] aads.newtalk.kr Docker 배포 (API + 대시보드)
+- [x] JWT 인증 기초 구현
+- [ ] AADS_ADMIN_PASSWORD 실제 값 설정 (서버 .env)
+- [ ] E2B 실제 API 키 적용 (실전 코드 생성 테스트)
+- [ ] Phase 3 서비스 범위 확정 (SaaS, HealthMate 등)
 
 ### 6-4. 주의사항
 - PAT 토큰 웹 Claude 세션 간 비유지 → Cursor/Claude Code가 push
@@ -152,6 +159,8 @@
 - `langgraph-supervisor` 프로덕션 사용 금지 (R-010)
 - Supabase Supavisor 경유 금지 (R-011)
 - 작업당 LLM 호출 최대 15회 (R-012)
+- JWT_SECRET_KEY, AADS_ADMIN_PASSWORD → 서버 .env에만 보관 (git 커밋 금지)
+- 차트 라이브러리 추가 금지 (Tailwind CSS 순수 구현)
 
 ---
 
