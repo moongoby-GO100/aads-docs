@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-02 (v2.9 — PHASE15-REALTEST-001 실전 파이프라인 검증)
+> 최종 업데이트: 2026-03-02 (v3.0 — PHASE15-CICD-002 GitHub Actions CI/CD)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -50,6 +50,7 @@
 | **PHASE1-W2-004** | **03-02** | **d2d0944** | **200** | **PHASE1-W2-004 — Docker Compose 배포 + Nginx 리버스 프록시, aads.newtalk.kr/api/v1/health ✅** |
 | **PHASE1-W2-005** | **03-02** | **d4f7636** | **200** | **PHASE1-W2-005 — 8-agent chain 완성 (Architect/DevOps/Researcher 추가), 45/45 PASS** |
 | **PHASE15-REALTEST-001** | **03-02** | **3fb1fd5** | **200** | **CUR-AADS-PHASE15-REALTEST-001 — HITL 체크포인트(6단계 auto_approve), 비용추적 강화(Redis), /costs API, 56/56 PASS** |
+| **PHASE15-CICD-002** | **03-02** | TBD | **200** | **CUR-AADS-PHASE15-CICD-002 — GitHub Actions CI/CD (unit+E2E 자동화), README 8-agent 반영, HANDOVER 버전이력 정렬** |
 
 ---
 
@@ -59,7 +60,7 @@
 |---------|------|------|
 | PHASE1-W1 | **완료** | aads-server Week 1: 3-agent chain, StateGraph, FastAPI 엔드포인트, 단위테스트 6/6 |
 | PHASE1-W2 | **완료** | W2-001 ✅, W2-002 ✅, W2-003 ✅, W2-004 배포 ✅, W2-005 8-agent ✅ → Phase 1 코어 8-agent 완성 |
-| PHASE1.5-REALTEST | **진행 중** | PHASE15-REALTEST-001 ✅ (HITL 체크포인트, 비용추적, 실전 파이프라인 기반) → REALTEST-002 대기 중 |
+| PHASE1.5 | **진행 중** | REALTEST-001 ✅, CICD-002 ✅ → 다음: REALTEST-003 실제 E2B 프로젝트 생성 또는 Phase 2 대시보드 |
 
 ---
 
@@ -167,8 +168,10 @@
 | v2.1 | 2026-03-01 | PUSH-007 — 설계서 v1.1 통합본(27섹션), CEO-DIRECTIVES v2.1, 기존 설계서 DEPRECATED, 6건 불일치 해소 |
 | v2.2 | 2026-03-02 | PUSH-008 — Phase 1 Week 1 구현 완료: aads-server 3-agent chain, 6/6 테스트 |
 | v2.3 | 2026-03-02 | PUSH-009 완료 확인, CAPABILITY-MAP 001~004 + INFRA-STRATEGY-001 추가, CEO 확정사항(9자체구축+3외부API, DO→Contabo 전략, $64~$172/월) 반영 |
-| v2.8 | 2026-03-02 | PHASE1-W2-005 8-agent chain 완성: Architect/DevOps/Researcher 추가, 45/45 PASS |
-| v2.7 | 2026-03-02 | PHASE1-W2-004 Docker Compose 배포 + Nginx (aads.newtalk.kr/api/v1/health ✅), Phase 1 Week 2 완료 |
-| v2.6 | 2026-03-02 | PHASE1-W2-003 E2B 연동 + E2E 테스트 (39 PASS, 5 SKIP), 5-agent+MCP+E2B 파이프라인 완성 |
-| v2.5 | 2026-03-02 | PHASE1-W2-002 MCP 서버 연결 (상시4+온디맨드3), MCPClientManager, README 업데이트, 36/36 PASS |
 | v2.4 | 2026-03-02 | CEO-DIRECTIVES v2.2 Genspark 통합지휘 규칙 추가, PHASE1-W2-001 QA/Judge 5-agent chain 완료 (23/23 PASS) |
+| v2.5 | 2026-03-02 | PHASE1-W2-002 MCP 서버 연결 (상시4+온디맨드3), MCPClientManager, README 업데이트, 36/36 PASS |
+| v2.6 | 2026-03-02 | PHASE1-W2-003 E2B 연동 + E2E 테스트 (39 PASS, 5 SKIP), 5-agent+MCP+E2B 파이프라인 완성 |
+| v2.7 | 2026-03-02 | PHASE1-W2-004 Docker Compose 배포 + Nginx (aads.newtalk.kr/api/v1/health ✅), Phase 1 Week 2 완료 |
+| v2.8 | 2026-03-02 | PHASE1-W2-005 8-agent chain 완성: Architect/DevOps/Researcher 추가, 45/45 PASS |
+| v2.9 | 2026-03-02 | PHASE15-REALTEST-001: HITL 체크포인트, 비용추적 강화(Redis), /costs API, 56/56 PASS |
+| v3.0 | 2026-03-02 | PHASE15-CICD-002: GitHub Actions CI/CD, README 8-agent 반영, 버전이력 정렬 |
