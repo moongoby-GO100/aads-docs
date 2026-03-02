@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-02 (v2.4 — CEO-DIRECTIVES v2.2, PHASE1-W2-001 완료)
+> 최종 업데이트: 2026-03-02 (v2.5 — PHASE1-W2-002 MCP 연결 완료)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -45,6 +45,7 @@
 | **INFRA-STRATEGY-001** | **03-02** | **42e2e1b** | **200** | **인프라 전략: DO→Contabo 이전 계획, 월 $64~$172 목표, DO Droplet 리사이즈 승인** |
 | **CEO-DIRECTIVES-v2.2** | **03-02** | **6fcc547** | **200** | **CEO-DIRECTIVES v2.2 — Genspark 통합지휘 규칙 추가 (섹션 4, 9-1~9-8)** |
 | **PHASE1-W2-001** | **03-02** | **f698b4c** | **200** | **PHASE1-W2-001 — QA/Judge 에이전트 추가, 5-agent chain (PM→Supervisor→Developer→QA→Judge), 23/23 PASS** |
+| **PHASE1-W2-002** | **03-02** | **7e59e18** | **200** | **PHASE1-W2-002 — MCP 서버 연결 (상시4+온디맨드3), MCPClientManager, graceful degradation, 36/36 PASS** |
 
 ---
 
@@ -53,7 +54,7 @@
 | Task ID | 상태 | 내용 |
 |---------|------|------|
 | PHASE1-W1 | **완료** | aads-server Week 1: 3-agent chain, StateGraph, FastAPI 엔드포인트, 단위테스트 6/6 |
-| PHASE1-W2 | **진행중** | W2-001 완료(QA/Judge) → 다음: MCP 연결(W2-002), Fly.io 배포(W2-003), E2B API 키(W2-004) |
+| PHASE1-W2 | **진행중** | W2-001 QA/Judge ✅, W2-002 MCP 연결 ✅ → 다음: Fly.io 배포(W2-003), E2B API 키(W2-004) |
 
 ---
 
@@ -160,4 +161,5 @@
 | v2.1 | 2026-03-01 | PUSH-007 — 설계서 v1.1 통합본(27섹션), CEO-DIRECTIVES v2.1, 기존 설계서 DEPRECATED, 6건 불일치 해소 |
 | v2.2 | 2026-03-02 | PUSH-008 — Phase 1 Week 1 구현 완료: aads-server 3-agent chain, 6/6 테스트 |
 | v2.3 | 2026-03-02 | PUSH-009 완료 확인, CAPABILITY-MAP 001~004 + INFRA-STRATEGY-001 추가, CEO 확정사항(9자체구축+3외부API, DO→Contabo 전략, $64~$172/월) 반영 |
+| v2.5 | 2026-03-02 | PHASE1-W2-002 MCP 서버 연결 (상시4+온디맨드3), MCPClientManager, README 업데이트, 36/36 PASS |
 | v2.4 | 2026-03-02 | CEO-DIRECTIVES v2.2 Genspark 통합지휘 규칙 추가, PHASE1-W2-001 QA/Judge 5-agent chain 완료 (23/23 PASS) |
