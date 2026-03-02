@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-02 (v2.6 — PHASE1-W2-003 E2B 연동 + E2E 테스트)
+> 최종 업데이트: 2026-03-02 (v2.7 — PHASE1-W2-004 Docker Compose 배포 + Nginx)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -47,6 +47,7 @@
 | **PHASE1-W2-001** | **03-02** | **f698b4c** | **200** | **PHASE1-W2-001 — QA/Judge 에이전트 추가, 5-agent chain (PM→Supervisor→Developer→QA→Judge), 23/23 PASS** |
 | **PHASE1-W2-002** | **03-02** | **7e59e18** | **200** | **PHASE1-W2-002 — MCP 서버 연결 (상시4+온디맨드3), MCPClientManager, graceful degradation, 36/36 PASS** |
 | **PHASE1-W2-003** | **03-02** | **0bae6a1** | **200** | **PHASE1-W2-003 — E2B 실제 연동 + E2E 테스트 (39 PASS, 5 SKIP, E2B PLACEHOLDER), 5-agent+MCP+E2B 파이프라인 완성** |
+| **PHASE1-W2-004** | **03-02** | **d2d0944** | **200** | **PHASE1-W2-004 — Docker Compose 배포 + Nginx 리버스 프록시, aads.newtalk.kr/api/v1/health ✅** |
 
 ---
 
@@ -55,7 +56,7 @@
 | Task ID | 상태 | 내용 |
 |---------|------|------|
 | PHASE1-W1 | **완료** | aads-server Week 1: 3-agent chain, StateGraph, FastAPI 엔드포인트, 단위테스트 6/6 |
-| PHASE1-W2 | **진행중** | W2-001 QA/Judge ✅, W2-002 MCP ✅, W2-003 E2B E2E ✅ → 다음: Fly.io 배포(W2-004) |
+| PHASE1-W2 | **완료** | W2-001 QA/Judge ✅, W2-002 MCP ✅, W2-003 E2B E2E ✅, W2-004 Docker Compose 배포 ✅ → Phase 1 Week 2 전체 완료 |
 
 ---
 
@@ -108,6 +109,7 @@
 ### CEO 확정 사항 (2026-03-02)
 - **능력 확장**: 12개 영역 중 9개 자체구축 + 3개 외부API (Groq Whisper/Google TTS/DALL-E 3)
 - **인프라 전략**: DO→Contabo VPS 30 이전 (2026-04-01 목표), 월 $84 절감 (88%)
+- **aads-server 배포**: 68서버 Docker Compose, aads.newtalk.kr Nginx 리버스 프록시, 포트 8100 (W2-004 완료)
 - **월 운영비 목표**: Contabo $12 + LLM $50~150 + 외부API $2~10 = **$64~172/월**
 - **GPU 구매 안 함**: 외부 API 활용으로 12개월 $1,936~$2,540 절감
 
@@ -162,6 +164,7 @@
 | v2.1 | 2026-03-01 | PUSH-007 — 설계서 v1.1 통합본(27섹션), CEO-DIRECTIVES v2.1, 기존 설계서 DEPRECATED, 6건 불일치 해소 |
 | v2.2 | 2026-03-02 | PUSH-008 — Phase 1 Week 1 구현 완료: aads-server 3-agent chain, 6/6 테스트 |
 | v2.3 | 2026-03-02 | PUSH-009 완료 확인, CAPABILITY-MAP 001~004 + INFRA-STRATEGY-001 추가, CEO 확정사항(9자체구축+3외부API, DO→Contabo 전략, $64~$172/월) 반영 |
+| v2.7 | 2026-03-02 | PHASE1-W2-004 Docker Compose 배포 + Nginx (aads.newtalk.kr/api/v1/health ✅), Phase 1 Week 2 완료 |
 | v2.6 | 2026-03-02 | PHASE1-W2-003 E2B 연동 + E2E 테스트 (39 PASS, 5 SKIP), 5-agent+MCP+E2B 파이프라인 완성 |
 | v2.5 | 2026-03-02 | PHASE1-W2-002 MCP 서버 연결 (상시4+온디맨드3), MCPClientManager, README 업데이트, 36/36 PASS |
 | v2.4 | 2026-03-02 | CEO-DIRECTIVES v2.2 Genspark 통합지휘 규칙 추가, PHASE1-W2-001 QA/Judge 5-agent chain 완료 (23/23 PASS) |
