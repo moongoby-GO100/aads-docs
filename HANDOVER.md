@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-02 (v2.8 — PHASE1-W2-005 8-agent chain 완성)
+> 최종 업데이트: 2026-03-02 (v2.9 — PHASE15-REALTEST-001 실전 파이프라인 검증)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -49,6 +49,7 @@
 | **PHASE1-W2-003** | **03-02** | **0bae6a1** | **200** | **PHASE1-W2-003 — E2B 실제 연동 + E2E 테스트 (39 PASS, 5 SKIP, E2B PLACEHOLDER), 5-agent+MCP+E2B 파이프라인 완성** |
 | **PHASE1-W2-004** | **03-02** | **d2d0944** | **200** | **PHASE1-W2-004 — Docker Compose 배포 + Nginx 리버스 프록시, aads.newtalk.kr/api/v1/health ✅** |
 | **PHASE1-W2-005** | **03-02** | **d4f7636** | **200** | **PHASE1-W2-005 — 8-agent chain 완성 (Architect/DevOps/Researcher 추가), 45/45 PASS** |
+| **PHASE15-REALTEST-001** | **03-02** | **3fb1fd5** | **200** | **CUR-AADS-PHASE15-REALTEST-001 — HITL 체크포인트(6단계 auto_approve), 비용추적 강화(Redis), /costs API, 56/56 PASS** |
 
 ---
 
@@ -58,6 +59,7 @@
 |---------|------|------|
 | PHASE1-W1 | **완료** | aads-server Week 1: 3-agent chain, StateGraph, FastAPI 엔드포인트, 단위테스트 6/6 |
 | PHASE1-W2 | **완료** | W2-001 ✅, W2-002 ✅, W2-003 ✅, W2-004 배포 ✅, W2-005 8-agent ✅ → Phase 1 코어 8-agent 완성 |
+| PHASE1.5-REALTEST | **진행 중** | PHASE15-REALTEST-001 ✅ (HITL 체크포인트, 비용추적, 실전 파이프라인 기반) → REALTEST-002 대기 중 |
 
 ---
 
