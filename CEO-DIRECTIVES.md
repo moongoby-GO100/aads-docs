@@ -1,5 +1,5 @@
 # CEO DIRECTIVES – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-02 (v2.2)
+> 최종 업데이트: 2026-03-02 (v2.3)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션에서 필수 읽기. 이 문서의 지시를 위반하는 설계/분석은 무효.
 
@@ -107,11 +107,11 @@
 |------|------|------|
 | 에이전트 코드 실행 | E2B Pro | $150–250/월 (사용량 기반, 초기 $100 무료 크레딧) |
 | GPU 태스크 | Modal | 종량제 (Phase 2+) |
-| API 서버 배포 | Fly.io (shared-cpu-2x, **2GB RAM**) | ~$20–50/월 |
+| API 서버 배포 | 68서버 Docker Compose (MVP 단계, SaaS 확장 시 외부 PaaS 이전) | $0 추가 |
 | 프론트엔드 배포 | Vercel Pro | $20/월 |
 | DB + Auth | Supabase Pro (**직접 연결 port 5432**) | $25–40/월 |
 | 캐시 | Upstash Redis | $0–10/월 |
-| MCP 서버 | Fly.io 동일 컨테이너 내 | 포함 |
+| MCP 서버 | 68서버 Docker Compose 내 | 포함 |
 
 ### T-005 AADS 기술 스택
 - **오케스트레이션**: LangGraph >= 1.0.10 (Native StateGraph, `langgraph-supervisor` 사용 금지)
@@ -123,7 +123,7 @@
 - **관측성**: LangSmith Free Tier (5K traces/월) — 초과 시 Langfuse OSS 전환 검토
 - **프론트엔드**: Next.js (latest stable) + React + Tailwind CSS
 - **백엔드 API**: FastAPI (Python 3.12+) + Uvicorn
-- **배포**: Fly.io (API) + Vercel (프론트)
+- **배포**: 68서버 Docker Compose (API, MVP) + Vercel (프론트) → SaaS 확장 시 Fly.io 이전
 - **CI/CD**: GitHub Actions → Fly.io 자동 배포 + health-check rollback
 
 ### T-006 로드맵 (점진적 자율성 확대 전략)
@@ -261,4 +261,5 @@ curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongob
 | v1.1 | 2026-02-28 | 절대 규칙 추가: R-NEW-1 브라우저 URL 보고, R-NEW-2 완료 보고 형식 |
 | v2.0 | 2026-02-28 | 대규모 개정 — 21건 수정사항 반영. D-009/D-010 추가, T-001~T-006 전면 수정(가격 정정, LangGraph 1.0.8, Native Supervisor, Judge Agent, 구조화 JSON, 점진적 자율성), T-007~T-009 신규, R-001~R-011 정리 |
 | v2.1 | 2026-03-01 | LangGraph 1.0.10 상향, MCP SSE transport 반영, LLM 호출 한도 15회 명시(R-012), T-007 TaskSpec 필드 12개로 확장, 6건 불일치 해소 |
+| v2.3 | 2026-03-02 | T-004 배포 전략 변경 (Fly.io → 68서버 Docker Compose, $0 추가, MVP 단계) |
 | v2.2 | 2026-03-02 | Genspark 통합지휘 규칙 섹션 4 추가 (9-1~9-8), Directive 블록 파싱, 보고 형식 표준화 |
