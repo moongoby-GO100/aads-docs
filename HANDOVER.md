@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-02 (v3.4 — LLM 실제 연동 + 8-agent E2E 파이프라인 완전 검증)
+> 최종 업데이트: 2026-03-02 (v3.5 — Phase 2 코드 품질·보안·타입 안정성 강화)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -53,6 +53,7 @@
 | **PHASE15-REALTEST-001** | **03-02** | **3fb1fd5** | **200** | **CUR-AADS-PHASE15-REALTEST-001 — HITL 체크포인트(6단계 auto_approve), 비용추적 강화(Redis), /costs API, 56/56 PASS** |
 | **PHASE15-CICD-002** | **03-02** | TBD | **200** | **CUR-AADS-PHASE15-CICD-002 — GitHub Actions CI/CD (unit+E2E 자동화), README 8-agent 반영, HANDOVER 버전이력 정렬** |
 | **PHASE2-INTEGRATION-003** | **03-02** | TBD | **200** | **8-agent 통합 실행 검증: SSE 스트리밍(/projects/{id}/stream), 프로젝트 상태 API, 3개 E2E 시나리오 테스트** |
+| **PHASE2-POLISH-004** | **03-02** | **2133437** | **200** | **CUR-AADS-PHASE2-POLISH-004 — auth.py hmac.compare_digest, 전역 예외 핸들러, structlog 표준화, API 문서 강화, TS 타입 안정성 0오류** |
 | **PHASE2-DASHBOARD-001** | **03-02** | TBD | **200** | **Phase 2 대시보드 기초: Next.js + React + Tailwind, 6개 페이지, Docker Compose 3100포트, aads.newtalk.kr/** |
 | **PHASE2-DASHBOARD-002** | **03-02** | TBD | **200** | **대시보드 인증(JWT), AgentStatus 파이프라인 시각화, CostTracker 바 차트, 에러 페이지, HANDOVER 섹션6** |
 | **PHASE2-LLM-CONNECT-003** | **03-02** | **4fa9341** | **200** | **실제 LLM 연동: state.py _last_value 리듀서, supervisor 병렬 버그 수정, E2B graceful degradation, 8-agent E2E completed ✅, 45/45 PASS** |
@@ -192,3 +193,4 @@
 | v3.2 | 2026-03-02 | PHASE2-DASHBOARD-001: Next.js 대시보드 기초, Docker Compose, Nginx 통합 |
 | v3.3 | 2026-03-02 | PHASE2-DASHBOARD-002: JWT 인증, 시각화 고도화, 에러 페이지 |
 | v3.4 | 2026-03-02 | PHASE2-LLM-CONNECT-003: 실제 LLM 연동, 8-agent E2E completed, 45/45 PASS |
+| v3.5 | 2026-03-02 | PHASE2-POLISH-004: auth.py 보안 강화(hmac.compare_digest), 전역 예외 핸들러, structlog 표준화, API 문서 강화, aads-dashboard TS 타입 안정성(빌드 오류 0건) |
