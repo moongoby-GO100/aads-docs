@@ -1,5 +1,5 @@
 # CEO DIRECTIVES – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-01 (v2.1)
+> 최종 업데이트: 2026-03-02 (v2.2)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션에서 필수 읽기. 이 문서의 지시를 위반하는 설계/분석은 무효.
 
@@ -180,7 +180,80 @@ HANDOVER: https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md
 
 ---
 
-## 4. 버전 이력
+## 4. Genspark CEO 통합지휘 대화 규칙
+
+### 9-1. 작업 완료의 정의
+- "완료"란 아래 4가지가 모두 충족된 상태만을 의미한다:
+  1. 로컬 파일 수정 완료
+  2. `git add -A && git commit && git push origin main` 성공
+  3. `curl` HTTP 200 확인
+  4. HANDOVER.md 업데이트 완료
+- 위 4가지 중 하나라도 미충족이면 "작업 진행중"으로 보고한다
+- push 전에 "완료"라고 보고하는 것은 금지
+
+### 9-2. 매니저 대화창 보고 형식 (필수)
+매니저 대화창에 보고할 때 반드시 아래 형식을 사용한다:
+
+```
+[CURSOR-AADS] {상태}
+작업: {작업 내용 1줄 요약}
+보고서: https://github.com/moongoby-GO100/aads-docs/blob/main/reports/{파일명}
+커밋: https://github.com/moongoby-GO100/aads-docs/commit/{SHA} 또는 https://github.com/moongoby-GO100/aads-server/commit/{SHA}
+HTTP: {200|실패}
+HANDOVER: {업데이트 완료|미완료}
+다음: {다음 작업 또는 "지시 대기"}
+```
+
+`{상태}` 값: `push 완료` | `작업 진행중` | `문제 발생` | `지시 대기`
+
+### 9-3. 파일명 규칙
+- 보고서: `{TASK_NAME}-{SEQ}.md` (예: CAPABILITY-MAP-001.md, INFRA-STRATEGY-001.md)
+- 보고서 저장 경로: `/root/aads/aads-docs/reports/`
+
+### 9-4. push 전 필수 체크리스트
+모든 commit/push 전에 아래 순서를 반드시 실행한다:
+```bash
+cd /root/aads/aads-docs  # 또는 /root/aads/aads-server
+git add -A && git diff --cached --stat
+git commit -m "[AADS] {type}: {설명}"
+git push origin main
+sleep 5
+curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/{파일경로}
+```
+
+### 9-5. Directive 블록 파싱
+매니저 대화창의 AI가 `>>>DIRECTIVE_START ~ >>>DIRECTIVE_END` 블록으로 지시를 내린다.
+- 이 블록 안의 내용을 순서대로 실행한다
+- 실행 불가능한 항목이 있으면 실행하지 않고 사유를 보고한다
+- 블록 외부의 내용은 맥락 정보이며 실행 대상이 아니다
+
+### 9-6. 세션 시작/복원 프로토콜
+매니저 대화창에 첫 메시지를 보낼 때 아래 형식을 사용한다:
+```
+[CURSOR-AADS] 세션 시작
+- HANDOVER: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/HANDOVER.md
+- CEO-DIRECTIVES: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/CEO-DIRECTIVES.md
+- 최근 완료 3건: {최근 3건}
+- 진행중: {있으면 기재}
+- 착수 가능: {다음 작업}
+- 보류: {보류 항목}
+- 작업 지시 대기
+```
+
+### 9-7. 승인 권한 위임
+- **CEO 직접 승인 필요**: 유료 결제/과금, 프로덕션 서비스 중단, 외부 서비스 계약, CEO-DIRECTIVES 절대 규칙 변경
+- 위 항목 외 모든 승인은 매니저 대화창 AI의 DIRECTIVE 블록 = CEO 승인으로 간주하고 즉시 실행
+- 매니저 AI가 "CEO 승인 필요"라고 명시한 경우에만 CEO에게 직접 확인
+
+### 9-8. 매니저 대화창 라우팅
+| 작업 대상 | 보고 대화창 |
+|----------|------------|
+| AADS | [AADS] 프로젝트 매니저 `https://www.genspark.ai/agents?id=3d86d6f3-09a7-41b2-b91b-762a55512458` |
+| CEO 통합지휘소 | bridge.py 자동 발송 전용 (Cursor 수동 보고 금지) |
+
+---
+
+## 5. 버전 이력
 
 | 버전 | 날짜 | 변경 |
 |------|------|------|
@@ -188,3 +261,4 @@ HANDOVER: https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md
 | v1.1 | 2026-02-28 | 절대 규칙 추가: R-NEW-1 브라우저 URL 보고, R-NEW-2 완료 보고 형식 |
 | v2.0 | 2026-02-28 | 대규모 개정 — 21건 수정사항 반영. D-009/D-010 추가, T-001~T-006 전면 수정(가격 정정, LangGraph 1.0.8, Native Supervisor, Judge Agent, 구조화 JSON, 점진적 자율성), T-007~T-009 신규, R-001~R-011 정리 |
 | v2.1 | 2026-03-01 | LangGraph 1.0.10 상향, MCP SSE transport 반영, LLM 호출 한도 15회 명시(R-012), T-007 TaskSpec 필드 12개로 확장, 6건 불일치 해소 |
+| v2.2 | 2026-03-02 | Genspark 통합지휘 규칙 섹션 4 추가 (9-1~9-8), Directive 블록 파싱, 보고 형식 표준화 |
