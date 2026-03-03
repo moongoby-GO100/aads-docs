@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-03 (v3.6 — MCP 실구동 서버 3개, 에이전트 프롬프트 전면 개선, 테스트 커버리지 43%→62%)
+> 최종 업데이트: 2026-03-03 (v3.7 — STABILITY-006: JWT 86자 보안키, PostgreSQL 로컬 연결, MCP SSE ping 수정, 118 PASS)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -58,6 +58,7 @@
 | **PHASE2-DASHBOARD-001** | **03-02** | TBD | **200** | **Phase 2 대시보드 기초: Next.js + React + Tailwind, 6개 페이지, Docker Compose 3100포트, aads.newtalk.kr/** |
 | **PHASE2-DASHBOARD-002** | **03-02** | TBD | **200** | **대시보드 인증(JWT), AgentStatus 파이프라인 시각화, CostTracker 바 차트, 에러 페이지, HANDOVER 섹션6** |
 | **PHASE2-LLM-CONNECT-003** | **03-02** | **4fa9341** | **200** | **실제 LLM 연동: state.py _last_value 리듀서, supervisor 병렬 버그 수정, E2B graceful degradation, 8-agent E2E completed ✅, 45/45 PASS** |
+| **PHASE2-STABILITY-006** | **03-03** | TBD | **200** | **CUR-AADS-PHASE2-STABILITY-006 — JWT 86자 보안키, AADS_ADMIN_PASSWORD 갱신, 호스트 PostgreSQL 연결(host.docker.internal+iptables), MCP SSE ping stream 수정, checkpointer 3단계 fallback, 118 PASS** |
 
 ---
 
@@ -68,7 +69,7 @@
 | PHASE1-W1 | **완료** | aads-server Week 1: 3-agent chain, StateGraph, FastAPI 엔드포인트, 단위테스트 6/6 |
 | PHASE1-W2 | **완료** | W2-001 ✅, W2-002 ✅, W2-003 ✅, W2-004 배포 ✅, W2-005 8-agent ✅ → Phase 1 코어 8-agent 완성 |
 | PHASE1.5 | **완료** | REALTEST-001 ✅, CICD-002 ✅, INTEGRATION-003 ✅ |
-| PHASE2 | **진행 중** | DASHBOARD-001 ✅, DASHBOARD-002 ✅, LLM-CONNECT-003 ✅, POLISH-004 ✅, **MCP-LIVE-005 ✅** → 다음: E2B 실전 API 키 적용, Docker rebuild 배포 |
+| PHASE2 | **진행 중** | DASHBOARD-001 ✅, DASHBOARD-002 ✅, LLM-CONNECT-003 ✅, POLISH-004 ✅, MCP-LIVE-005 ✅, **STABILITY-006 ✅** → 다음: E2E-FULLCYCLE-007 (P1), PHASE3-PLAN-008 (P2) |
 
 ---
 
@@ -199,3 +200,4 @@
 | v3.4 | 2026-03-02 | PHASE2-LLM-CONNECT-003: 실제 LLM 연동, 8-agent E2E completed, 45/45 PASS |
 | v3.5 | 2026-03-02 | PHASE2-POLISH-004: auth.py 보안 강화(hmac.compare_digest), 전역 예외 핸들러, structlog 표준화, API 문서 강화, aads-dashboard TS 타입 안정성(빌드 오류 0건) |
 | v3.6 | 2026-03-03 | PHASE2-MCP-LIVE-005: MCP 실구동 서버 3개(Filesystem/Git/Memory FastMCP SSE), supervisord.conf, Dockerfile 갱신, MCPClientManager HTTP ping, 에이전트 8개 프롬프트 전면 개선, 테스트 118개(+73), 커버리지 43%→62% |
+| v3.7 | 2026-03-03 | PHASE2-STABILITY-006: JWT 86자 보안키, AADS_ADMIN_PASSWORD 갱신, 호스트 PostgreSQL 연결(host.docker.internal+iptables 5432), MCP SSE ping stream 수정, checkpointer 3단계 fallback(local→supabase→memory), 118 PASS |
