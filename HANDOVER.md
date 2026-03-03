@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-02 (v3.5 — Phase 2 코드 품질·보안·타입 안정성 강화)
+> 최종 업데이트: 2026-03-03 (v3.6 — MCP 실구동 서버 3개, 에이전트 프롬프트 전면 개선, 테스트 커버리지 43%→62%)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -54,6 +54,7 @@
 | **PHASE15-CICD-002** | **03-02** | TBD | **200** | **CUR-AADS-PHASE15-CICD-002 — GitHub Actions CI/CD (unit+E2E 자동화), README 8-agent 반영, HANDOVER 버전이력 정렬** |
 | **PHASE2-INTEGRATION-003** | **03-02** | TBD | **200** | **8-agent 통합 실행 검증: SSE 스트리밍(/projects/{id}/stream), 프로젝트 상태 API, 3개 E2E 시나리오 테스트** |
 | **PHASE2-POLISH-004** | **03-02** | **2133437** | **200** | **CUR-AADS-PHASE2-POLISH-004 — auth.py hmac.compare_digest, 전역 예외 핸들러, structlog 표준화, API 문서 강화, TS 타입 안정성 0오류** |
+| **PHASE2-MCP-LIVE-005** | **03-03** | **046111f** | **200** | **CUR-AADS-PHASE2-MCP-LIVE-005 — MCP 실구동 서버 3개(Filesystem/Git/Memory FastMCP SSE), supervisord.conf, Dockerfile 갱신, MCPClientManager HTTP ping 검증, 에이전트 8개 프롬프트 전면 개선, 테스트 118개(+73), 커버리지 43%→62%** |
 | **PHASE2-DASHBOARD-001** | **03-02** | TBD | **200** | **Phase 2 대시보드 기초: Next.js + React + Tailwind, 6개 페이지, Docker Compose 3100포트, aads.newtalk.kr/** |
 | **PHASE2-DASHBOARD-002** | **03-02** | TBD | **200** | **대시보드 인증(JWT), AgentStatus 파이프라인 시각화, CostTracker 바 차트, 에러 페이지, HANDOVER 섹션6** |
 | **PHASE2-LLM-CONNECT-003** | **03-02** | **4fa9341** | **200** | **실제 LLM 연동: state.py _last_value 리듀서, supervisor 병렬 버그 수정, E2B graceful degradation, 8-agent E2E completed ✅, 45/45 PASS** |
@@ -67,7 +68,7 @@
 | PHASE1-W1 | **완료** | aads-server Week 1: 3-agent chain, StateGraph, FastAPI 엔드포인트, 단위테스트 6/6 |
 | PHASE1-W2 | **완료** | W2-001 ✅, W2-002 ✅, W2-003 ✅, W2-004 배포 ✅, W2-005 8-agent ✅ → Phase 1 코어 8-agent 완성 |
 | PHASE1.5 | **완료** | REALTEST-001 ✅, CICD-002 ✅, INTEGRATION-003 ✅ |
-| PHASE2 | **진행 중** | DASHBOARD-001 ✅, DASHBOARD-002 ✅ → 다음: E2B 실전 연동 테스트 또는 대시보드 추가 기능 |
+| PHASE2 | **진행 중** | DASHBOARD-001 ✅, DASHBOARD-002 ✅, LLM-CONNECT-003 ✅, POLISH-004 ✅, **MCP-LIVE-005 ✅** → 다음: E2B 실전 API 키 적용, Docker rebuild 배포 |
 
 ---
 
@@ -129,13 +130,16 @@
 
 ## 6. 웹 Claude 인수인계 사항
 
-### 6-1. 최신 상태 (v3.3 기준)
+### 6-1. 최신 상태 (v3.6 기준)
 - **Phase 1 완료**: 8-agent chain, LangGraph 1.0.10, FastAPI, MCP 7개, HITL 체크포인트
 - **Phase 1.5 완료**: REALTEST-001, CICD-002, INTEGRATION-003 — 63/63 테스트 PASS
 - **Phase 2 진행 중**: aads-dashboard (Next.js 16, https://aads.newtalk.kr/), JWT 인증, SSE 모니터
+  - MCP-LIVE-005 ✅: Filesystem/Git/Memory 실구동 서버 + supervisord.conf 완성
+  - 에이전트 8개 프롬프트 전면 개선 (역할/원칙/출력형식 구체화)
+  - 테스트 118개, 커버리지 62%
 - CEO-DIRECTIVES v2.2 확정 (Genspark 통합지휘 규칙 포함)
 - 설계서 v1.1 통합본(27섹션): `design/aads-architecture-v1.1.md`
-- GitHub: aads-server (a79d67e), aads-dashboard (8805203), aads-docs (최신)
+- GitHub: aads-server (**046111f**), aads-dashboard (2ea0348), aads-docs (최신)
 
 ### 6-2. 웹 Claude가 해야 할 일
 1. Phase 2 대시보드 고도화 지시 (E2B 실전 연동, 대시보드 추가 기능)
@@ -194,3 +198,4 @@
 | v3.3 | 2026-03-02 | PHASE2-DASHBOARD-002: JWT 인증, 시각화 고도화, 에러 페이지 |
 | v3.4 | 2026-03-02 | PHASE2-LLM-CONNECT-003: 실제 LLM 연동, 8-agent E2E completed, 45/45 PASS |
 | v3.5 | 2026-03-02 | PHASE2-POLISH-004: auth.py 보안 강화(hmac.compare_digest), 전역 예외 핸들러, structlog 표준화, API 문서 강화, aads-dashboard TS 타입 안정성(빌드 오류 0건) |
+| v3.6 | 2026-03-03 | PHASE2-MCP-LIVE-005: MCP 실구동 서버 3개(Filesystem/Git/Memory FastMCP SSE), supervisord.conf, Dockerfile 갱신, MCPClientManager HTTP ping, 에이전트 8개 프롬프트 전면 개선, 테스트 118개(+73), 커버리지 43%→62% |
