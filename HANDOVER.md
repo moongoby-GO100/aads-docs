@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-05 (v5.5 — T-039: 모바일 QA 파이프라인 — Android 에뮬레이터(KVM)+Appium+Gemini Vision 6항목 감리, /api/v1/mobile-qa/* 5 엔드포인트, IOS-QA-SETUP.md, QA Agent mobile_android|mobile_ios 분기; v5.4 — T-036: GET /context/public-summary 읽기전용 엔드포인트 200 PASS, 민감 데이터 0건; T-037: bridge.py 대화분류/저장(classify_aads_conversation 7카테고리), memory_helper.sh save_manager_report() 추가; v5.3 — T-035: 모바일 반응형 최적화 — Sidebar 햄버거 메뉴, ClientLayout, 로그인 풀스크린)
+> 최종 업데이트: 2026-03-05 (v5.6 — T-038: 매니저 협업 API 4개 엔드포인트 (GET /memory/search, GET /memory/ceo-decisions, POST /memory/cross-message, GET /memory/inbox/{agent_id}), 매니저 레지스트리 6건 등록 (SALES/FINANCE/CONTENT/QA/CUSTOMER/INVESTMENT MGR), INTERVAL make_interval 버그 수정, memory.py+mobile_qa.py 컨테이너 배포; v5.5 — T-039: 모바일 QA 파이프라인 — Android 에뮬레이터(KVM)+Appium+Gemini Vision 6항목 감리, /api/v1/mobile-qa/* 5 엔드포인트, IOS-QA-SETUP.md, QA Agent mobile_android|mobile_ios 분기; v5.4 — T-036: GET /context/public-summary 읽기전용 엔드포인트 200 PASS, 민감 데이터 0건; T-037: bridge.py 대화분류/저장(classify_aads_conversation 7카테고리), memory_helper.sh save_manager_report() 추가; v5.3 — T-035: 모바일 반응형 최적화 — Sidebar 햄버거 메뉴, ClientLayout, 로그인 풀스크린)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
