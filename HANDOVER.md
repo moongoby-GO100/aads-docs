@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-04 (v4.7 — T-027: ShortFlow 영상 품질 게이트 + 자동 보정 루프)
+> 최종 업데이트: 2026-03-04 (v4.8 — T-028: 뉴톡 이미지 검수 + 211/116 서버 클라이언트 배포)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -67,6 +67,7 @@
 | **T-025** | **03-04** | **17bf032** | **200** | **LLM 디자인 감리 엔진 6단계 스코어카드: design_auditor.py(DesignAuditor 클래스), AUDIT_PROMPT(5개 항목 10점), Gemini 2.5 Flash Vision→Claude Sonnet Vision fallback, AuditResult(PASS/CONDITIONAL/FAIL), generate_report(마크다운), 2개 신규 API(POST /visual-qa/audit, GET /visual-qa/audit/{project_id}/latest), experience_memory 자동저장(experience_type=design_audit)** |
 | **T-026** | **03-04** | **71a4f0a** | **200** | **QA Agent 통합 — Visual Regression + LLM 감리 + CEO 알림: agents/qa.py(5단계 파이프라인 통합), services/qa_pipeline.py(run_full_qa → AUTO PASS/CEO 확인 요청/AUTO FAIL 판정), services/ceo_notify.py(텔레그램+Context API), POST /visual-qa/full-qa 엔드포인트, Context API qa_results+qa_notifications 저장** |
 | **T-027** | **03-04** | **9f0cc1c** | **200** | **ShortFlow 영상 품질 게이트 + 자동 보정 루프: benchmark_spec.py(BenchmarkSpecExtractor — Gemini→Claude Vision, spec_to_ffmpeg_params, system_memory 저장), auto_correction.py(AutoCorrector — CORRECTION_MAP 6항목, analyze_failures, generate_correction_params, create_correction_directive), visual_qa.py 3개 신규 엔드포인트(POST /quality-gate, GET /benchmark-specs/{project}/{channel}, POST /extract-spec), scripts/shortflow_quality_gate.sh(211서버 cron 직전 호출), VIDEO_QA_PROMPT(6항목 60점), FFmpeg 프레임 추출, AUTO_PUBLISH(85%+)/CONDITIONAL(70-84%)/AUTO_REJECT(<70%) 판정** |
+| **T-028** | **03-04** | **TBD** | **200** | **뉴톡 이미지 검수 + 211/116 서버 클라이언트 배포: IMAGE_AUDIT_PROMPT(이커머스 6항목 60점 스코어카드 — resolution_clarity/background_quality/product_visibility/color_accuracy/text_overlay/commercial_readiness), DesignAuditor.audit_product_image/audit_product_images_batch 메서드 추가, visual_qa.py 2개 신규 엔드포인트(POST /image-qa, POST /image-quality-gate), scripts/aads_qa_client.sh(image-qa/image-gate 명령 추가, quality-gate 통합), docs/SHORTFLOW-QA-INTEGRATION.md+NEWTALK-QA-INTEGRATION.md 생성, PASS 48+(80%)/CONDITIONAL 36-47/FAIL 35이하** |
 
 ---
 
@@ -241,7 +242,7 @@
 
 ---
 
-## 13. Visual QA & Quality Gate System (v4.7, T-024~T-027)
+## 13. Visual QA & Quality Gate System (v4.8, T-024~T-028)
 
 ### 웹 QA (T-024, T-025, T-026)
 - **Playwright + Visual Regression**: headless 1920x1080 스크린샷 → Pillow pixelmatch 비교 (diff_percent)
@@ -280,6 +281,26 @@
   - 반환 코드: 0=AUTO_PUBLISH, 2=CONDITIONAL, 3=AUTO_REJECT, 1=ERROR
 - **AADS URL**: `https://aads.newtalk.kr/api/v1/visual-qa/quality-gate`
 - **ShortFlow 영상 경로**: `/data/shortflow/outputs/{channel}/`
+
+### 이미지 검수 (T-028)
+- **IMAGE_AUDIT_PROMPT**: 이커머스 6항목 각 10점, 총 60점
+  - resolution_clarity, background_quality, product_visibility, color_accuracy, text_overlay, commercial_readiness
+- **판정**: PASS 48+(80%) / CONDITIONAL 36-47(60-79%) / FAIL 35이하
+- **DesignAuditor**: `audit_product_image(image_path_or_base64, is_base64)` / `audit_product_images_batch(images, is_base64)`
+- **엔드포인트**:
+  - `POST /api/v1/visual-qa/image-qa` — 이미지 일괄 검수 (ImageQAResponse)
+  - `POST /api/v1/visual-qa/image-quality-gate` — 단일 이미지 품질 게이트 (action: approve|reject)
+
+### 서버 배포 현황 (T-027+T-028)
+
+| 서버 | 역할 | 클라이언트 | 용도 |
+|------|------|-----------|------|
+| 68 (AADS) | 중앙 검수 엔진 | — | 모든 검수 API 처리 |
+| 211 (ShortFlow/GO100) | 영상 생성·업로드 | /root/aads_qa_client.sh | 영상 품질 게이트, 웹 검수 |
+| 116 (뉴톡 V2) | 이미지 저장·서빙 | /root/aads_qa_client.sh | 이미지 품질 게이트, 웹 검수 |
+
+- **aads_qa_client.sh 명령**: `quality-gate`, `image-qa`, `image-gate`
+- **연동 가이드**: `docs/SHORTFLOW-QA-INTEGRATION.md`, `docs/NEWTALK-QA-INTEGRATION.md`
 
 ### CEO 알림
 - Context API `qa_results`+`qa_notifications` 저장 (T-026)
