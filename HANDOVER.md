@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-04 (v4.4 — T-024: Playwright Visual QA 스크린샷 + Visual Regression 기반 구축)
+> 최종 업데이트: 2026-03-04 (v4.5 — T-025: LLM 디자인 감리 엔진 6단계 스코어카드)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -64,6 +64,7 @@
 | **T-019** | **03-04** | **b54ff75** | **200** | **System Memory HANDOVER 데이터 마이그레이션: migrate_handover.py v3.8 재작성, 9카테고리(status/repos/architecture/agents/phase/costs/ceo_directives/pending/history) 30건 INSERT, Docker Postgres(5433) 적재, GET /context/system 9카테고리 확인, GET /context/handover 섹션1~9 완전 마크다운 생성** |
 | **T-021** | **03-04** | **TBD** | **200** | **메모리 시스템 워크플로우 통합: memory_helper.sh(read_context/write_task_result/write_experience/write_error 4함수), claude_exec.sh(Context API 맥락주입+결과기록), auto_trigger.sh(COMPLETED 스킵+phase 자동업데이트), bridge.py(CEO결정감지+ceo_directives 자동저장). nginx User-Agent 필터 우회(curl/7.64.0) 발견.** |
 | **T-024** | **03-04** | **cddeeed** | **200** | **Visual QA 스크린샷 + Visual Regression 기반 구축: VisualQAService(Playwright headless 1920x1080 + Pillow pixelmatch), 4개 API 엔드포인트(capture/compare/set-baseline/baselines), Docker glibc fallback, pyproject.toml playwright+Pillow 추가, Dockerfile chromium install, compare diff_percent=0.0(identical) / 100.0(diff) 검증 완료** |
+| **T-025** | **03-04** | **17bf032** | **200** | **LLM 디자인 감리 엔진 6단계 스코어카드: design_auditor.py(DesignAuditor 클래스), AUDIT_PROMPT(5개 항목 10점), Gemini 2.5 Flash Vision→Claude Sonnet Vision fallback, AuditResult(PASS/CONDITIONAL/FAIL), generate_report(마크다운), 2개 신규 API(POST /visual-qa/audit, GET /visual-qa/audit/{project_id}/latest), experience_memory 자동저장(experience_type=design_audit)** |
 
 ---
 
@@ -275,3 +276,5 @@
 | v4.1 | 2026-03-04 | T-020: Context API POST /context/system 보안 강화 — verify_monitor_key Depends 추가(401), data 반환, Rate Limiting 30회/분/IP(429), curl 전체 테스트 통과 |
 | v4.2 | 2026-03-04 | T-017: HANDOVER v3.8 누락 섹션 추가(Memory System/Chat Endpoint/Sandbox/E2E Test Result), CEO-DIRECTIVES v2.4 완성(D-011~D-013/T-011 추가), System Memory 버전 업데이트 |
 | v4.3 | 2026-03-04 | T-021: 메모리 시스템 워크플로우 통합 — memory_helper.sh 4함수(read/write), claude_exec.sh(맥락주입), auto_trigger.sh(완료스킵+phase업데이트), bridge.py(CEO결정감지). nginx User-Agent 필터(curl/7.64.0) 발견·적용. |
+| v4.4 | 2026-03-04 | T-024: Playwright Visual QA 스크린샷 + Visual Regression 기반 구축 — VisualQAService, 4개 API 엔드포인트, Docker glibc fallback, commit cddeeed |
+| v4.5 | 2026-03-04 | T-025: LLM 디자인 감리 엔진 6단계 스코어카드 — design_auditor.py DesignAuditor 클래스, 5항목 10점 AUDIT_PROMPT, Gemini→Claude Vision fallback, PASS/CONDITIONAL/FAIL 판정, POST /visual-qa/audit + GET /visual-qa/audit/{project_id}/latest, experience_memory 저장, commit 17bf032 |
