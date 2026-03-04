@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-04 (v4.1 — T-020: Context API 보안 강화 완료, POST 인증+Rate Limiting)
+> 최종 업데이트: 2026-03-04 (v4.2 — T-017: HANDOVER v3.8 누락 섹션 추가, CEO-DIRECTIVES v2.4 완성)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -180,6 +180,56 @@
 
 ---
 
+## 9. Memory System (v3.8+)
+
+- **5-Layer Architecture 가동** (PostgreSQL + pgvector 기반)
+- L1: Working Memory (AADSState + AsyncPostgresSaver checkpointer)
+- L2: Project Memory (project_memories 테이블)
+- L3: Experience Memory (experience_memory + pgvector, RIF scoring)
+- L4: System Memory (system_memory 테이블, 9 카테고리)
+- L5: Procedural Memory (procedural_memory 테이블)
+- Context API: `/api/v1/context/*`
+- HANDOVER.md는 System Memory DB에서 자동생성 가능: `GET /api/v1/context/handover`
+- Monitor Key: 설정됨 (읽기전용 API, 서버 .env 보관)
+
+---
+
+## 10. Chat Endpoint (v3.8+)
+
+- **엔드포인트**: `POST /api/v1/chat`
+- 자연어 입력 → 의도 분류 → 액션 라우팅
+- 키워드 기반 룰 라우터 (LLM 비용 $0)
+- Genspark 브릿지 연동 준비 완료
+- 예시: `{"message":"상태 보고"}` → `{"intent":"check_status","action":"GET /api/v1/health + GET /api/v1/context/system/status"}`
+
+---
+
+## 11. Sandbox (v3.8+)
+
+- **Docker 로컬 샌드박스** (E2B 대체, CEO D-011 확정 2026-03-03)
+- 이미지: python:3.12-slim, node:20-slim
+- 보안: `--network=none --memory=512m --cpus=1 --read-only tmpfs:/tmp:100m`
+- 최대 5 동시 컨테이너
+- docker-compose 소켓 마운트: `/var/run/docker.sock`
+- 대형 프로젝트: 사용자 서버 SSH/Docker API (Phase 3)
+- E2B: Phase 3+ SaaS 확장 시 옵션 (현재 PLACEHOLDER)
+
+---
+
+## 12. E2E Test Result (v3.8)
+
+- **프로젝트**: CEO-Test-Calculator
+- **결과**: 7/8 PASS
+  - ✅ health, login, create_project, pipeline, memory, costs, chat_api
+  - ❌ sandbox (E2B_API_KEY=PLACEHOLDER, 실제 키 필요)
+- **LLM 호출**: 8회
+- **비용**: $0.69
+- **Verdict**: **LAUNCH READY**
+- **날짜**: 2026-03-04
+- **커밋**: a69c061
+
+---
+
 ## 7. 업데이트 규칙
 - 모든 Task 완료 시 이 문서 업데이트 필수
 - push 후 raw URL HTTP 200 확인:
@@ -215,3 +265,4 @@
 | v3.9 | 2026-03-04 | T-020: Context API POST 인증 강화(verify_monitor_key), data 반환, Rate Limiting 30회/분/IP |
 | v4.0 | 2026-03-04 | T-019: System Memory HANDOVER 마이그레이션 — 9카테고리 30건 적재, GET /context/system+handover 검증 완료, commit b54ff75 |
 | v4.1 | 2026-03-04 | T-020: Context API POST /context/system 보안 강화 — verify_monitor_key Depends 추가(401), data 반환, Rate Limiting 30회/분/IP(429), curl 전체 테스트 통과 |
+| v4.2 | 2026-03-04 | T-017: HANDOVER v3.8 누락 섹션 추가(Memory System/Chat Endpoint/Sandbox/E2E Test Result), CEO-DIRECTIVES v2.4 완성(D-011~D-013/T-011 추가), System Memory 버전 업데이트 |

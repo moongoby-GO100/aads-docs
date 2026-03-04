@@ -65,6 +65,22 @@
 - 6단계 사용자 체크포인트: 요구사항 대화 → 기획서 승인 → 설계 확인 → 자율 개발 → 중간 확인 → 최종 승인·배포
 - 이 체크포인트가 경쟁사(Bolt, Lovable)와의 핵심 차별점
 
+### D-011: Sandbox 2단계 전략
+- 기본: Docker 로컬 컨테이너 (python:3.12-slim, node:20-slim)
+- 제한: 512MB RAM, 1 CPU, 네트워크 차단, 최대 5동시
+- 대형 프로젝트: 사용자 서버 SSH/Docker API (Phase 3)
+- E2B: 선택사항 (멀티테넌트 SaaS 확장 시)
+
+### D-012: 인프라 컨설팅 서비스
+- Architect Agent가 프로젝트 규모 분석 → 서버 사양 제안
+- 추천 서버: Contabo, Hetzner, Vultr 등 가성비 우선
+
+### D-013: Frontend Dual Strategy
+- 2026년: Genspark AI 채팅 (무료) + AADS Dashboard 병행
+- 브릿지: Genspark ↔ AADS API 연결
+- Chat Endpoint: /api/v1/chat (자연어 → 액션 라우터)
+- 2027년: 자체 채팅 UI 완성 후 Genspark은 선택적 채널
+
 ---
 
 ## 2. 기술적 지시
@@ -179,6 +195,13 @@ SaaS 티어:
 | Pro | 소형+사용자서버 연결 | $49/월 |
 | Enterprise | 전용 서버, 전담 지원 | 커스텀 |
 
+### T-011: 5-Layer Memory Architecture
+- L1: Working Memory (AADSState + AsyncPostgresSaver)
+- L2: Project Memory (project_memory 테이블)
+- L3: Experience Memory (experience_memory + pgvector)
+- L4: System Memory (system_memory, HANDOVER 대체)
+- L5: Procedural Memory (procedural_memory)
+
 ---
 
 ## 3. 절대 규칙 (위반 시 작업 무효)
@@ -282,6 +305,6 @@ curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongob
 | v1.1 | 2026-02-28 | 절대 규칙 추가: R-NEW-1 브라우저 URL 보고, R-NEW-2 완료 보고 형식 |
 | v2.0 | 2026-02-28 | 대규모 개정 — 21건 수정사항 반영. D-009/D-010 추가, T-001~T-006 전면 수정(가격 정정, LangGraph 1.0.8, Native Supervisor, Judge Agent, 구조화 JSON, 점진적 자율성), T-007~T-009 신규, R-001~R-011 정리 |
 | v2.1 | 2026-03-01 | LangGraph 1.0.10 상향, MCP SSE transport 반영, LLM 호출 한도 15회 명시(R-012), T-007 TaskSpec 필드 12개로 확장, 6건 불일치 해소 |
-| v2.4 | 2026-03-03 | 샌드박스 2단계(D-011), 인프라 컨설팅(D-012), 수익 모델(T-010), 월 운영비 $23~$63 |
+| v2.4 | 2026-03-04 | D-011~D-013 추가(Sandbox 2단계, 인프라 컨설팅, Frontend Dual Strategy), T-010~T-011 추가(수익 모델, 5-Layer Memory), D-004 비용 $23~$63 변경 |
 | v2.3 | 2026-03-02 | T-004 배포 전략 변경 (Fly.io → 68서버 Docker Compose, $0 추가, MVP 단계) |
 | v2.2 | 2026-03-02 | Genspark 통합지휘 규칙 섹션 4 추가 (9-1~9-8), Directive 블록 파싱, 보고 형식 표준화 |
