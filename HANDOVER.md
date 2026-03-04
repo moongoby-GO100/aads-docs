@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-04 (v4.5 — T-025: LLM 디자인 감리 엔진 6단계 스코어카드)
+> 최종 업데이트: 2026-03-04 (v4.6 — T-026: QA Agent 통합 — Visual Regression + LLM 감리 + CEO 알림)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -65,6 +65,7 @@
 | **T-021** | **03-04** | **TBD** | **200** | **메모리 시스템 워크플로우 통합: memory_helper.sh(read_context/write_task_result/write_experience/write_error 4함수), claude_exec.sh(Context API 맥락주입+결과기록), auto_trigger.sh(COMPLETED 스킵+phase 자동업데이트), bridge.py(CEO결정감지+ceo_directives 자동저장). nginx User-Agent 필터 우회(curl/7.64.0) 발견.** |
 | **T-024** | **03-04** | **cddeeed** | **200** | **Visual QA 스크린샷 + Visual Regression 기반 구축: VisualQAService(Playwright headless 1920x1080 + Pillow pixelmatch), 4개 API 엔드포인트(capture/compare/set-baseline/baselines), Docker glibc fallback, pyproject.toml playwright+Pillow 추가, Dockerfile chromium install, compare diff_percent=0.0(identical) / 100.0(diff) 검증 완료** |
 | **T-025** | **03-04** | **17bf032** | **200** | **LLM 디자인 감리 엔진 6단계 스코어카드: design_auditor.py(DesignAuditor 클래스), AUDIT_PROMPT(5개 항목 10점), Gemini 2.5 Flash Vision→Claude Sonnet Vision fallback, AuditResult(PASS/CONDITIONAL/FAIL), generate_report(마크다운), 2개 신규 API(POST /visual-qa/audit, GET /visual-qa/audit/{project_id}/latest), experience_memory 자동저장(experience_type=design_audit)** |
+| **T-026** | **03-04** | **71a4f0a** | **200** | **QA Agent 통합 — Visual Regression + LLM 감리 + CEO 알림: agents/qa.py(5단계 파이프라인 통합), services/qa_pipeline.py(run_full_qa → AUTO PASS/CEO 확인 요청/AUTO FAIL 판정), services/ceo_notify.py(텔레그램+Context API), POST /visual-qa/full-qa 엔드포인트, Context API qa_results+qa_notifications 저장** |
 
 ---
 
@@ -278,3 +279,4 @@
 | v4.3 | 2026-03-04 | T-021: 메모리 시스템 워크플로우 통합 — memory_helper.sh 4함수(read/write), claude_exec.sh(맥락주입), auto_trigger.sh(완료스킵+phase업데이트), bridge.py(CEO결정감지). nginx User-Agent 필터(curl/7.64.0) 발견·적용. |
 | v4.4 | 2026-03-04 | T-024: Playwright Visual QA 스크린샷 + Visual Regression 기반 구축 — VisualQAService, 4개 API 엔드포인트, Docker glibc fallback, commit cddeeed |
 | v4.5 | 2026-03-04 | T-025: LLM 디자인 감리 엔진 6단계 스코어카드 — design_auditor.py DesignAuditor 클래스, 5항목 10점 AUDIT_PROMPT, Gemini→Claude Vision fallback, PASS/CONDITIONAL/FAIL 판정, POST /visual-qa/audit + GET /visual-qa/audit/{project_id}/latest, experience_memory 저장, commit 17bf032 |
+| v4.6 | 2026-03-04 | T-026: QA Agent 통합 — Visual Regression + LLM 감리 + CEO 알림 — agents/qa.py 5단계 파이프라인(코드→스크린샷→Visual Regression→LLM 감리→종합판정), services/qa_pipeline.py run_full_qa(AUTO PASS/CEO 확인 요청/AUTO FAIL), services/ceo_notify.py 텔레그램+Context API 저장, POST /visual-qa/full-qa, commit 71a4f0a |
