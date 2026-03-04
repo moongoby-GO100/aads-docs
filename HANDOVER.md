@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-04 (v3.8 — LAUNCH-READY: Docker 샌드박스, E2E 풀사이클, CEO 직접 테스트 가능)
+> 최종 업데이트: 2026-03-04 (v4.0 — T-019: System Memory HANDOVER 데이터 마이그레이션 완료, 9카테고리 30건 적재)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -60,6 +60,8 @@
 | **PHASE2-LLM-CONNECT-003** | **03-02** | **4fa9341** | **200** | **실제 LLM 연동: state.py _last_value 리듀서, supervisor 병렬 버그 수정, E2B graceful degradation, 8-agent E2E completed ✅, 45/45 PASS** |
 | **PHASE2-STABILITY-006** | **03-03** | TBD | **200** | **CUR-AADS-PHASE2-STABILITY-006 — JWT 86자 보안키, AADS_ADMIN_PASSWORD 갱신, 호스트 PostgreSQL 연결(host.docker.internal+iptables), MCP SSE ping stream 수정, checkpointer 3단계 fallback, 118 PASS** |
 | **LAUNCH-READY-010** | **03-04** | **a69c061** | **200** | **Docker 샌드박스(D-011), CEO-DIRECTIVES v2.4, E2E 풀사이클 검증(CEO-Test-Calculator, 8 LLM calls, $0.69), docker-compose 소켓 마운트, 대시보드 접근 OK, 가동 준비 완료** |
+| **T-020** | **03-04** | **TBD** | **200** | **Context API 보안 강화: POST /context/system Monitor Key 인증 추가(401 반환), 응답에 saved data 포함, Rate Limiting 분당 30회/IP(429), 전체 curl 테스트 통과** |
+| **T-019** | **03-04** | **b54ff75** | **200** | **System Memory HANDOVER 데이터 마이그레이션: migrate_handover.py v3.8 재작성, 9카테고리(status/repos/architecture/agents/phase/costs/ceo_directives/pending/history) 30건 INSERT, Docker Postgres(5433) 적재, GET /context/system 9카테고리 확인, GET /context/handover 섹션1~9 완전 마크다운 생성** |
 
 ---
 
@@ -210,3 +212,5 @@
 | v3.6 | 2026-03-03 | PHASE2-MCP-LIVE-005: MCP 실구동 서버 3개(Filesystem/Git/Memory FastMCP SSE), supervisord.conf, Dockerfile 갱신, MCPClientManager HTTP ping, 에이전트 8개 프롬프트 전면 개선, 테스트 118개(+73), 커버리지 43%→62% |
 | v3.7 | 2026-03-03 | PHASE2-STABILITY-006: JWT 86자 보안키, AADS_ADMIN_PASSWORD 갱신, 호스트 PostgreSQL 연결(host.docker.internal+iptables 5432), MCP SSE ping stream 수정, checkpointer 3단계 fallback(local→supabase→memory), 118 PASS |
 | v3.8 | 2026-03-04 | LAUNCH-READY-010: Docker 샌드박스, CEO-DIRECTIVES v2.4, E2E 풀사이클, 가동 준비 완료 |
+| v3.9 | 2026-03-04 | T-020: Context API POST 인증 강화(verify_monitor_key), data 반환, Rate Limiting 30회/분/IP |
+| v4.0 | 2026-03-04 | T-019: System Memory HANDOVER 마이그레이션 — 9카테고리 30건 적재, GET /context/system+handover 검증 완료, commit b54ff75 |
