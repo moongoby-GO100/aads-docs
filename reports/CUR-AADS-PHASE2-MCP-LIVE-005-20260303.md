@@ -1,8 +1,8 @@
 # CUR-AADS-PHASE2-MCP-LIVE-005 완료 보고서
-**날짜**: 2026-03-03  
-**작업자**: Cursor (Claude)  
-**커밋**: moongoby-GO100/aads-server@046111f  
-**HTTP**: 200  
+**날짜**: 2026-03-03
+**작업자**: Cursor (Claude)
+**커밋**: moongoby-GO100/aads-server@046111f
+**HTTP**: 200
 
 ---
 

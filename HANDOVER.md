@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-03 (v3.7 — STABILITY-006: JWT 86자 보안키, PostgreSQL 로컬 연결, MCP SSE ping 수정, 118 PASS)
+> 최종 업데이트: 2026-03-04 (v3.8 — LAUNCH-READY: Docker 샌드박스, E2E 풀사이클, CEO 직접 테스트 가능)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -59,6 +59,7 @@
 | **PHASE2-DASHBOARD-002** | **03-02** | TBD | **200** | **대시보드 인증(JWT), AgentStatus 파이프라인 시각화, CostTracker 바 차트, 에러 페이지, HANDOVER 섹션6** |
 | **PHASE2-LLM-CONNECT-003** | **03-02** | **4fa9341** | **200** | **실제 LLM 연동: state.py _last_value 리듀서, supervisor 병렬 버그 수정, E2B graceful degradation, 8-agent E2E completed ✅, 45/45 PASS** |
 | **PHASE2-STABILITY-006** | **03-03** | TBD | **200** | **CUR-AADS-PHASE2-STABILITY-006 — JWT 86자 보안키, AADS_ADMIN_PASSWORD 갱신, 호스트 PostgreSQL 연결(host.docker.internal+iptables), MCP SSE ping stream 수정, checkpointer 3단계 fallback, 118 PASS** |
+| **LAUNCH-READY-010** | **03-04** | **a69c061** | **200** | **Docker 샌드박스(D-011), CEO-DIRECTIVES v2.4, E2E 풀사이클 검증(CEO-Test-Calculator, 8 LLM calls, $0.69), docker-compose 소켓 마운트, 대시보드 접근 OK, 가동 준비 완료** |
 
 ---
 
@@ -69,7 +70,7 @@
 | PHASE1-W1 | **완료** | aads-server Week 1: 3-agent chain, StateGraph, FastAPI 엔드포인트, 단위테스트 6/6 |
 | PHASE1-W2 | **완료** | W2-001 ✅, W2-002 ✅, W2-003 ✅, W2-004 배포 ✅, W2-005 8-agent ✅ → Phase 1 코어 8-agent 완성 |
 | PHASE1.5 | **완료** | REALTEST-001 ✅, CICD-002 ✅, INTEGRATION-003 ✅ |
-| PHASE2 | **진행 중** | DASHBOARD-001 ✅, DASHBOARD-002 ✅, LLM-CONNECT-003 ✅, POLISH-004 ✅, MCP-LIVE-005 ✅, **STABILITY-006 ✅** → 다음: E2E-FULLCYCLE-007 (P1), PHASE3-PLAN-008 (P2) |
+| PHASE2 | **가동 준비 완료** | LAUNCH-READY-010 ✅ → CEO 직접 테스트 단계 |
 
 ---
 
@@ -131,7 +132,14 @@
 
 ## 6. 웹 Claude 인수인계 사항
 
-### 6-1. 최신 상태 (v3.6 기준)
+### 6-1. 최신 상태 (v3.8 기준)
+
+**가동 상태**: CEO 직접 테스트 가능
+- **대시보드**: https://aads.newtalk.kr/
+- **로그인**: AADS_ADMIN_EMAIL / AADS_ADMIN_PASSWORD (.env 참조)
+- **프로젝트 생성**: 대시보드 또는 API POST /api/v1/projects
+
+### 6-1-prev. 이전 상태 (v3.6 기준)
 - **Phase 1 완료**: 8-agent chain, LangGraph 1.0.10, FastAPI, MCP 7개, HITL 체크포인트
 - **Phase 1.5 완료**: REALTEST-001, CICD-002, INTEGRATION-003 — 63/63 테스트 PASS
 - **Phase 2 진행 중**: aads-dashboard (Next.js 16, https://aads.newtalk.kr/), JWT 인증, SSE 모니터
@@ -201,3 +209,4 @@
 | v3.5 | 2026-03-02 | PHASE2-POLISH-004: auth.py 보안 강화(hmac.compare_digest), 전역 예외 핸들러, structlog 표준화, API 문서 강화, aads-dashboard TS 타입 안정성(빌드 오류 0건) |
 | v3.6 | 2026-03-03 | PHASE2-MCP-LIVE-005: MCP 실구동 서버 3개(Filesystem/Git/Memory FastMCP SSE), supervisord.conf, Dockerfile 갱신, MCPClientManager HTTP ping, 에이전트 8개 프롬프트 전면 개선, 테스트 118개(+73), 커버리지 43%→62% |
 | v3.7 | 2026-03-03 | PHASE2-STABILITY-006: JWT 86자 보안키, AADS_ADMIN_PASSWORD 갱신, 호스트 PostgreSQL 연결(host.docker.internal+iptables 5432), MCP SSE ping stream 수정, checkpointer 3단계 fallback(local→supabase→memory), 118 PASS |
+| v3.8 | 2026-03-04 | LAUNCH-READY-010: Docker 샌드박스, CEO-DIRECTIVES v2.4, E2E 풀사이클, 가동 준비 완료 |

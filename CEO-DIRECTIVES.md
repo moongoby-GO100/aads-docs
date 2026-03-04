@@ -1,5 +1,5 @@
 # CEO DIRECTIVES – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-02 (v2.3)
+> 최종 업데이트: 2026-03-04 (v2.4)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션에서 필수 읽기. 이 문서의 지시를 위반하는 설계/분석은 무효.
 
@@ -28,7 +28,7 @@
 - 최저 비용으로 최대 품질 달성이 설계 원칙
 - 모델 라우팅: 단순 태스크→nano/flash($0.05~0.40/1M), 복잡 태스크→Opus/Pro($5~25/1M)
 - 오픈소스 우선: 상용 SaaS 대체 가능하면 오픈소스 적극 활용
-- 월 인프라 비용 $500 이하 유지 목표 (프로토타이핑 단계)
+- 월 인프라 비용 $23~$63/월 목표 (프로토타이핑 단계)
 - 프롬프트 캐싱(최대 90% 절감) + 배치 API(50% 절감) 적극 활용
 
 ### D-005 컨텍스트 패키지 시스템
@@ -102,22 +102,28 @@
 - **전송 방식**: supervisord 환경에서는 SSE transport (localhost), 직접 호출 시 stdio. 원격 MCP 서버는 SSE/HTTP
 - **인증**: 환경 변수로 토큰 주입
 
-### T-004 샌드박스 & 배포 인프라
+### T-004 샌드박스 전략 (2단계 하이브리드, CEO 확정 2026-03-03)
+- **소형 프로젝트**: 자체 서버 Docker 컨테이너 실행 (비용 $0)
+  - Docker SDK (`docker` Python 패키지)로 컨테이너 생성→실행→결과수집→삭제
+  - 보안: --network=none, --memory=512m, --cpus=1, --read-only, tmpfs /tmp 100M
+  - 동시 샌드박스 최대 5개
+- **대형 프로젝트**: 사용자 서버 원격 실행 (AADS가 최적 서버+비용 자동 제안, 사용자 승인 후 SSH/Docker API 접속)
+- **E2B**: SaaS 확장 시(Phase 3+) 옵션. MVP에서는 사용 안 함.
+
+인프라 비용표:
 | 용도 | 도구 | 비용 |
 |------|------|------|
-| 에이전트 코드 실행 | E2B Pro | $150–250/월 (사용량 기반, 초기 $100 무료 크레딧) |
-| GPU 태스크 | Modal | 종량제 (Phase 2+) |
-| API 서버 배포 | 68서버 Docker Compose (MVP 단계, SaaS 확장 시 외부 PaaS 이전) | $0 추가 |
-| 프론트엔드 배포 | Vercel Pro | $20/월 |
-| DB + Auth | Supabase Pro (**직접 연결 port 5432**) | $25–40/월 |
-| 캐시 | Upstash Redis | $0–10/월 |
-| MCP 서버 | 68서버 Docker Compose 내 | 포함 |
+| 소형 코드 실행 | Docker 로컬 샌드박스 | $0 |
+| 대형 코드 실행 | 사용자 서버 SSH | $0 (사용자 부담) |
+| API 서버 | Contabo Docker Compose | $12.99/월 |
+| DB | 로컬 PostgreSQL (Docker) | $0 |
+| 캐시 | 로컬 Redis (Docker) | $0 |
 
 ### T-005 AADS 기술 스택
 - **오케스트레이션**: LangGraph >= 1.0.10 (Native StateGraph, `langgraph-supervisor` 사용 금지)
 - **AI API**: Anthropic Claude API (메인), OpenAI API (보조), Google Gemini API (데이터)
 - **MCP**: `langchain-mcp-adapters` + `MultiServerMCPClient`
-- **샌드박스**: E2B (Sandbox-as-Tool 패턴)
+- **샌드박스**: Docker 로컬 (D-011, 소형 기본) / SSH 원격 (대형, Phase 3) / E2B (Phase 3+ 옵션)
 - **상태 저장**: PostgreSQL + `langgraph-checkpoint-postgres` (AsyncPostgresSaver, Supabase 직접 연결)
 - **캐싱**: Upstash Redis
 - **관측성**: LangSmith Free Tier (5K traces/월) — 초과 시 Langfuse OSS 전환 검토
@@ -157,6 +163,21 @@
 - 사용자 수정 요청 비율 10% 이하 → 체크포인트 간소화 가능
 - 성공률 70% 미만 하락 시 HITL 게이트 재활성화
 - 최소 20건 데이터 필요, 그 전에는 항상 HITL 유지
+
+### T-010 수익 모델 (신규, 2026-03-03)
+| 수익원 | 방식 | 예상 |
+|--------|------|------|
+| 개발비 | 프로젝트당 과금/월 구독 | $19~$199/월 |
+| 인프라 추천 | 제휴 커미션 | 서버 비용 5~15% |
+| 유지보수 | 배포 후 모니터링 구독 | $9~$29/월 |
+
+SaaS 티어:
+| 티어 | 내용 | 가격 |
+|------|------|------|
+| Free | Docker 소형 월3건 | $0 |
+| Starter | Docker 소형 월10건 | $19/월 |
+| Pro | 소형+사용자서버 연결 | $49/월 |
+| Enterprise | 전용 서버, 전담 지원 | 커스텀 |
 
 ---
 
@@ -261,5 +282,6 @@ curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongob
 | v1.1 | 2026-02-28 | 절대 규칙 추가: R-NEW-1 브라우저 URL 보고, R-NEW-2 완료 보고 형식 |
 | v2.0 | 2026-02-28 | 대규모 개정 — 21건 수정사항 반영. D-009/D-010 추가, T-001~T-006 전면 수정(가격 정정, LangGraph 1.0.8, Native Supervisor, Judge Agent, 구조화 JSON, 점진적 자율성), T-007~T-009 신규, R-001~R-011 정리 |
 | v2.1 | 2026-03-01 | LangGraph 1.0.10 상향, MCP SSE transport 반영, LLM 호출 한도 15회 명시(R-012), T-007 TaskSpec 필드 12개로 확장, 6건 불일치 해소 |
+| v2.4 | 2026-03-03 | 샌드박스 2단계(D-011), 인프라 컨설팅(D-012), 수익 모델(T-010), 월 운영비 $23~$63 |
 | v2.3 | 2026-03-02 | T-004 배포 전략 변경 (Fly.io → 68서버 Docker Compose, $0 추가, MVP 단계) |
 | v2.2 | 2026-03-02 | Genspark 통합지휘 규칙 섹션 4 추가 (9-1~9-8), Directive 블록 파싱, 보고 형식 표준화 |
