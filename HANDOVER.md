@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-04 (v4.3 — T-021: 메모리 시스템 워크플로우 통합 — memory_helper+claude_exec+auto_trigger+bridge)
+> 최종 업데이트: 2026-03-04 (v4.4 — T-024: Playwright Visual QA 스크린샷 + Visual Regression 기반 구축)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -63,6 +63,7 @@
 | **T-020** | **03-04** | **TBD** | **200** | **Context API 보안 강화: POST /context/system Monitor Key 인증 추가(401 반환), 응답에 saved data 포함, Rate Limiting 분당 30회/IP(429), 전체 curl 테스트 통과** |
 | **T-019** | **03-04** | **b54ff75** | **200** | **System Memory HANDOVER 데이터 마이그레이션: migrate_handover.py v3.8 재작성, 9카테고리(status/repos/architecture/agents/phase/costs/ceo_directives/pending/history) 30건 INSERT, Docker Postgres(5433) 적재, GET /context/system 9카테고리 확인, GET /context/handover 섹션1~9 완전 마크다운 생성** |
 | **T-021** | **03-04** | **TBD** | **200** | **메모리 시스템 워크플로우 통합: memory_helper.sh(read_context/write_task_result/write_experience/write_error 4함수), claude_exec.sh(Context API 맥락주입+결과기록), auto_trigger.sh(COMPLETED 스킵+phase 자동업데이트), bridge.py(CEO결정감지+ceo_directives 자동저장). nginx User-Agent 필터 우회(curl/7.64.0) 발견.** |
+| **T-024** | **03-04** | **cddeeed** | **200** | **Visual QA 스크린샷 + Visual Regression 기반 구축: VisualQAService(Playwright headless 1920x1080 + Pillow pixelmatch), 4개 API 엔드포인트(capture/compare/set-baseline/baselines), Docker glibc fallback, pyproject.toml playwright+Pillow 추가, Dockerfile chromium install, compare diff_percent=0.0(identical) / 100.0(diff) 검증 완료** |
 
 ---
 
