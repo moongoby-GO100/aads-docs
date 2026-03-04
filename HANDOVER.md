@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-05 (v5.4 — T-036: GET /context/public-summary 읽기전용 엔드포인트 200 PASS, 민감 데이터 0건; T-037: bridge.py 대화분류/저장(classify_aads_conversation 7카테고리), memory_helper.sh save_manager_report() 추가; v5.3 — T-035: 모바일 반응형 최적화 — Sidebar 햄버거 메뉴, ClientLayout, 로그인 풀스크린)
+> 최종 업데이트: 2026-03-05 (v5.5 — T-039: 모바일 QA 파이프라인 — Android 에뮬레이터(KVM)+Appium+Gemini Vision 6항목 감리, /api/v1/mobile-qa/* 5 엔드포인트, IOS-QA-SETUP.md, QA Agent mobile_android|mobile_ios 분기; v5.4 — T-036: GET /context/public-summary 읽기전용 엔드포인트 200 PASS, 민감 데이터 0건; T-037: bridge.py 대화분류/저장(classify_aads_conversation 7카테고리), memory_helper.sh save_manager_report() 추가; v5.3 — T-035: 모바일 반응형 최적화 — Sidebar 햄버거 메뉴, ClientLayout, 로그인 풀스크린)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -74,6 +74,7 @@
 | **T-035** | **03-05** | **c0def58** | **200** | **모바일 반응형 최적화: Sidebar.tsx(햄버거 버튼+overlay+slide-in, X버튼, 라우트변경 자동닫힘, md 이상 고정), ClientLayout.tsx 신규("/login" 사이드바제외, useState isMenuOpen), layout.tsx(ClientLayout 교체, viewport meta), Header.tsx(pl-12 md:pl-0, text-sm md:text-base), page.tsx(p-3 md:p-6, flex-col sm:flex-row, w-full sm:w-auto, grid-cols-1 sm:grid-cols-2 lg:grid-cols-3), login/page.tsx(max-w-sm sm:max-w-md, p-5 sm:p-8), npm build 0 errors, git push 완료** |
 | **T-036** | **03-05** | **df233cf** | **200** | **GET /context/public-summary 읽기전용 엔드포인트: SENSITIVE_KEYS 마스킹(_sanitize 키+값), procedural_memory 컬럼 수정, main.py NameError 버그 수정, 200✅/민감데이터0건/POST405** |
 | **T-037** | **03-05** | **—** | **—** | **bridge.py 확장: classify_aads_conversation(7카테고리), extract_decisions/action_items, save_aads_conversation(Context API 저장), process_message T-037 통합. memory_helper.sh: save_manager_report() 추가(매니저 보고 Context API 저장). 검증 PASS** |
+| **T-039** | **03-05** | **7459b8a** | **200** | **모바일 QA 파이프라인: KVM 가용(8코어), Appium 3.2.0(uiautomator2+xcuitest), docker/android-emulator/docker-compose.yml(API-33), scripts/mobile_qa/adb_utils.sh, app/services/mobile_qa.py(MobileQAService: connect_android/connect_ios/install_and_launch/take_screenshot/tap_element/scroll_down/input_text/get_page_source/check_crash/run_test_scenario/close), app/api/mobile_qa.py(GET health/POST install/POST test-scenario/POST audit-screen/POST full-qa), design_auditor.py audit_mobile_screen(6항목: layout_consistency/touch_target_size/text_readability/navigation_clarity/visual_hierarchy/platform_compliance, PASS≥48/CONDITIONAL36-47/FAIL≤35), qa_pipeline.py run_mobile_qa(mobile_android|mobile_ios 분기), qa.py project_type분기, iOS graceful skip(IOS_APPIUM_URL 미설정시 NotImplementedError), IOS-QA-SETUP.md(Option A Mac mini/B Cloud/C GitHub Actions), .env Mobile QA 변수 추가** |
 | **T-031** | **03-04** | **TBD** | **200** | **AADS 코어 고도화 — LangGraph Native Supervisor 프로덕션 전환: supervisor.py(TaskSpec 기반 동적 배정, 병렬 실행 Researcher+Architect, max_iterations CEO 에스컬레이션, max_llm_calls R-012, fallback 체인), judge_agent.py(Gemini 3.1 Pro 독립 모델, success_criteria↔output_artifacts 구조화 비교, fail시 rework_instructions JSON), autonomy_gate.py 신규(PostgreSQL autonomy_stats/autonomy_levels 테이블, 성공률≥90%→auto_approve/<70%→HITL재활성화, 최소20건미만 항상HITL), model_router.py T-002 프로덕션 매핑(Supervisor/Architect: claude-opus-4-6 $5/$25, PM/Developer/QA: claude-sonnet-4-6 $3/$15, Judge: gemini-3.1-pro-preview $2/$12, DevOps: gpt-5-mini $0.25/$2, Researcher: gemini-2.5-flash $0.30/$2.50, primary→fallback→error 3단계 체인), test_core_production.py 신규(4시나리오 34개 테스트 34/34 PASS), health ✅** |
 
 ---
@@ -333,6 +334,23 @@
 
 ---
 
+## 14. Mobile QA System (v5.5, T-039)
+
+- **Android**: Docker 에뮬레이터(halimqarroum/docker-android:api-33) + KVM(/dev/kvm 8코어) + ADB + Appium 3.2.0 + Gemini Vision 6항목 감리
+- **iOS**: Appium xcuitest 드라이버(v10.24.2) 사전 설치, Mac 연결 시 즉시 활성화 (IOS_APPIUM_URL 설정)
+- **API**: `/api/v1/mobile-qa/*`
+  - `GET  /health` — Android 에뮬레이터 상태, Appium 상태, KVM 가용성, iOS 설정 여부
+  - `POST /install` — APK 다운로드 → ADB 설치 → 앱 실행 → 스크린샷
+  - `POST /test-scenario` — 시나리오 실행(tap/input/scroll/screenshot/wait) + 크래시 감지
+  - `POST /audit-screen` — Gemini Vision 6항목 감리(PASS≥48/CONDITIONAL36-47/FAIL≤35)
+  - `POST /full-qa` — 설치→시나리오→감리→판정→Context API 저장→CEO 알림
+- **QA Agent 통합**: `project_type=mobile_android|mobile_ios` 분기 (qa.py/qa_pipeline.py)
+- **iOS 설정 가이드**: `aads-docs/docs/IOS-QA-SETUP.md` (Option A Mac mini / B Cloud Mac / C GitHub Actions)
+- **Gemini Vision 모바일 6항목**: layout_consistency, touch_target_size, text_readability, navigation_clarity, visual_hierarchy, platform_compliance
+- **환경변수**: `ANDROID_EMULATOR_HOST`, `ANDROID_EMULATOR_PORT`, `APPIUM_URL`, `IOS_APPIUM_URL`(Mac 연결 시)
+
+---
+
 ## 7. 업데이트 규칙
 - 모든 Task 완료 시 이 문서 업데이트 필수
 - push 후 raw URL HTTP 200 확인:
@@ -377,5 +395,6 @@
 | v4.8 | 2026-03-04 | T-028: 뉴톡 이미지 검수 + 211/116 서버 클라이언트 배포 — IMAGE_AUDIT_PROMPT(이커머스 6항목 60점), DesignAuditor.audit_product_image/batch, visual_qa.py /image-qa+/image-quality-gate, aads_qa_client.sh(image-qa/image-gate), SHORTFLOW/NEWTALK-QA-INTEGRATION.md, commit 268139c |
 | v4.9 | 2026-03-04 | T-029: 211서버 ShortFlow 검수 클라이언트 배포 + run_v4_pipeline.py 통합 — run_v4_integration.py(AadsQualityGate 3단계 fallback + quality_gate_check), run_v4_pipeline_qa_patch.py(quality_gate_before_upload), deploy_to_211.sh(SSH/SCP 자동배포 6단계), SHORTFLOW-QA-INTEGRATION.md(방법A+B 연동 가이드), commit 7ba68e1, AADS 4개 엔드포인트 HTTP 200 확인 |
 | v5.0 | 2026-03-04 | T-030: 116서버 뉴톡 V2 이미지 검수 클라이언트 배포 — deploy_to_116.sh(자동배포 스크립트 6단계), ProductController_AADS.php(Laravel 방법A+B+배치), image-gate exit 1(REJECT, score=4) 동작 확인, image-qa 배치 JSON 스코어카드 반환, Context API qa_results 저장. 실제 116서버 SSH 배포는 id_ed25519_newtalk 키 필요 |
+| v5.5 | 2026-03-05 | T-039: 모바일 QA 파이프라인 — Android 에뮬레이터(KVM)+Appium 3.2.0(uiautomator2+xcuitest)+Gemini Vision 6항목 감리, MobileQAService(10메서드), /api/v1/mobile-qa/* 5 엔드포인트, design_auditor.audit_mobile_screen, qa_pipeline.run_mobile_qa, QA Agent mobile_android|mobile_ios 분기, IOS-QA-SETUP.md, .env Mobile QA 환경변수, commit 7459b8a |
 | v5.2 | 2026-03-05 | T-032: 68서버 프로덕션 강화 — docker-compose.prod.yml(restart always, json-file logging 10m/3, aads-server memory 1.5G, pg shared_buffers=256MB/max_connections=50, redis maxmemory 128mb allkeys-lru, healthcheck 전 서비스), nginx-aads.conf(rate_limit 60r/m, gzip, proxy_read_timeout 120s/connect 10s, 보안헤더 X-Frame-Options DENY/X-Content-Type-Options nosniff/X-XSS-Protection/CORS aads.newtalk.kr), aads.service(systemd oneshot), backup.sh(cron 03:00 daily, 7일 자동삭제), health ✅, commit f7bc122 |
 | v5.1 | 2026-03-04 | T-031: AADS 코어 고도화 — LangGraph Native Supervisor 프로덕션 전환 — supervisor.py(TaskSpec 동적 배정, 병렬 Researcher+Architect, max_iterations CEO 에스컬레이션, R-012 LLM 한도, fallback 체인), judge_agent.py(Gemini 3.1 Pro, success_criteria↔output_artifacts 구조화 비교, rework_instructions), autonomy_gate.py 신규(autonomy_stats/levels 테이블, 성공률≥90%→auto_approve/<70%→HITL), model_router.py T-002 완전 정렬(Opus-4-6/Sonnet-4-6/Gemini-3.1-Pro/GPT-5-mini, primary→fallback→error), test_core_production.py(34/34 PASS), health ✅ |
