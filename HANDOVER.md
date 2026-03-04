@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-04 (v4.6 — T-026: QA Agent 통합 — Visual Regression + LLM 감리 + CEO 알림)
+> 최종 업데이트: 2026-03-04 (v4.7 — T-027: ShortFlow 영상 품질 게이트 + 자동 보정 루프)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -66,6 +66,7 @@
 | **T-024** | **03-04** | **cddeeed** | **200** | **Visual QA 스크린샷 + Visual Regression 기반 구축: VisualQAService(Playwright headless 1920x1080 + Pillow pixelmatch), 4개 API 엔드포인트(capture/compare/set-baseline/baselines), Docker glibc fallback, pyproject.toml playwright+Pillow 추가, Dockerfile chromium install, compare diff_percent=0.0(identical) / 100.0(diff) 검증 완료** |
 | **T-025** | **03-04** | **17bf032** | **200** | **LLM 디자인 감리 엔진 6단계 스코어카드: design_auditor.py(DesignAuditor 클래스), AUDIT_PROMPT(5개 항목 10점), Gemini 2.5 Flash Vision→Claude Sonnet Vision fallback, AuditResult(PASS/CONDITIONAL/FAIL), generate_report(마크다운), 2개 신규 API(POST /visual-qa/audit, GET /visual-qa/audit/{project_id}/latest), experience_memory 자동저장(experience_type=design_audit)** |
 | **T-026** | **03-04** | **71a4f0a** | **200** | **QA Agent 통합 — Visual Regression + LLM 감리 + CEO 알림: agents/qa.py(5단계 파이프라인 통합), services/qa_pipeline.py(run_full_qa → AUTO PASS/CEO 확인 요청/AUTO FAIL 판정), services/ceo_notify.py(텔레그램+Context API), POST /visual-qa/full-qa 엔드포인트, Context API qa_results+qa_notifications 저장** |
+| **T-027** | **03-04** | **TBD** | **200** | **ShortFlow 영상 품질 게이트 + 자동 보정 루프: benchmark_spec.py(BenchmarkSpecExtractor — Gemini→Claude Vision, spec_to_ffmpeg_params, system_memory 저장), auto_correction.py(AutoCorrector — CORRECTION_MAP 6항목, analyze_failures, generate_correction_params, create_correction_directive), visual_qa.py 3개 신규 엔드포인트(POST /quality-gate, GET /benchmark-specs/{project}/{channel}, POST /extract-spec), scripts/shortflow_quality_gate.sh(211서버 cron 직전 호출), VIDEO_QA_PROMPT(6항목 60점), FFmpeg 프레임 추출, AUTO_PUBLISH(85%+)/CONDITIONAL(70-84%)/AUTO_REJECT(<70%) 판정** |
 
 ---
 
@@ -240,6 +241,52 @@
 
 ---
 
+## 13. Visual QA & Quality Gate System (v4.7, T-024~T-027)
+
+### 웹 QA (T-024, T-025, T-026)
+- **Playwright + Visual Regression**: headless 1920x1080 스크린샷 → Pillow pixelmatch 비교 (diff_percent)
+- **Gemini Vision 6항목**: visual_consistency, accessibility, interaction_clarity, brand_coherence, polish + (웹용 5항목)
+- **DesignAuditor**: AUDIT_PROMPT 5항목 10점, PASS(35+)/CONDITIONAL(25-34)/FAIL(24 이하)
+- **QA Agent 파이프라인** (T-026): 코드→스크린샷→Visual Regression→LLM 감리→종합판정 → CEO 알림(텔레그램+Context API)
+
+### 영상 QA (T-027)
+- **FFmpeg 프레임 추출**: `ffprobe` 길이 확인 → 균등 간격 5 프레임 추출 (JPEG)
+- **Gemini Vision 6항목**: subtitle_readability, background_quality, composition, brand_consistency, visual_consistency, polish (각 10점, 총 60점)
+- **match_percent**: total_score / 60 × 100
+
+### 벤치마크 비교 (T-027)
+- **BenchmarkSpecExtractor** (`services/benchmark_spec.py`): SPEC_PROMPT → 사양 JSON 추출 (subtitle/background/composition/branding)
+- **spec_to_ffmpeg_params**: 사양 → FFmpeg 파라미터 매핑 (fontsize, box_alpha, margin_bottom, resolution 등)
+- **저장**: `system_memory` (category: benchmark_specs, key: {project_id}_{channel})
+
+### 품질 게이트 판정 (T-027)
+| 판정 | 기준 | 액션 |
+|------|------|------|
+| AUTO_PUBLISH | match_percent ≥ 85% (51점+) | action: publish → 업로드 진행 |
+| CONDITIONAL | 70% ≤ match_percent < 85% | action: ceo_review → CEO 리뷰 대기 |
+| AUTO_REJECT | match_percent < 70% | action: re-render (auto_correct=true) 또는 reject |
+
+### 자동 보정 (T-027)
+- **AutoCorrector** (`services/auto_correction.py`): CORRECTION_MAP 6항목 → FFmpeg 파라미터 delta 적용
+  - subtitle_readability → fontsize +8, box_alpha +0.2
+  - background_quality → min_resolution 1080x1920
+  - composition → margin_bottom +5%
+  - brand_consistency → color_grading 적용
+- **재렌더링 지시서**: `{"action":"re-render", "video_id":"...", "params":{...}, "max_retries":2}`
+
+### ShortFlow 연동
+- **scripts/shortflow_quality_gate.sh**: 211서버 cron에서 업로드 직전 호출
+  - 사용: `./shortflow_quality_gate.sh /path/to/video.mp4 economy economy_20260304`
+  - 반환 코드: 0=AUTO_PUBLISH, 2=CONDITIONAL, 3=AUTO_REJECT, 1=ERROR
+- **AADS URL**: `https://aads.newtalk.kr/api/v1/visual-qa/quality-gate`
+- **ShortFlow 영상 경로**: `/data/shortflow/outputs/{channel}/`
+
+### CEO 알림
+- Context API `qa_results`+`qa_notifications` 저장 (T-026)
+- 텔레그램 알림 (옵션, ceo_notify.py)
+
+---
+
 ## 7. 업데이트 규칙
 - 모든 Task 완료 시 이 문서 업데이트 필수
 - push 후 raw URL HTTP 200 확인:
@@ -280,3 +327,4 @@
 | v4.4 | 2026-03-04 | T-024: Playwright Visual QA 스크린샷 + Visual Regression 기반 구축 — VisualQAService, 4개 API 엔드포인트, Docker glibc fallback, commit cddeeed |
 | v4.5 | 2026-03-04 | T-025: LLM 디자인 감리 엔진 6단계 스코어카드 — design_auditor.py DesignAuditor 클래스, 5항목 10점 AUDIT_PROMPT, Gemini→Claude Vision fallback, PASS/CONDITIONAL/FAIL 판정, POST /visual-qa/audit + GET /visual-qa/audit/{project_id}/latest, experience_memory 저장, commit 17bf032 |
 | v4.6 | 2026-03-04 | T-026: QA Agent 통합 — Visual Regression + LLM 감리 + CEO 알림 — agents/qa.py 5단계 파이프라인(코드→스크린샷→Visual Regression→LLM 감리→종합판정), services/qa_pipeline.py run_full_qa(AUTO PASS/CEO 확인 요청/AUTO FAIL), services/ceo_notify.py 텔레그램+Context API 저장, POST /visual-qa/full-qa, commit 71a4f0a |
+| v4.7 | 2026-03-04 | T-027: ShortFlow 영상 품질 게이트 + 자동 보정 루프 — benchmark_spec.py(BenchmarkSpecExtractor), auto_correction.py(AutoCorrector CORRECTION_MAP 6항목), visual_qa.py 3 신규 엔드포인트(quality-gate/benchmark-specs/extract-spec), shortflow_quality_gate.sh(cron 연동), VIDEO_QA_PROMPT 6항목 60점, AUTO_PUBLISH(85%+)/CONDITIONAL(70-84%)/AUTO_REJECT(<70%), 섹션 13 추가, CEO-DIRECTIVES D-014 |

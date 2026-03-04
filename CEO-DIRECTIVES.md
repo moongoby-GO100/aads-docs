@@ -1,5 +1,5 @@
 # CEO DIRECTIVES – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-04 (v2.4)
+> 최종 업데이트: 2026-03-04 (v2.5)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션에서 필수 읽기. 이 문서의 지시를 위반하는 설계/분석은 무효.
 
@@ -80,6 +80,19 @@
 - 브릿지: Genspark ↔ AADS API 연결
 - Chat Endpoint: /api/v1/chat (자연어 → 액션 라우터)
 - 2027년: 자체 채팅 UI 완성 후 Genspark은 선택적 채널
+
+### D-014: 콘텐츠 품질 게이트 (2026-03-04 확정)
+- **모든 자동 배포 콘텐츠는 벤치마크 85% 이상 필수** (match_percent ≥ 85%)
+- 판정 기준:
+  - AUTO_PUBLISH (85%+): 즉시 업로드 허용
+  - CONDITIONAL (70-84%): CEO 리뷰 후 배포 결정
+  - AUTO_REJECT (<70%): 자동 보정 파라미터 생성 후 재렌더링 지시 (max_retries=2)
+- 적용 대상: ShortFlow 영상 (economy, finance, tech 등 채널), 향후 모든 자동 생성 콘텐츠
+- 품질 게이트 API: `POST /api/v1/visual-qa/quality-gate` (AADS 68서버)
+- ShortFlow 연동: `shortflow_quality_gate.sh` (211서버 cron 업로드 직전 호출)
+- 벤치마크 사양: 채널별 기준 영상 프레임 등록 → system_memory 저장 (category: benchmark_specs)
+- 자동 보정: CORRECTION_MAP 6항목 FFmpeg 파라미터 delta 적용 (fontsize, box_alpha, margin, resolution, color_grading 등)
+- CEO 알림: CONDITIONAL 판정 시 텔레그램 + Context API qa_notifications 저장
 
 ---
 
@@ -308,3 +321,4 @@ curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongob
 | v2.4 | 2026-03-04 | D-011~D-013 추가(Sandbox 2단계, 인프라 컨설팅, Frontend Dual Strategy), T-010~T-011 추가(수익 모델, 5-Layer Memory), D-004 비용 $23~$63 변경 |
 | v2.3 | 2026-03-02 | T-004 배포 전략 변경 (Fly.io → 68서버 Docker Compose, $0 추가, MVP 단계) |
 | v2.2 | 2026-03-02 | Genspark 통합지휘 규칙 섹션 4 추가 (9-1~9-8), Directive 블록 파싱, 보고 형식 표준화 |
+| v2.5 | 2026-03-04 | D-014 추가 — 콘텐츠 품질 게이트: 자동 배포 콘텐츠 벤치마크 85% 이상 필수, ShortFlow 연동(shortflow_quality_gate.sh), AUTO_PUBLISH/CONDITIONAL/AUTO_REJECT 판정 기준 |
