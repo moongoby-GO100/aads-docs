@@ -208,6 +208,7 @@
   - `auto_trigger.sh`: 지시서 감지 → COMPLETED 스킵 → 자동실행 → phase 업데이트
   - `bridge.py`: CEO 결정감지("확정"/"승인"/"OK" 등) → ceo_directives 자동저장
 - **주의**: nginx가 Python-urllib User-Agent 차단 → 반드시 `User-Agent: curl/7.64.0` 헤더 필요
+- **Public Summary**: GET /api/v1/context/public-summary (인증 불필요, 민감 데이터 자동 제거, 웹 Claude 실시간 조회용)
 
 ---
 
