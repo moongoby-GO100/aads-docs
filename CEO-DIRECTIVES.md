@@ -1,5 +1,5 @@
 # CEO DIRECTIVES – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-04 (v2.5)
+> 최종 업데이트: 2026-03-05 (v2.6)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션에서 필수 읽기. 이 문서의 지시를 위반하는 설계/분석은 무효.
 
@@ -93,6 +93,17 @@
 - 벤치마크 사양: 채널별 기준 영상 프레임 등록 → system_memory 저장 (category: benchmark_specs)
 - 자동 보정: CORRECTION_MAP 6항목 FFmpeg 파라미터 delta 적용 (fontsize, box_alpha, margin, resolution, color_grading 등)
 - CEO 알림: CONDITIONAL 판정 시 텔레그램 + Context API qa_notifications 저장
+
+### D-015: 68서버 프로덕션 유지 결정 (2026-03-05 확정)
+- **68서버 (aads.newtalk.kr) 유지**: 옵션 A 채택 — 현 서버에서 프로덕션 운영 계속
+- **도메인 aads.newtalk.kr 고정**: 변경 금지. 모든 내외부 연동에 이 도메인 사용
+- **Fly.io 보류**: Phase 3 SaaS 확장 시점에 재평가. MVP/현재 단계에서는 Fly.io 사용 금지
+- 근거: 추가 비용 $0, 현 인프라 안정성 확인, 68서버 docker-compose.prod.yml 기반 운영
+- 프로덕션 강화 내용 (T-032):
+  - docker-compose.prod.yml: restart always, json-file logging, memory limit 1.5G, pg shared_buffers=256MB
+  - nginx: rate_limit 60r/m, gzip, proxy timeout 120s/10s, 보안헤더(X-Frame/X-Content-Type/X-XSS/CORS)
+  - systemd: aads.service (oneshot docker compose)
+  - backup.sh: 매일 03:00 cron, 7일 자동삭제
 
 ---
 
@@ -321,4 +332,5 @@ curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongob
 | v2.4 | 2026-03-04 | D-011~D-013 추가(Sandbox 2단계, 인프라 컨설팅, Frontend Dual Strategy), T-010~T-011 추가(수익 모델, 5-Layer Memory), D-004 비용 $23~$63 변경 |
 | v2.3 | 2026-03-02 | T-004 배포 전략 변경 (Fly.io → 68서버 Docker Compose, $0 추가, MVP 단계) |
 | v2.2 | 2026-03-02 | Genspark 통합지휘 규칙 섹션 4 추가 (9-1~9-8), Directive 블록 파싱, 보고 형식 표준화 |
+| v2.6 | 2026-03-05 | D-015 추가 — 68서버 프로덕션 유지 결정: 옵션 A (68서버 유지), 도메인 aads.newtalk.kr 고정, Fly.io Phase 3 SaaS 확장 시 재평가. T-032 프로덕션 강화 완료. |
 | v2.5 | 2026-03-04 | D-014 추가 — 콘텐츠 품질 게이트: 자동 배포 콘텐츠 벤치마크 85% 이상 필수, ShortFlow 연동(shortflow_quality_gate.sh), AUTO_PUBLISH/CONDITIONAL/AUTO_REJECT 판정 기준 |
