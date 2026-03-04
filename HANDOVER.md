@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-04 (v4.9 — T-029: 211서버 ShortFlow 검수 클라이언트 배포 + run_v4_pipeline.py 통합)
+> 최종 업데이트: 2026-03-04 (v5.0 — T-030: 116서버 뉴톡 V2 이미지 검수 클라이언트 배포)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -68,6 +68,7 @@
 | **T-026** | **03-04** | **71a4f0a** | **200** | **QA Agent 통합 — Visual Regression + LLM 감리 + CEO 알림: agents/qa.py(5단계 파이프라인 통합), services/qa_pipeline.py(run_full_qa → AUTO PASS/CEO 확인 요청/AUTO FAIL 판정), services/ceo_notify.py(텔레그램+Context API), POST /visual-qa/full-qa 엔드포인트, Context API qa_results+qa_notifications 저장** |
 | **T-027** | **03-04** | **9f0cc1c** | **200** | **ShortFlow 영상 품질 게이트 + 자동 보정 루프: benchmark_spec.py(BenchmarkSpecExtractor — Gemini→Claude Vision, spec_to_ffmpeg_params, system_memory 저장), auto_correction.py(AutoCorrector — CORRECTION_MAP 6항목, analyze_failures, generate_correction_params, create_correction_directive), visual_qa.py 3개 신규 엔드포인트(POST /quality-gate, GET /benchmark-specs/{project}/{channel}, POST /extract-spec), scripts/shortflow_quality_gate.sh(211서버 cron 직전 호출), VIDEO_QA_PROMPT(6항목 60점), FFmpeg 프레임 추출, AUTO_PUBLISH(85%+)/CONDITIONAL(70-84%)/AUTO_REJECT(<70%) 판정** |
 | **T-028** | **03-04** | **268139c** | **200** | **뉴톡 이미지 검수 + 211/116 서버 클라이언트 배포: IMAGE_AUDIT_PROMPT(이커머스 6항목 60점 스코어카드 — resolution_clarity/background_quality/product_visibility/color_accuracy/text_overlay/commercial_readiness), DesignAuditor.audit_product_image/audit_product_images_batch 메서드 추가, visual_qa.py 2개 신규 엔드포인트(POST /image-qa, POST /image-quality-gate), scripts/aads_qa_client.sh(image-qa/image-gate 명령 추가, quality-gate 통합), docs/SHORTFLOW-QA-INTEGRATION.md+NEWTALK-QA-INTEGRATION.md 생성, PASS 48+(80%)/CONDITIONAL 36-47/FAIL 35이하** |
+| **T-030** | **03-04** | **TBD** | **200** | **116서버 뉴톡 V2 이미지 검수 클라이언트 배포: scripts/deploy_to_116.sh(SSH/SCP 자동배포 6단계 — 연결테스트/디렉터리생성/파일전송/.env.aads생성/환경설정/동작확인), docs/ProductController_AADS.php(Laravel 연동 방법A Shell+방법B HTTP+배치검수), image-quality-gate REJECT(score=4 1x1PNG) exit 1 확인, image-qa 배치 2건 FAIL JSON 스코어카드 반환, Context API qa_results/newtalk_t030_test 저장 완료. 116서버 실제 SSH 배포는 id_ed25519_newtalk 키 제공 후 deploy_to_116.sh 실행으로 완료** |
 | **T-029** | **03-04** | **TBD** | **200** | **211서버 ShortFlow 검수 클라이언트 배포 + run_v4_pipeline.py 통합: scripts/aads_qa_local/run_v4_integration.py(AadsQualityGate 클래스 + quality_gate_check 함수 — quality_gate.sh→aads_qa_client.sh→requests 3단계 fallback), scripts/deploy_to_211.sh(SSH/SCP 자동 배포 스크립트 — 연결테스트/파일전송/권한설정/pip설치/동작확인 6단계), aads_qa_211_deploy.tar.gz(배포 패키지), AADS 서버 4개 엔드포인트 HTTP 200 확인(health/quality-gate/extract-spec/benchmark-specs)** |
 
 ---
@@ -369,3 +370,4 @@
 | v4.7 | 2026-03-04 | T-027: ShortFlow 영상 품질 게이트 + 자동 보정 루프 — benchmark_spec.py(BenchmarkSpecExtractor), auto_correction.py(AutoCorrector CORRECTION_MAP 6항목), visual_qa.py 3 신규 엔드포인트(quality-gate/benchmark-specs/extract-spec), shortflow_quality_gate.sh(cron 연동), VIDEO_QA_PROMPT 6항목 60점, AUTO_PUBLISH(85%+)/CONDITIONAL(70-84%)/AUTO_REJECT(<70%), 섹션 13 추가, CEO-DIRECTIVES D-014 |
 | v4.8 | 2026-03-04 | T-028: 뉴톡 이미지 검수 + 211/116 서버 클라이언트 배포 — IMAGE_AUDIT_PROMPT(이커머스 6항목 60점), DesignAuditor.audit_product_image/batch, visual_qa.py /image-qa+/image-quality-gate, aads_qa_client.sh(image-qa/image-gate), SHORTFLOW/NEWTALK-QA-INTEGRATION.md, commit 268139c |
 | v4.9 | 2026-03-04 | T-029: 211서버 ShortFlow 검수 클라이언트 배포 + run_v4_pipeline.py 통합 — run_v4_integration.py(AadsQualityGate 3단계 fallback + quality_gate_check), deploy_to_211.sh(SSH/SCP 자동배포 6단계), aads_qa_211_deploy.tar.gz(배포 패키지), AADS 4개 엔드포인트 HTTP 200 확인 |
+| v5.0 | 2026-03-04 | T-030: 116서버 뉴톡 V2 이미지 검수 클라이언트 배포 — deploy_to_116.sh(자동배포 스크립트 6단계), ProductController_AADS.php(Laravel 방법A+B+배치), image-gate exit 1(REJECT, score=4) 동작 확인, image-qa 배치 JSON 스코어카드 반환, Context API qa_results 저장. 실제 116서버 SSH 배포는 id_ed25519_newtalk 키 필요 |
