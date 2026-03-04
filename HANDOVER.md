@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-04 (v4.0 — T-019: System Memory HANDOVER 데이터 마이그레이션 완료, 9카테고리 30건 적재)
+> 최종 업데이트: 2026-03-04 (v4.1 — T-020: Context API 보안 강화 완료, POST 인증+Rate Limiting)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -214,3 +214,4 @@
 | v3.8 | 2026-03-04 | LAUNCH-READY-010: Docker 샌드박스, CEO-DIRECTIVES v2.4, E2E 풀사이클, 가동 준비 완료 |
 | v3.9 | 2026-03-04 | T-020: Context API POST 인증 강화(verify_monitor_key), data 반환, Rate Limiting 30회/분/IP |
 | v4.0 | 2026-03-04 | T-019: System Memory HANDOVER 마이그레이션 — 9카테고리 30건 적재, GET /context/system+handover 검증 완료, commit b54ff75 |
+| v4.1 | 2026-03-04 | T-020: Context API POST /context/system 보안 강화 — verify_monitor_key Depends 추가(401), data 반환, Rate Limiting 30회/분/IP(429), curl 전체 테스트 통과 |
