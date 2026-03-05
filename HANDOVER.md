@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-05 (v5.8 — T-045: main.py에 memory(5 엔드포인트)+conversations(2 엔드포인트) 라우터 등록, Nginx /api/v1/memory/ + /api/v1/conversations 프록시 활성화, 외부 7/7 200 확인; T-046: CEO 대시보드 5페이지(홈 시스템현황/대화뷰어/매니저/태스크/프로젝트), 다크 테마(bg-gray-950), Sidebar v0.3.0(5메뉴), npm build 0 에러; T-047: AADS_MGR required_docs URL 수정(aads-docs repo), NAS_MGR docs URL 수정(nas→nas-image); v5.6 — T-038: 매니저 협업 API 4개 엔드포인트 (GET /memory/search, GET /memory/ceo-decisions, POST /memory/cross-message, GET /memory/inbox/{agent_id}), 매니저 레지스트리 6건 등록 (SALES/FINANCE/CONTENT/QA/CUSTOMER/INVESTMENT MGR), INTERVAL make_interval 버그 수정, memory.py+mobile_qa.py 컨테이너 배포; v5.5 — T-039: 모바일 QA 파이프라인 — Android 에뮬레이터(KVM)+Appium+Gemini Vision 6항목 감리, /api/v1/mobile-qa/* 5 엔드포인트, IOS-QA-SETUP.md, QA Agent mobile_android|mobile_ios 분기; v5.4 — T-036: GET /context/public-summary 읽기전용 엔드포인트 200 PASS, 민감 데이터 0건; T-037: bridge.py 대화분류/저장(classify_aads_conversation 7카테고리), memory_helper.sh save_manager_report() 추가; v5.3 — T-035: 모바일 반응형 최적화 — Sidebar 햄버거 메뉴, ClientLayout, 로그인 풀스크린)
+> 최종 업데이트: 2026-03-05 (v5.9 — T-048: 프로젝트 통합 현황 API 4개 엔드포인트; T-049: CEO 대시보드 7페이지+다크테마; T-056: Docker 재빌드; T-057: Memory project_status 6건 적재+dashboard 데이터 연동 보강; v5.8 — T-045: main.py에 memory(5 엔드포인트)+conversations(2 엔드포인트) 라우터 등록, Nginx /api/v1/memory/ + /api/v1/conversations 프록시 활성화, 외부 7/7 200 확인; T-046: CEO 대시보드 5페이지(홈 시스템현황/대화뷰어/매니저/태스크/프로젝트), 다크 테마(bg-gray-950), Sidebar v0.3.0(5메뉴), npm build 0 에러; T-047: AADS_MGR required_docs URL 수정(aads-docs repo), NAS_MGR docs URL 수정(nas→nas-image); v5.6 — T-038: 매니저 협업 API 4개 엔드포인트 (GET /memory/search, GET /memory/ceo-decisions, POST /memory/cross-message, GET /memory/inbox/{agent_id}), 매니저 레지스트리 6건 등록 (SALES/FINANCE/CONTENT/QA/CUSTOMER/INVESTMENT MGR), INTERVAL make_interval 버그 수정, memory.py+mobile_qa.py 컨테이너 배포; v5.5 — T-039: 모바일 QA 파이프라인 — Android 에뮬레이터(KVM)+Appium+Gemini Vision 6항목 감리, /api/v1/mobile-qa/* 5 엔드포인트, IOS-QA-SETUP.md, QA Agent mobile_android|mobile_ios 분기; v5.4 — T-036: GET /context/public-summary 읽기전용 엔드포인트 200 PASS, 민감 데이터 0건; T-037: bridge.py 대화분류/저장(classify_aads_conversation 7카테고리), memory_helper.sh save_manager_report() 추가; v5.3 — T-035: 모바일 반응형 최적화 — Sidebar 햄버거 메뉴, ClientLayout, 로그인 풀스크린)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -79,6 +79,10 @@
 | **T-045** | **03-05** | **d4f45ee** | **200** | **main.py memory+conversations 라우터 등록, 7 엔드포인트 활성화, Nginx 프록시** |
 | **T-046** | **03-05** | **ad190a9** | **200** | **CEO 대시보드 5페이지, 다크 테마, Sidebar v0.3.0** |
 | **T-047** | **03-05** | **ca71bf3** | **200** | **AADS_MGR/NAS_MGR docs URL 수정, HANDOVER v5.8** |
+| **T-048** | **03-05** | **5b594b2** | **200** | **프로젝트 통합 현황 API 4개 엔드포인트 (dashboard, {id}, timeline, alerts)** |
+| **T-049** | **03-05** | **a0125ae** | **200** | **CEO 대시보드 7페이지+다크테마 (Home, Project Status, Conversations, Managers, Decisions, Pipeline, Settings)** |
+| **T-056** | **03-05** | **—** | **200** | **Dashboard Docker 재빌드 완료** |
+| **T-057** | **03-05** | **9ab699c** | **200** | **Memory project_status 6건 적재, dashboard 데이터 연동 보강, HANDOVER v5.9** |
 
 ---
 
