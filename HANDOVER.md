@@ -83,8 +83,7 @@
 | **T-049** | **03-05** | **a0125ae** | **200** | **CEO 대시보드 7페이지+다크테마 (Home, Project Status, Conversations, Managers, Decisions, Pipeline, Settings)** |
 | **T-056** | **03-05** | **—** | **200** | **Dashboard Docker 재빌드 완료** |
 | **T-057** | **03-05** | **9ab699c** | **200** | **Memory project_status 6건 적재, dashboard 데이터 연동 보강, HANDOVER v5.9** |
-| **T-060** | **03-05** | **3e17ec8** | **200** | **Dashboard/Decisions JS 에러 5건 수정(y.slice/e.map→Array.isArray), progress_percent 필드명 수정(page.tsx+project-status), Pipeline 사용자 프로젝트 생성+모니터링 UI(createProject/autoRunProject/resumeProject/getProjectCosts+10초 자동갱신), npm build 0 에러, 7페이지 모두 HTTP 200** |
-| **T-060** | **03-05** | **3e17ec8** | **200** | **JS 에러 5건 수정(y.slice/e.map→Array.isArray), progress_percent 필드명, Pipeline 프로젝트 생성+모니터링 UI, HANDOVER v5.10** |
+| **T-060** | **03-05** | **3e17ec8** | **200** | **JS 에러 5건 수정(y.slice/e.map→Array.isArray), progress_percent 필드명 수정, Pipeline 사용자 프로젝트 생성+모니터링 UI(createProject/autoRunProject/resumeProject/getProjectCosts+10초 자동갱신), npm build 0 에러, 7페이지 HTTP 200, HANDOVER v5.10** |
 
 ---
 
