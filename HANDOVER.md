@@ -78,7 +78,7 @@
 | **T-031** | **03-04** | **TBD** | **200** | **AADS 코어 고도화 — LangGraph Native Supervisor 프로덕션 전환: supervisor.py(TaskSpec 기반 동적 배정, 병렬 실행 Researcher+Architect, max_iterations CEO 에스컬레이션, max_llm_calls R-012, fallback 체인), judge_agent.py(Gemini 3.1 Pro 독립 모델, success_criteria↔output_artifacts 구조화 비교, fail시 rework_instructions JSON), autonomy_gate.py 신규(PostgreSQL autonomy_stats/autonomy_levels 테이블, 성공률≥90%→auto_approve/<70%→HITL재활성화, 최소20건미만 항상HITL), model_router.py T-002 프로덕션 매핑(Supervisor/Architect: claude-opus-4-6 $5/$25, PM/Developer/QA: claude-sonnet-4-6 $3/$15, Judge: gemini-3.1-pro-preview $2/$12, DevOps: gpt-5-mini $0.25/$2, Researcher: gemini-2.5-flash $0.30/$2.50, primary→fallback→error 3단계 체인), test_core_production.py 신규(4시나리오 34개 테스트 34/34 PASS), health ✅** |
 | **T-045** | **03-05** | **d4f45ee** | **200** | **main.py memory+conversations 라우터 등록, 7 엔드포인트 활성화, Nginx 프록시** |
 | **T-046** | **03-05** | **ad190a9** | **200** | **CEO 대시보드 5페이지, 다크 테마, Sidebar v0.3.0** |
-| **T-047** | **03-05** | **TBD** | **200** | **AADS_MGR/NAS_MGR docs URL 수정, HANDOVER v5.8** |
+| **T-047** | **03-05** | **ca71bf3** | **200** | **AADS_MGR/NAS_MGR docs URL 수정, HANDOVER v5.8** |
 
 ---
 
