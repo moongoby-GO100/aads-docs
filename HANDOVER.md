@@ -444,6 +444,7 @@
 | v5.17 | 2026-03-05 | aads_remote_agent.py message_type→notify 수정(HTTP 422→200), aads-remote-agent.service 재시작 완료; genspark_bridge.py _save_conversation_to_aads() 확인(3000자 청크, category=conversation:{proj}, AADS /memory/ API 저장); REMOTE_211 자동 보고 정상 동작 확인 |
 | v5.14 | 2026-03-05 | T-071(BRIDGE): HANDOVER 업데이트 — T-067(분석탭+analytics API) / T-068(애널리틱스 대시보드 3엔드포인트) / T-069(파싱 엔진 ParseEngine 12테스트 PASS) / T-070(REMOTE_211 온라인) 완료 항목 추가, 원격 에이전트 현황(REMOTE_211/REMOTE_114 online), 서버 전체 배치표(68:AADS, 211:KIS/GO100/ShortFlow docs, 114:ShortFlow service/NewTalk/NAS) 추가 |
 | v5.20 | 2026-03-05 | T-091: 원격 에이전트 task_result 자동수집 + project_tasks upsert — context.py data/value 양방향 허용(SystemMemoryRequest.get_value), _upsert_task_result 타임스탬프 파싱 수정(fromisoformat), schema.sql project_tasks DDL 추가, scripts/aads_remote_agent.py auto_report_task_results() 추가(프로젝트 디렉토리 24h 보고서 파일 감지→task_result 전송), 211서버 KIS/GO100/ShortFlow + 114서버 ShortFlow/NewTalk/NAS, curl 검증 KIS/ShortFlow PASS, commit 6c042bb, push 완료 |
+| v5.21 | 2026-03-05 | T-092: 비용 자동 추적 — cost_tracker.py(PRICE_TABLE 6모델, calculate_cost/record_cost/parse_result_file), auto_trigger.sh 비용 추적 연동(exec_duration_ms 계산+cost_tracker.py record 자동 호출), task_cost_log session_duration_ms/source 컬럼 추가, GET /dashboard/costs by_project_model 집계 추가, analytics cost_status 'no_data' 수정, backfill_costs.py 실행(92파일 스캔 성공60 스킵32), DB 총 65건/$18.35, analytics cost=$17.92 status=active, HTTP 200, commit 6efa920, push 완료 |
 
 ## 지시서 작성규칙
 
