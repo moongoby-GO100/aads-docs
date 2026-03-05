@@ -441,3 +441,23 @@
 | v5.11 | 2026-03-05 | T-066: CEO 대시보드 Tasks 페이지(지시서/보고서/원격작업 3탭), API 4개(GET /dashboard/directives+reports+reports/{filename}+task-history), Sidebar Tasks 메뉴, docker-compose .genspark/directives+project-docs 볼륨 마운트, npm build 0 에러, git push 완료 |
 | v5.17 | 2026-03-05 | aads_remote_agent.py message_type→notify 수정(HTTP 422→200), aads-remote-agent.service 재시작 완료; genspark_bridge.py _save_conversation_to_aads() 확인(3000자 청크, category=conversation:{proj}, AADS /memory/ API 저장); REMOTE_211 자동 보고 정상 동작 확인 |
 | v5.14 | 2026-03-05 | T-071(BRIDGE): HANDOVER 업데이트 — T-067(분석탭+analytics API) / T-068(애널리틱스 대시보드 3엔드포인트) / T-069(파싱 엔진 ParseEngine 12테스트 PASS) / T-070(REMOTE_211 온라인) 완료 항목 추가, 원격 에이전트 현황(REMOTE_211/REMOTE_114 online), 서버 전체 배치표(68:AADS, 211:KIS/GO100/ShortFlow docs, 114:ShortFlow service/NewTalk/NAS) 추가 |
+
+## 지시서 작성규칙
+
+```
+>>>DIRECTIVE_START
+Task ID: T-NNN
+제목: (한글 제목)
+서버: 68 (aads)
+우선순위: P0-CRITICAL / P1-HIGH / P2-NORMAL
+예상 시간: N분
+예상 비용: $0
+의존성: (없음 또는 선행 Task ID)
+
+(작업 내용 상세 기술)
+>>>DIRECTIVE_END
+```
+
+- 타임스탬프: KST 기준 (UTC 금지)
+- 작업 완료 후 HANDOVER.md 반드시 갱신
+- git commit + push 필수
