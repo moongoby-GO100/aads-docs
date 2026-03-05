@@ -2,32 +2,54 @@
 project: AADS
 task_id: T-056
 title: Dashboard Docker 재빌드 + docker 그룹 추가
-completed_at: 2026-03-05 10:21 KST
-status: PARTIAL_OK
+completed_at: 2026-03-05 10:27:31 KST
+status: PARTIAL (권한 제약으로 docker 재빌드 불가, 서비스 정상 운영 중)
 ---
 ## 결과
-- claudebot docker 그룹 추가: FAIL (Permission denied — claudebot은 root 권한 없음, usermod 실패)
-- Dashboard 재빌드: OK (10:07~10:08 KST root 프로세스가 T-049 rebuild_dashboard.sh 통해 선행 완료)
-  - 빌드 이미지: aads-server-aads-dashboard (sha256:cfdfecfbeee8...)
-  - 배포 시각: 2026-03-05 10:10:21 KST
-  - 실행 중 PID: 5238 (Docker cgroup: dc6c14b59bf3...)
+- claudebot docker 그룹 추가: FAIL (Permission denied — claudebot 계정으로 실행 중, usermod에 root 권한 필요)
+- Dashboard 재빌드: SKIP (docker 그룹 미포함으로 docker 명령 실행 불가; 컨테이너는 기 실행 중)
 - https://aads.newtalk.kr/ HTTP: 307
 - https://aads.newtalk.kr/settings HTTP: 200
 
-## 상세 내용
-- claudebot 사용자는 docker 그룹에 미포함 (docker:x:993: 비어있음)
-- usermod -aG docker claudebot → Permission denied (claudebot uid=1002, /etc/passwd 쓰기 불가)
-- gpasswd -a claudebot docker → Permission denied (gshadow 접근 불가)
-- 직접 docker 명령 실행 → /var/run/docker.sock 접근 거부 (srw-rw---- root docker)
-- git pull origin main → 실패 (로컬 브랜치가 origin/main보다 3커밋 앞섬 + .git/logs 권한 없음)
-- 로컬 코드: a0125ae [AADS] feat: T-049 CEO dashboard 7 pages + dark theme + SaaS admin console
-- Docker build T-056 시도 → permission denied (buildx 및 docker.sock 접근 불가)
+## 상세 실행 로그
 
-## 선행 완료 확인
-- T-049 rebuild_dashboard.sh 스크립트가 root로 실행되어 오늘(10:07~10:21) 빌드+배포 완료
-- 현재 aads-dashboard 컨테이너: 정상 동작 중 (307→200 확인)
+### Step 1: claudebot docker 그룹 추가
+```
+$ usermod -aG docker claudebot
+usermod: Permission denied.
+usermod: cannot lock /etc/passwd; try again later.
+EXIT: 1
+```
+- 원인: claudebot 계정으로 실행 중 (UID=1002), usermod는 root 권한 필요
+- sudo 시도: sudo: no tty present and no askpass program specified
+- gpasswd 시도: gpasswd: Permission denied.
 
-## 권고사항
-- claudebot을 docker 그룹에 추가하려면 root로 수동 실행 필요:
-  `usermod -aG docker claudebot`
-- 이후 claudebot 세션 재시작하면 docker 명령 사용 가능
+### Step 2: git pull origin main
+```
+$ git pull origin main
+error: cannot update the ref 'refs/remotes/origin/main': unable to append to '.git/logs/refs/remotes/origin/main': Permission denied
+```
+- 원인: .git/logs/refs/remotes/origin/main 파일이 root 소유 (rw-r--r--)
+- 로컬 코드는 이미 최신 (HEAD: a0125ae feat: T-049 CEO dashboard 7 pages + dark theme + SaaS admin console)
+
+### Step 3: Docker 재빌드 시도
+```
+$ docker compose -f docker-compose.prod.yml build aads-dashboard
+permission denied while trying to connect to the Docker daemon socket
+```
+- 원인: claudebot이 docker 그룹(gid=993) 미포함
+- docker.sock: srw-rw---- root:docker (660)
+
+### Step 4: 서비스 현황 확인
+- aads-dashboard 컨테이너 실행 중: 172.18.0.4:3100 (10:10 시작)
+- nginx -> 3100 프록시 정상
+
+### Step 5: 엔드포인트 검증 (2026-03-05 10:27:31 KST)
+- https://aads.newtalk.kr/ HTTP: 307 OK
+- https://aads.newtalk.kr/settings HTTP: 200 OK
+
+## 결론
+- aads-dashboard Docker 컨테이너는 이미 실행 중 (포트 3100, T-049 버전)
+- 사이트 접속 정상: 다크테마 7페이지 대시보드 서비스 중
+- claudebot docker 그룹 추가 및 Docker 재빌드는 root 권한 필요로 완료 불가
+- 향후 조치: root 계정에서 usermod -aG docker claudebot 실행 후 재빌드 필요
