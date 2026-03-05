@@ -84,6 +84,7 @@
 | **T-056** | **03-05** | **—** | **200** | **Dashboard Docker 재빌드 완료** |
 | **T-057** | **03-05** | **9ab699c** | **200** | **Memory project_status 6건 적재, dashboard 데이터 연동 보강, HANDOVER v5.9** |
 | **T-060** | **03-05** | **3e17ec8** | **200** | **JS 에러 5건 수정(y.slice/e.map→Array.isArray), progress_percent 필드명 수정, Pipeline 사용자 프로젝트 생성+모니터링 UI(createProject/autoRunProject/resumeProject/getProjectCosts+10초 자동갱신), npm build 0 에러, 7페이지 HTTP 200, HANDOVER v5.10** |
+| **T-062** | **03-05** | **TBD** | **PARTIAL** | **116서버 Remote Agent 준비: aads_remote_agent.py(T-061 기반, aiohttp, /health+/status+/tasks+auto_report+collect_conversations), aads-remote-agent-116.service(systemd), deploy_remote_to_116.sh(6단계 자동배포), PROJECTS=newtalk_v2/NT_MGR, 68서버 Context API REMOTE_116 데이터 저장 확인(Memory API id=21 ok). 실제 116서버 배포는 NT116_IP + id_ed25519_newtalk SSH 키 필요** |
 
 ---
 
@@ -409,3 +410,4 @@
 | v5.6 | 2026-03-05 | T-038: 매니저 협업 API 4개 엔드포인트 + 레지스트리 6건 등록(SALES/FINANCE/CONTENT/QA/CUSTOMER/INVESTMENT MGR), INTERVAL make_interval 버그 수정, memory.py+mobile_qa.py 컨테이너 배포 |
 | v5.7 | 2026-03-05 | T-045: main.py memory+conversations 라우터 등록(7 엔드포인트), Nginx /api/v1/memory/+/api/v1/conversations 프록시 활성화, 외부 7/7 200 확인; T-046: CEO 대시보드 5페이지(홈/시스템현황/대화뷰어/매니저/태스크/프로젝트), 다크 테마(bg-gray-950), Sidebar v0.3.0(5메뉴), npm build 0 에러 |
 | v5.8 | 2026-03-05 | T-047: AADS_MGR required_docs URL 수정(aads-docs repo), NAS_MGR docs URL 수정(nas→nas-image), HANDOVER v5.8 |
+| v5.12 | 2026-03-05 | T-062: 116서버 Remote Agent 준비 — aads_remote_agent.py(T-061 기반 aiohttp 데몬), aads-remote-agent-116.service(systemd REMOTE_116), deploy_remote_to_116.sh(6단계 자동배포), PROJECTS=newtalk_v2/NT_MGR, Context API REMOTE_116 저장 확인. 실배포: NT116_IP + SSH 키 필요 |
