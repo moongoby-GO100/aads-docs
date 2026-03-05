@@ -91,6 +91,8 @@
 | **T-069** | **03-05** | **TBD** | **200** | **파싱 엔진 구축: ParseEngine 클래스(HTML/JSON/마크다운 3파서 통합), scripts/parse_engine.py 신규, POST /api/v1/parse 엔드포인트, 지시서 메타데이터(task_id/title/priority/server/steps) 자동 추출, 처리율 90%+, 단위테스트 12/12 PASS** |
 | **T-070** | **03-05** | **TBD** | **200** | **REMOTE_211 에이전트 온라인: 211서버 aads_remote_agent.py 데몬 가동, aads-remote-agent-211.service(systemd), Context API REMOTE_211 등록(heartbeat 60초), PROJECTS=KIS/GO100/ShortFlow, GET /api/v1/memory/agents/REMOTE_211 200 확인** |
 | **T-071** | **03-05** | **TBD** | **200** | **HANDOVER v5.14 업데이트: 원격 에이전트 현황(REMOTE_211 online, REMOTE_114 online) 기록, 서버 배치표 추가(211: KIS/GO100/ShortFlow docs, 114: ShortFlow service/NewTalk/NAS, 68: AADS), T-068~T-071 완료 항목 추가, 보고서 /root/project-docs/aads/reports/T-068_069_070_RESULT.md 작성** |
+| **T-072** | **03-05** | **7656f1e(dashboard)** | **200** | **Tasks 페이지 복구: safeRender dedup 수정, API 평탄화(error=int, error_breakdown), project 필터 백엔드 지원, Directive 타입 추가, 테이블 컬럼(에러유형/시작/완료), npm build 0 에러** |
+| **T-073** | **03-05** | **b926c73(server)/7656f1e(dashboard)** | **200** | **CEO Chat v2 — 계층 메모리 + 컨텍스트 DB + 모델 분기 엔진: DB 4테이블(ceo_chat_sessions/ceo_chat_messages/ceo_facts 22건/ceo_session_summaries), Context Manager 4-layer 시스템프롬프트(facts+세션요약+활성태스크+최근대화 3,500~5,500토큰), Model Router(complex→claude-opus-4-5/code→claude-sonnet-4-5/simple→gemini-2.0-flash/default→sonnet), Gemini Flash 세션 자동 요약(10턴마다+세션종료), 5 API(/ceo-chat/message+/sessions+/sessions/{id}+/end-session+/cost-summary), CEO Chat 프론트엔드(채팅버블+모델정보+비용대시보드+세션관리+접이식사이드바), Sidebar CEO Chat 메뉴(Tasks↓ Pipeline↑), /ceo-chat 200 OK, npm build 0 에러, docker deploy 완료** |
 
 ---
 
