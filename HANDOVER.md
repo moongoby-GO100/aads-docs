@@ -1,5 +1,5 @@
 # HANDOVER – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-05 (v5.13 — T-072: React Error #31 완전 수정(safeRender+중복제거), API 평탄화(directives/reports error=int, error_breakdown 분리), project 필터 백엔드 지원(?project=KIS 등), _parse_directive_file started_at+completed_at+duration_seconds 추가, 지시서 테이블 에러유형+시작+완료 컬럼 추가, 클라이언트 project 필터 fix, npm build 0 에러, docker deploy, git push 완료; v5.12 — T-066 task-history REMOTE_116→114, status 분류(notify→reported, task_result→completed/error), T-067: 분석탭 추가+analytics API; v5.11 — T-066: CEO 대시보드 Tasks 페이지 추가(지시서/보고서/원격작업 3탭), API 4개(/dashboard/directives+reports+reports/{filename}+task-history), Sidebar Tasks 메뉴, docker-compose 볼륨 마운트(.genspark/directives), npm build 0 에러, git push 완료; v5.10 — T-060: JS 에러 5건 수정(slice/map→Array.isArray), progress_percent 필드명 수정, Pipeline 사용자 프로젝트 생성+모니터링 UI; v5.9 — T-048: 프로젝트 통합 현황 API 4개 엔드포인트; T-049: CEO 대시보드 7페이지+다크테마; T-056: Docker 재빌드; T-057: Memory project_status 6건 적재+dashboard 데이터 연동 보강; v5.8 — T-045: main.py에 memory(5 엔드포인트)+conversations(2 엔드포인트) 라우터 등록, Nginx /api/v1/memory/ + /api/v1/conversations 프록시 활성화, 외부 7/7 200 확인; T-046: CEO 대시보드 5페이지(홈 시스템현황/대화뷰어/매니저/태스크/프로젝트), 다크 테마(bg-gray-950), Sidebar v0.3.0(5메뉴), npm build 0 에러; T-047: AADS_MGR required_docs URL 수정(aads-docs repo), NAS_MGR docs URL 수정(nas→nas-image); v5.6 — T-038: 매니저 협업 API 4개 엔드포인트 (GET /memory/search, GET /memory/ceo-decisions, POST /memory/cross-message, GET /memory/inbox/{agent_id}), 매니저 레지스트리 6건 등록 (SALES/FINANCE/CONTENT/QA/CUSTOMER/INVESTMENT MGR), INTERVAL make_interval 버그 수정, memory.py+mobile_qa.py 컨테이너 배포; v5.5 — T-039: 모바일 QA 파이프라인 — Android 에뮬레이터(KVM)+Appium+Gemini Vision 6항목 감리, /api/v1/mobile-qa/* 5 엔드포인트, IOS-QA-SETUP.md, QA Agent mobile_android|mobile_ios 분기; v5.4 — T-036: GET /context/public-summary 읽기전용 엔드포인트 200 PASS, 민감 데이터 0건; T-037: bridge.py 대화분류/저장(classify_aads_conversation 7카테고리), memory_helper.sh save_manager_report() 추가; v5.3 — T-035: 모바일 반응형 최적화 — Sidebar 햄버거 메뉴, ClientLayout, 로그인 풀스크린)
+> 최종 업데이트: 2026-03-05 (v5.14 — T-071: HANDOVER v5.14 업데이트(원격 에이전트 REMOTE_211/REMOTE_114 online 기록, 서버 배치표 추가); T-070: REMOTE_211 에이전트 온라인(211서버 aads_remote_agent.py 데몬 가동, Context API REMOTE_211 등록, heartbeat 60초); T-069: 파싱 엔진 구축(HTML/JSON/마크다운 멀티파서 ParseEngine 클래스, POST /api/v1/parse 엔드포인트, 처리율 90%+); T-068: 애널리틱스 대시보드(KPI 4종 실시간 집계, /dashboard/analytics 페이지, GET /dashboard/analytics+stats+export 3엔드포인트, npm build 0 에러); v5.13 — T-072: React Error #31 완전 수정(safeRender+중복제거), API 평탄화(directives/reports error=int, error_breakdown 분리), project 필터 백엔드 지원(?project=KIS 등), _parse_directive_file started_at+completed_at+duration_seconds 추가, 지시서 테이블 에러유형+시작+완료 컬럼 추가, 클라이언트 project 필터 fix, npm build 0 에러, docker deploy, git push 완료; v5.12 — T-066 task-history REMOTE_116→114, status 분류(notify→reported, task_result→completed/error), T-067: 분석탭 추가+analytics API; v5.11 — T-066: CEO 대시보드 Tasks 페이지 추가(지시서/보고서/원격작업 3탭), API 4개(/dashboard/directives+reports+reports/{filename}+task-history), Sidebar Tasks 메뉴, docker-compose 볼륨 마운트(.genspark/directives), npm build 0 에러, git push 완료; v5.10 — T-060: JS 에러 5건 수정(slice/map→Array.isArray), progress_percent 필드명 수정, Pipeline 사용자 프로젝트 생성+모니터링 UI; v5.9 — T-048: 프로젝트 통합 현황 API 4개 엔드포인트; T-049: CEO 대시보드 7페이지+다크테마; T-056: Docker 재빌드; T-057: Memory project_status 6건 적재+dashboard 데이터 연동 보강; v5.8 — T-045: main.py에 memory(5 엔드포인트)+conversations(2 엔드포인트) 라우터 등록, Nginx /api/v1/memory/ + /api/v1/conversations 프록시 활성화, 외부 7/7 200 확인; T-046: CEO 대시보드 5페이지(홈 시스템현황/대화뷰어/매니저/태스크/프로젝트), 다크 테마(bg-gray-950), Sidebar v0.3.0(5메뉴), npm build 0 에러; T-047: AADS_MGR required_docs URL 수정(aads-docs repo), NAS_MGR docs URL 수정(nas→nas-image); v5.6 — T-038: 매니저 협업 API 4개 엔드포인트 (GET /memory/search, GET /memory/ceo-decisions, POST /memory/cross-message, GET /memory/inbox/{agent_id}), 매니저 레지스트리 6건 등록 (SALES/FINANCE/CONTENT/QA/CUSTOMER/INVESTMENT MGR), INTERVAL make_interval 버그 수정, memory.py+mobile_qa.py 컨테이너 배포; v5.5 — T-039: 모바일 QA 파이프라인 — Android 에뮬레이터(KVM)+Appium+Gemini Vision 6항목 감리, /api/v1/mobile-qa/* 5 엔드포인트, IOS-QA-SETUP.md, QA Agent mobile_android|mobile_ios 분기; v5.4 — T-036: GET /context/public-summary 읽기전용 엔드포인트 200 PASS, 민감 데이터 0건; T-037: bridge.py 대화분류/저장(classify_aads_conversation 7카테고리), memory_helper.sh save_manager_report() 추가; v5.3 — T-035: 모바일 반응형 최적화 — Sidebar 햄버거 메뉴, ClientLayout, 로그인 풀스크린)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션(웹 Claude, Cursor, Claude Code) 시작 시 필수 읽기
 
@@ -86,6 +86,11 @@
 | **T-060** | **03-05** | **3e17ec8** | **200** | **JS 에러 5건 수정(y.slice/e.map→Array.isArray), progress_percent 필드명 수정, Pipeline 사용자 프로젝트 생성+모니터링 UI(createProject/autoRunProject/resumeProject/getProjectCosts+10초 자동갱신), npm build 0 에러, 7페이지 HTTP 200, HANDOVER v5.10** |
 | **T-062** | **03-05** | **TBD** | **PARTIAL** | **116서버 Remote Agent 준비: aads_remote_agent.py(T-061 기반, aiohttp, /health+/status+/tasks+auto_report+collect_conversations), aads-remote-agent-116.service(systemd), deploy_remote_to_116.sh(6단계 자동배포), PROJECTS=newtalk_v2/NT_MGR, 68서버 Context API REMOTE_116 데이터 저장 확인(Memory API id=21 ok). 실제 116서버 배포는 NT116_IP + id_ed25519_newtalk SSH 키 필요** |
 | **T-066** | **03-05** | **292564a/8cc7aa8** | **200** | **CEO 대시보드 Tasks 페이지(지시서/보고서/원격작업 3탭), API 4개(/dashboard/directives+reports+reports/{filename}+task-history), Sidebar Tasks 메뉴, docker-compose 볼륨 마운트(.genspark/directives), npm build 0 에러, HANDOVER v5.11** |
+| **T-067** | **03-05** | **TBD** | **200** | **분석탭 추가 + analytics API: task-history REMOTE_116→114 수정, status 분류(notify→reported, task_result→completed/error), GET /dashboard/analytics 엔드포인트, 분석 탭 UI(완료율/에러율/원격작업 현황), npm build 0 에러** |
+| **T-068** | **03-05** | **TBD** | **200** | **애널리틱스 대시보드: KPI 4종(총 지시서/완료/에러/원격작업) 실시간 집계, /dashboard/analytics 페이지, GET /dashboard/analytics+/dashboard/analytics/stats+/dashboard/analytics/export 3 엔드포인트, Chart.js 없이 Tailwind CSS 순수 구현, npm build 0 에러, docker deploy 완료** |
+| **T-069** | **03-05** | **TBD** | **200** | **파싱 엔진 구축: ParseEngine 클래스(HTML/JSON/마크다운 3파서 통합), scripts/parse_engine.py 신규, POST /api/v1/parse 엔드포인트, 지시서 메타데이터(task_id/title/priority/server/steps) 자동 추출, 처리율 90%+, 단위테스트 12/12 PASS** |
+| **T-070** | **03-05** | **TBD** | **200** | **REMOTE_211 에이전트 온라인: 211서버 aads_remote_agent.py 데몬 가동, aads-remote-agent-211.service(systemd), Context API REMOTE_211 등록(heartbeat 60초), PROJECTS=KIS/GO100/ShortFlow, GET /api/v1/memory/agents/REMOTE_211 200 확인** |
+| **T-071** | **03-05** | **TBD** | **200** | **HANDOVER v5.14 업데이트: 원격 에이전트 현황(REMOTE_211 online, REMOTE_114 online) 기록, 서버 배치표 추가(211: KIS/GO100/ShortFlow docs, 114: ShortFlow service/NewTalk/NAS, 68: AADS), T-068~T-071 완료 항목 추가, 보고서 /root/project-docs/aads/reports/T-068_069_070_RESULT.md 작성** |
 
 ---
 
@@ -310,7 +315,25 @@
   - `POST /api/v1/visual-qa/image-qa` — 이미지 일괄 검수 (ImageQAResponse)
   - `POST /api/v1/visual-qa/image-quality-gate` — 단일 이미지 품질 게이트 (action: approve|reject)
 
-### 서버 배포 현황 (T-027+T-028+T-029)
+### 서버 전체 배치표 (v5.14, T-071 기준)
+
+| 서버 | 호스트명 | 주요 서비스 | 원격 에이전트 | 상태 |
+|------|----------|------------|--------------|------|
+| **68** | aads.newtalk.kr | AADS 코어(FastAPI+LangGraph), CEO 대시보드(Next.js), PostgreSQL, Redis, Nginx | — | **ONLINE** |
+| **211** | ShortFlow/GO100 서버 | KIS 프로젝트, GO100 파이프라인, ShortFlow 문서/스크립트 | **REMOTE_211** | **ONLINE** |
+| **114** | ShortFlow 서비스 서버 | ShortFlow 영상 서비스, NewTalk V2, NAS 연동 | **REMOTE_114** | **ONLINE** |
+
+### 원격 에이전트 현황 (v5.14)
+
+| 에이전트 ID | 서버 | 프로젝트 | 상태 | 마지막 heartbeat |
+|------------|------|----------|------|----------------|
+| REMOTE_211 | 211서버 | KIS, GO100, ShortFlow | **online** | 60초 주기 |
+| REMOTE_114 | 114서버 | ShortFlow service, NewTalk, NAS | **online** | 60초 주기 |
+
+- **Context API 확인**: `GET /api/v1/memory/agents/REMOTE_211`, `GET /api/v1/memory/agents/REMOTE_114`
+- **배포 스크립트**: `scripts/deploy_remote_to_211.sh`, `scripts/deploy_remote_to_114.sh`
+
+### 서버 배포 현황 (T-027+T-028+T-029, QA 클라이언트)
 
 | 서버 | 역할 | 클라이언트 | 용도 |
 |------|------|-----------|------|
@@ -413,3 +436,4 @@
 | v5.8 | 2026-03-05 | T-047: AADS_MGR required_docs URL 수정(aads-docs repo), NAS_MGR docs URL 수정(nas→nas-image), HANDOVER v5.8 |
 | v5.12 | 2026-03-05 | T-062: 116서버 Remote Agent 준비 — aads_remote_agent.py(T-061 기반 aiohttp 데몬), aads-remote-agent-116.service(systemd REMOTE_116), deploy_remote_to_116.sh(6단계 자동배포), PROJECTS=newtalk_v2/NT_MGR, Context API REMOTE_116 저장 확인. 실배포: NT116_IP + SSH 키 필요 |
 | v5.11 | 2026-03-05 | T-066: CEO 대시보드 Tasks 페이지(지시서/보고서/원격작업 3탭), API 4개(GET /dashboard/directives+reports+reports/{filename}+task-history), Sidebar Tasks 메뉴, docker-compose .genspark/directives+project-docs 볼륨 마운트, npm build 0 에러, git push 완료 |
+| v5.14 | 2026-03-05 | T-071(BRIDGE): HANDOVER 업데이트 — T-067(분석탭+analytics API) / T-068(애널리틱스 대시보드 3엔드포인트) / T-069(파싱 엔진 ParseEngine 12테스트 PASS) / T-070(REMOTE_211 온라인) 완료 항목 추가, 원격 에이전트 현황(REMOTE_211/REMOTE_114 online), 서버 전체 배치표(68:AADS, 211:KIS/GO100/ShortFlow docs, 114:ShortFlow service/NewTalk/NAS) 추가 |
