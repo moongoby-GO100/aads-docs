@@ -1,5 +1,5 @@
-# AADS HANDOVER v6.4
-최종 업데이트: 2026-03-06 | 버전: v6.4 — AADS-128/129/130 10-Agent 풀사이클 통합 완료
+# AADS HANDOVER v6.5
+최종 업데이트: 2026-03-06 | 버전: v6.5 — AADS-130 E2E 검증 완료 + 소스코드 모듈화 확정
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -17,7 +17,7 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-124 FLOW 체계 최종 Wrap up | 완료 |
+| AADS | Phase 2 운영 | AADS-130 E2E 검증 + 모듈화 Wrap-up | 완료 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
@@ -37,23 +37,32 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 소규모 수정: Operate → Wrap up만 수행 가능
 상세: shared/rules/flow-rules.md | WRAP 게이트: auto_trigger.sh (R-014)
 
-## AADS-128~130 완료 사항 (2026-03-06)
-- AADS-128: Full-Cycle Graph (ideation+execution 서브그래프 통합), project_artifacts DB, artifacts API 3개
-- AADS-129: CEO 체크포인트 UI 4페이지 (select-item, approve-plan, full-cycle, reports), checkpoint sub-routes 4개
-- AADS-130: E2E 3시나리오 검증(20/20 통과), models/ 모듈화(strategy/plan/artifact), services/db_recorder.py, debate-logs optional query
-- 신규 DB 테이블: project_artifacts (산출물 통합 저장)
-- 신규 API: POST/GET /api/v1/artifacts, POST /api/v1/projects/{id}/checkpoint/{action}
-- 테스트: test_full_cycle.py(10/10), test_e2e_scenarios.py(20/20), 기존 183 통과
+## AADS-130 최종 완료 사항 (2026-03-06 Wrap-up)
+- **E2E 3시나리오 검증 완료**: AI 퍼포먼스 마케팅 SaaS / K-12 교육 플랫폼 / 이커머스 셀러 도구
+  - 각 시나리오: strategy_reports ✅ + project_plans ✅ + debate_logs ✅ + artifacts 6건 ✅
+  - 건당 비용: $3.72~$4.03 (전체 $5 이하 기준 통과)
+  - DB 총합: strategy_reports 4건, project_plans 4건, debate_logs 6건, artifacts 18건
+- **소스코드 모듈화 (D-017 준수)**:
+  - agents/: 10파일 (BaseAgent + strategist/planner/pm/supervisor/architect/developer/qa/judge/devops/researcher)
+  - graphs/: 3파일 (ideation_subgraph/execution_chain/full_cycle_graph) + __init__
+  - models/: 4파일 (strategy/plan/task/artifact) + __init__
+  - services/: 4파일 (mcp_client/model_router/db_recorder/cost_tracker) + __init__
+- **신규 DB 테이블**: debate_logs (토론 이력) + projects (모드 컬럼 포함)
+- **신규 API**: GET /api/v1/debate-logs?project_id=...
+- **테스트**: strategist 7/7, planner 7/7, ideation_subgraph 9/9, full_cycle 10/10, unit 114/118 (4건 sandbox 기존 실패)
 
-## AADS-124 완료 사항 (2026-03-06)
-- CEO-DIRECTIVES v2.8: D-016 FLOW, R-014 Wrap up 의무화, R-015 교훈 등록, 9-3 파일명 확장
-- auto_trigger.sh WRAP 게이트: P0/P1 WRAP 미완료 시 다음 작업 차단 (10분 대기)
-- claude_exec.sh 자동 health-check: P2/P3 완료 후 5분 → pipeline_healthy 확인, 실패 시 WRAP 자동 생성
-- 전체 검증 체크리스트 20개 항목 수행 + PLN-AADS-001-v2 Wrap up 완료
+## AADS-128~129 완료 사항 (2026-03-06)
+- AADS-128: Full-Cycle Graph (ideation+execution 서브그래프 통합), project_artifacts DB, artifacts API
+- AADS-129: CEO 체크포인트 UI 4페이지 (select-item, approve-plan, full-cycle, reports)
+
+## CEO-DIRECTIVES 원칙 (현행 v2.8)
+- D-016: FLOW 프레임워크 (Find→Layout→Operate→Wrap up) 모든 작업 의무
+- D-017: 소스코드 모듈화 원칙 — agents/graphs/models/services 4개 디렉토리 독립 모듈
+- 모든 산출물 DB화 원칙: project_artifacts 테이블 통합 저장
 
 ## 상세 참조
 - AADS 전용 지식: /root/aads/aads-server/docs/knowledge/AADS-KNOWLEDGE.md
 - 공유 교훈: shared/lessons/INDEX.md
 - CEO 지침: CEO-DIRECTIVES.md (v2.8)
 - 이전 HANDOVER 전문: archive/HANDOVER-v5.39-full.md
-- WRAP 보고서: shared/verify/AADS-WRAP-124_FLOW체계전체검증.md
+- WRAP 보고서: AADS-130_WRAPUP_REPORT.md
