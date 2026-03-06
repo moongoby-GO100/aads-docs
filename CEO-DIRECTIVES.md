@@ -246,6 +246,12 @@ HANDOVER: https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md
 - R-011: Supabase 연결 시 반드시 직접 연결(port 5432) 사용. Supavisor/PgBouncer(port 6543) 경유 금지 (AsyncPostgresSaver pipeline 충돌).
 - R-012: 작업당 LLM 호출 최대 15회. 초과 시 자동 중단 후 Supervisor에 에스컬레이션.
 
+### R-013: Task ID 접두사 체계
+- 신규 지시서는 반드시 프로젝트 접두사 사용
+- AADS-xxx, KIS-xxx, GO100-xxx, SF-xxx, NT-xxx, SALES-xxx, NAS-xxx
+- 번호는 프로젝트별 마지막 번호+1 (AADS: 107~, KIS: 168~, GO100: 038~)
+- T-xxx 레거시 ID는 읽기 전용으로 유효, 신규 발행 금지
+
 ---
 
 ## 4. Genspark CEO 통합지휘 대화 규칙
@@ -334,3 +340,4 @@ curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongob
 | v2.2 | 2026-03-02 | Genspark 통합지휘 규칙 섹션 4 추가 (9-1~9-8), Directive 블록 파싱, 보고 형식 표준화 |
 | v2.6 | 2026-03-05 | D-015 추가 — 68서버 프로덕션 유지 결정: 옵션 A (68서버 유지), 도메인 aads.newtalk.kr 고정, Fly.io Phase 3 SaaS 확장 시 재평가. T-032 프로덕션 강화 완료. |
 | v2.5 | 2026-03-04 | D-014 추가 — 콘텐츠 품질 게이트: 자동 배포 콘텐츠 벤치마크 85% 이상 필수, ShortFlow 연동(shortflow_quality_gate.sh), AUTO_PUBLISH/CONDITIONAL/AUTO_REJECT 판정 기준 |
+| v2.7 | 2026-03-06 | AADS-107: R-013 Task ID 접두사 체계 등록 — 프로젝트별 독립 넘버링(AADS/KIS/GO100/SF/NT/SALES/NAS), T-xxx 레거시 신규 발행 금지 |

@@ -478,6 +478,7 @@
 | v5.25 | 2026-03-06 | T-102: CEO 문서 자동 저장 시스템 — documents.py(GET/POST/DELETE /api/v1/documents 4엔드포인트, _index.json 관리, system_memory ceo_document 저장), bridge.py 문서감지 확장(DOCUMENT_PATTERNS 5종 키워드, classify_document, save_as_document), backfill_ceo_documents.py 소급저장(5건: PLAN-001/TECH-001/TECH-002/RESEARCH-001/STATUS-001), Docker 재빌드, curl 5건 반환 확인 |
 | v5.26 | 2026-03-06 | T-103: 대화창 관리 CRUD UI — channels.py(GET/POST/PUT/DELETE /api/v1/channels + GET /api/v1/channels/{id}/context-package), system_memory category=channels, 6건 마이그레이션(AADS_MGR/GO100_MGR/KIS_V41_MGR/SF_MGR/NAS_MGR/NTV2_MGR), 대시보드 /channels 페이지(추가/수정/삭제 모달+액션), Sidebar 대화창 메뉴, api.ts 채널 CRUD 4함수, npm build 0에러, docker rebuild+재배포, curl 외부 6건 HTTP 200 |
 | v5.27 | 2026-03-06 | T-105+T-095+T-103(확장)+T-104: 대기큐 정리(4건 done/ 이동) + UI-PROTO-001.md 설계서(designs/) + channels.py context_docs+system_prompt+context-package endpoint + 6채널 context_docs 등록 + ModelSelector.tsx(5모델 칩) + /genspark 페이지(iframe→새탭 폴백) + Sidebar Genspark AI 메뉴 + 대시보드 Genspark 카드 + ceo-chat ModelSelector 연동 + ceo_chat.py model override + api.ts model 파라미터+getContextPackage + npm build 0에러 + Docker 재배포 + HTTP 200 |
+| v5.28 | 2026-03-06 | AADS-107: Task ID 프로젝트 접두사 체계 전환 — T-xxx → AADS-xxx/KIS-xxx/GO100-xxx/SF-xxx/NT-xxx/SALES-xxx/NAS-xxx 프로젝트별 독립 넘버링, genspark_bridge.py DirectiveBridge 클래스(PROJECT_PREFIX_MAP, _normalize_task_id, _is_task_seen, _mark_task_seen), migrate_seen_tasks.py 마이그레이션 스크립트, auto_trigger.sh grep -oP 접두사 패턴 인식, context.py _normalize_task_id_for_db, project_dashboard.py _project_from_task_id, R-013 규칙 등록, Task ID 카운터 테이블 추가, 충돌 근본 해결 |
 
 ## 지시서 작성규칙
 
@@ -498,3 +499,15 @@ Task ID: T-NNN
 - 타임스탬프: KST 기준 (UTC 금지)
 - 작업 완료 후 HANDOVER.md 반드시 갱신
 - git commit + push 필수
+
+## Task ID 카운터
+
+| 프로젝트 | 접두사 | 마지막 ID | 다음 ID |
+|----------|--------|-----------|---------|
+| AADS | AADS- | AADS-107 | AADS-108 |
+| KIS | KIS- | KIS-168 | KIS-169 |
+| GO100 | GO100- | GO100-038 | GO100-039 |
+| ShortFlow | SF- | SF-012 | SF-013 |
+| NewTalk | NT- | NT-033 | NT-034 |
+| SALES | SALES- | SALES-003 | SALES-004 |
+| NAS | NAS- | NAS-001 | NAS-002 |
