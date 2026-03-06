@@ -1,5 +1,5 @@
-# AADS HANDOVER v6.5
-최종 업데이트: 2026-03-06 | 버전: v6.5 — AADS-130 E2E 검증 완료 + 소스코드 모듈화 확정
+# AADS HANDOVER v6.6
+최종 업데이트: 2026-03-06 | 버전: v6.6 — AADS-134 4계층 자기치유 통합 + 대시보드 Recovery/Servers + CEO-DIRECTIVES v3.0
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -29,8 +29,29 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 
 ## 핵심 자동화 (TECH-002 참조)
 8단계 파이프라인: CEO지시→Bridge감지→사전검증→우선순위전송→Claude실행→결과보고→DB기록→교차검증(9종)
-자동복구: 12건 상시 가동 (pipeline_monitor, watchdog, cross_validator, approval_queue)
+자동복구: **15건** 상시 가동 (기존 12 + 신규 3: recovery_graph + escalation_engine + circuit_breaker)
 세션 관리: 글로벌 ≤4, 서버별 동적 1~3슬롯
+
+## 4계층 자기치유 체계 (AADS-131~134, 2026-03-06)
+| 계층 | 컴포넌트 | 주기/타임아웃 | 위치 |
+|------|---------|-------------|------|
+| L1 | claude_exec 내장 타이머 | 30분 하드 타임아웃 | 3서버 공통 |
+| L1 | bridge 셀프체크 | 60초 | 서버 211 |
+| L2 | watchdog_daemon | 30초 | 서버 68 |
+| L2 | pipeline_monitor | 2분 | 서버 211 |
+| L2 | bridge_monitor | 60초 | 서버 211 |
+| L3 | meta_watchdog.sh | cron */1 | 서버 211 |
+| L4 | UptimeRobot / GitHub Actions | 외부 | 외부 |
+
+**서버 상호감시**: 211↔68↔114 삼각형 크로스 모니터링, 2분 주기
+**복구 의존성**: recovery_graph.py 위상정렬 기반
+**에스컬레이션**: 3단계 (L2→L3→L4)
+**서킷브레이커**: 3회 연속 실패 → 5분 쿨다운 (circuit_breaker_state DB)
+**복구 이력**: recovery_logs DB (project_id 포함)
+
+## 대시보드 신규 페이지 (AADS-134)
+- `/ops/recovery` — Recovery History + 서킷브레이커 상태 + 통계
+- `/ops/servers` — 3서버 상태 카드 + 감시 토폴로지 + 4계층 현황
 
 ## FLOW 프레임워크
 모든 작업: Find → Lay out → Operate → Wrap up (D-016)
@@ -55,9 +76,13 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 - AADS-128: Full-Cycle Graph (ideation+execution 서브그래프 통합), project_artifacts DB, artifacts API
 - AADS-129: CEO 체크포인트 UI 4페이지 (select-item, approve-plan, full-cycle, reports)
 
-## CEO-DIRECTIVES 원칙 (현행 v2.8)
+## CEO-DIRECTIVES 원칙 (현행 v3.0)
 - D-016: FLOW 프레임워크 (Find→Layout→Operate→Wrap up) 모든 작업 의무
 - D-017: 소스코드 모듈화 원칙 — agents/graphs/models/services 4개 디렉토리 독립 모듈
+- D-018: 4계층 자기치유 원칙 — L1~L4 모든 프로세스 타임아웃+감시 의무
+- D-019: 서버 상호 감시 의무화 — 3서버 2분 주기 크로스 모니터링
+- D-020: 복구 이력 DB 의무화 — recovery_logs 테이블 기록
+- R-016: 서킷브레이커 준수 — 3회 실패 시 5분 쿨다운
 - 모든 산출물 DB화 원칙: project_artifacts 테이블 통합 저장
 
 ## 상세 참조

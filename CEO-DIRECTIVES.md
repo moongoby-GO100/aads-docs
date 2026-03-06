@@ -1,5 +1,5 @@
 # CEO DIRECTIVES – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-06 (v2.9)
+> 최종 업데이트: 2026-03-06 (v3.0)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션에서 필수 읽기. 이 문서의 지시를 위반하는 설계/분석은 무효.
 
@@ -116,6 +116,22 @@
 - Pydantic 모델은 `app/models/` (strategy.py, plan.py, artifact.py)로 분리한다.
 - 공통 DB 기록은 `app/services/db_recorder.py`를 통해 수행한다.
 - 각 모듈은 독립적으로 import/단위테스트 가능해야 한다.
+
+### D-018: 4계층 자기치유 원칙 (AADS-134, 2026-03-06)
+- L1(프로세스 자체 방어) → L2(핵심 감시자) → L3(메타 감시자) → L4(외부 감시) 4계층 구조를 의무화한다.
+- 모든 프로세스는 자체 타임아웃(L1, 30분)을 반드시 가져야 한다.
+- 감시자를 감시하는 상위 계층이 반드시 존재해야 한다. 단일 watchdog는 자기 자신의 장애를 감지할 수 없다.
+- 복구 간 의존성은 그래프(recovery_graph)로 관리하며, 3단계 에스컬레이션을 적용한다.
+
+### D-019: 서버 상호 감시 의무화 (AADS-134, 2026-03-06)
+- 3서버(211, 68, 114)는 서로를 2분 주기로 크로스 모니터링한다.
+- 어느 1대 장애 시 나머지 2대가 감지·복구·알림을 수행한다.
+- 삼각형 감시 토폴로지: 211↔68↔114↔211. 단일 장애점 제거.
+
+### D-020: 복구 이력 DB 의무화 (AADS-134, 2026-03-06)
+- 모든 자동복구 시도는 `recovery_logs` 테이블에 project_id 포함하여 기록한다.
+- 주간 단위로 복구 통계(/ops/recovery)를 리뷰하고, 반복 이슈는 근본 해결한다.
+- circuit_breaker_state 테이블로 서킷브레이커 상태를 영속 관리한다.
 
 ---
 
@@ -273,6 +289,12 @@ HANDOVER: https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md
 - Wrap up 시 다른 프로젝트에도 적용 가능한 교훈이 있으면 shared/lessons/에 등록.
 - 결과 파일에 ## 교훈 섹션 작성 시 API가 자동 등록.
 
+### R-016: 서킷브레이커 준수 (AADS-134, 2026-03-06)
+- 동일 서버/프로젝트에서 3회 연속 작업 실패 시 5분(300초) 쿨다운 의무.
+- 쿨다운 중 해당 서버/프로젝트에 신규 작업 투입 금지.
+- 쿨다운 만료 후 half_open 상태에서 1건 시험 실행 후 closed 복귀.
+- 수동 리셋은 대시보드 /ops/recovery에서 CEO 승인 후 수행.
+
 ---
 
 ## 4. Genspark CEO 통합지휘 대화 규칙
@@ -369,3 +391,4 @@ curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongob
 | v2.7 | 2026-03-06 | AADS-107: R-013 Task ID 접두사 체계 등록 — 프로젝트별 독립 넘버링(AADS/KIS/GO100/SF/NT/SALES/NAS), T-xxx 레거시 신규 발행 금지 |
 | v2.9 | 2026-03-06 | D-017 소스코드 모듈화, project_artifacts DB화 원칙, AADS-128~130 풀사이클 완료 |
 | v2.8 | 2026-03-06 | D-016 FLOW 프레임워크, R-014 Wrap up 의무화, R-015 교훈 등록, 9-3 산출물 파일명 확장, 버전 이력 시간순 정렬 |
+| v3.0 | 2026-03-06 | AADS-134: D-018(4계층 자기치유), D-019(서버 상호 감시), D-020(복구 이력 DB), R-016(서킷브레이커 준수) — 대시보드 Recovery+Servers 페이지, project_healing.py |
