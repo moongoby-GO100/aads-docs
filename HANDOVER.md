@@ -1,5 +1,5 @@
-# AADS HANDOVER v6.0
-최종 업데이트: 2026-03-06 | 버전: v6.0 — FLOW 문서화 체계 도입
+# AADS HANDOVER v6.1
+최종 업데이트: 2026-03-06 | 버전: v6.1 — AADS-122 Context API lessons 엔드포인트 + 교훈 자동등록
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -17,7 +17,7 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-120 FLOW Phase 1-B 완료 | 진행중 |
+| AADS | Phase 2 운영 | AADS-122 lessons API + 교훈 자동등록 완료 | 진행중 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
@@ -36,6 +36,14 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 모든 작업: Find → Lay out → Operate → Wrap up
 소규모 수정: Operate → Wrap up만 수행 가능
 상세: shared/rules/flow-rules.md
+
+## AADS-122 완료 사항 (2026-03-06)
+- GET/POST /api/v1/lessons — 교훈 CRUD API
+- DB: lessons 테이블 생성 (10번째 테이블)
+- 교훈 8건 DB 등록 (L-001~L-008)
+- claude_exec.sh: aads_lesson_check() 자동 등록 함수
+- genspark_bridge.py: 교훈 자동첨부 로직 (_attach_relevant_lessons)
+- 유지보수 모드 첫 실전 적용 (AADS-116)
 
 ## 상세 참조
 - AADS 전용 지식: /root/aads/aads-server/docs/knowledge/AADS-KNOWLEDGE.md
