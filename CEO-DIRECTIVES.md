@@ -1,5 +1,5 @@
 # CEO DIRECTIVES – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-06 (v2.8)
+> 최종 업데이트: 2026-03-06 (v2.9)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션에서 필수 읽기. 이 문서의 지시를 위반하는 설계/분석은 무효.
 
@@ -109,6 +109,13 @@
 - 모든 신규 작업은 Find→Layout→Operate→Wrap up 4단계를 따른다.
 - 소규모 버그수정/설정변경은 Operate→Wrap up만 수행 가능.
 - 각 단계 산출물에 parent 필드로 선행 산출물을 참조한다.
+
+### D-017: 소스코드 모듈화 원칙 (AADS-130, 2026-03-06)
+- 모든 에이전트 산출물은 `project_artifacts` 테이블에 통합 저장한다.
+- 에이전트별 로직은 `app/agents/` 독립 파일로 분리한다.
+- Pydantic 모델은 `app/models/` (strategy.py, plan.py, artifact.py)로 분리한다.
+- 공통 DB 기록은 `app/services/db_recorder.py`를 통해 수행한다.
+- 각 모듈은 독립적으로 import/단위테스트 가능해야 한다.
 
 ---
 
@@ -360,4 +367,5 @@ curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongob
 | v2.6 | 2026-03-05 | D-015 추가 — 68서버 프로덕션 유지 결정: 옵션 A (68서버 유지), 도메인 aads.newtalk.kr 고정, Fly.io Phase 3 SaaS 확장 시 재평가. T-032 프로덕션 강화 완료. |
 | v2.5 | 2026-03-04 | D-014 추가 — 콘텐츠 품질 게이트: 자동 배포 콘텐츠 벤치마크 85% 이상 필수, ShortFlow 연동(shortflow_quality_gate.sh), AUTO_PUBLISH/CONDITIONAL/AUTO_REJECT 판정 기준 |
 | v2.7 | 2026-03-06 | AADS-107: R-013 Task ID 접두사 체계 등록 — 프로젝트별 독립 넘버링(AADS/KIS/GO100/SF/NT/SALES/NAS), T-xxx 레거시 신규 발행 금지 |
+| v2.9 | 2026-03-06 | D-017 소스코드 모듈화, project_artifacts DB화 원칙, AADS-128~130 풀사이클 완료 |
 | v2.8 | 2026-03-06 | D-016 FLOW 프레임워크, R-014 Wrap up 의무화, R-015 교훈 등록, 9-3 산출물 파일명 확장, 버전 이력 시간순 정렬 |

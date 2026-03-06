@@ -1,5 +1,5 @@
-# AADS HANDOVER v6.3
-최종 업데이트: 2026-03-06 | 버전: v6.3 — AADS-124 FLOW 문서화 체계 최종 Wrap up
+# AADS HANDOVER v6.4
+최종 업데이트: 2026-03-06 | 버전: v6.4 — AADS-128/129/130 10-Agent 풀사이클 통합 완료
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -36,6 +36,14 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 모든 작업: Find → Lay out → Operate → Wrap up (D-016)
 소규모 수정: Operate → Wrap up만 수행 가능
 상세: shared/rules/flow-rules.md | WRAP 게이트: auto_trigger.sh (R-014)
+
+## AADS-128~130 완료 사항 (2026-03-06)
+- AADS-128: Full-Cycle Graph (ideation+execution 서브그래프 통합), project_artifacts DB, artifacts API 3개
+- AADS-129: CEO 체크포인트 UI 4페이지 (select-item, approve-plan, full-cycle, reports), checkpoint sub-routes 4개
+- AADS-130: E2E 3시나리오 검증(20/20 통과), models/ 모듈화(strategy/plan/artifact), services/db_recorder.py, debate-logs optional query
+- 신규 DB 테이블: project_artifacts (산출물 통합 저장)
+- 신규 API: POST/GET /api/v1/artifacts, POST /api/v1/projects/{id}/checkpoint/{action}
+- 테스트: test_full_cycle.py(10/10), test_e2e_scenarios.py(20/20), 기존 183 통과
 
 ## AADS-124 완료 사항 (2026-03-06)
 - CEO-DIRECTIVES v2.8: D-016 FLOW, R-014 Wrap up 의무화, R-015 교훈 등록, 9-3 파일명 확장
