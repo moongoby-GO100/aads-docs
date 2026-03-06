@@ -1,13 +1,43 @@
 {
-  "generated_at": "2026-03-06 12:14 KST",
-  "total_documents": 5,
+  "generated_at": "2026-03-06 14:50 KST",
+  "total_documents": 31,
   "documents": [
+    {
+      "id": "TECH-002",
+      "type": "tech",
+      "title": "AADS 정적 스냅샷 시스템 연구",
+      "filename": "TECH-002_aads-정적-스냅샷-시스템-연구.md",
+      "created_at": "2026-03-06 00:00 KST",
+      "source_session": "genspark_aads_mgr_current",
+      "summary": "# TECH-002: AADS 정적 스냅샷 시스템 연구  ## 목적 AADS API 서버가 다운되거나 응답이 느릴 때 CEO가 핵심 정보에 즉시 접근할 수 있도록 정적 JSON 스냅샷을 주기적으로 생성·저장하는 시스템.  ## 아키텍처 ``` cron (5분 주기) └── generate_manager_snapshot.py     ├── GET /api/v",
+      "tags": [
+        "tech",
+        "snapshot",
+        "static",
+        "research"
+      ]
+    },
+    {
+      "id": "STATUS-001",
+      "type": "status",
+      "title": "지휘통제소 종합 상황 보고서 (API 맵 포함)",
+      "filename": "STATUS-001_지휘통제소-종합-상황-보고서-api-맵-포함.md",
+      "created_at": "2026-03-06 00:00 KST",
+      "source_session": "genspark_aads_mgr_current",
+      "summary": "# STATUS-001: 지휘통제소 종합 상황 보고서  ## 보고 일시 2026-03-06 KST  ## 시스템 현황 요약 | 서버 | 역할 | 상태 | 포트 | |------|------|------|------| | Server 68 | AADS 메인 (aads.newtalk.kr) | 운영중 | 8100, 8101, 18085 | | Server 11",
+      "tags": [
+        "status",
+        "report",
+        "api-map",
+        "system"
+      ]
+    },
     {
       "id": "PLAN-001",
       "type": "plan",
       "title": "Adaptive UI 프로토타입 설계서 (UI-PROTO-001)",
       "filename": "PLAN-001_adaptive-ui-프로토타입-설계서-ui-proto-001.md",
-      "created_at": "2026-03-06 12:14 KST",
+      "created_at": "2026-03-05 00:00 KST",
       "source_session": "genspark_aads_mgr_prev",
       "summary": "# PLAN-001: Adaptive UI 프로토타입 설계서 (UI-PROTO-001)  ## 개요 AADS CEO 대시보드를 위한 Adaptive UI 프로토타입 설계. 3-Layer Progressive Disclosure UI 구조와 Adaptive Router를 통한 키워드-UI 매핑 13종 지원.  ## 3-Layer Progressive Disc",
       "tags": [
@@ -22,7 +52,7 @@
       "type": "tech",
       "title": "Adaptive UI 컴포넌트 구조 + 라우터 설계",
       "filename": "TECH-001_adaptive-ui-컴포넌트-구조-라우터-설계.md",
-      "created_at": "2026-03-06 12:14 KST",
+      "created_at": "2026-03-05 00:00 KST",
       "source_session": "genspark_aads_mgr_prev",
       "summary": "# TECH-001: Adaptive UI 컴포넌트 구조 + 라우터 설계  ## 컴포넌트 구조  ### AdaptiveRouter ``` AdaptiveRouter ├── KeywordParser       — 입력 텍스트에서 키워드 추출 ├── UIMapper            — 키워드 → UI 컴포넌트 매핑 ├── DataFetcher        ",
       "tags": [
@@ -33,26 +63,11 @@
       ]
     },
     {
-      "id": "TECH-002",
-      "type": "tech",
-      "title": "AADS 정적 스냅샷 시스템 연구",
-      "filename": "TECH-002_aads-정적-스냅샷-시스템-연구.md",
-      "created_at": "2026-03-06 12:14 KST",
-      "source_session": "genspark_aads_mgr_current",
-      "summary": "# TECH-002: AADS 정적 스냅샷 시스템 연구  ## 목적 AADS API 서버가 다운되거나 응답이 느릴 때 CEO가 핵심 정보에 즉시 접근할 수 있도록 정적 JSON 스냅샷을 주기적으로 생성·저장하는 시스템.  ## 아키텍처 ``` cron (5분 주기) └── generate_manager_snapshot.py     ├── GET /api/v",
-      "tags": [
-        "tech",
-        "snapshot",
-        "static",
-        "research"
-      ]
-    },
-    {
       "id": "RESEARCH-001",
       "type": "research",
       "title": "AI 비용 최적화 연구 보고 (7개 전략)",
       "filename": "RESEARCH-001_ai-비용-최적화-연구-보고-7개-전략.md",
-      "created_at": "2026-03-06 12:14 KST",
+      "created_at": "2026-03-05 00:00 KST",
       "source_session": "genspark_aads_mgr_prev",
       "summary": "# RESEARCH-001: AI 비용 최적화 연구 보고 (7개 전략)  ## 개요 AADS 시스템에서 사용하는 AI API 비용을 최적화하기 위한 7가지 전략 연구.  ## 전략 1: 모델 티어 분리 - 단순 작업: claude-haiku-4-5 (저렴) - 중간 복잡도: claude-sonnet-4-6 (중간) - 복잡한 분석: claude-opus-4",
       "tags": [
@@ -63,18 +78,374 @@
       ]
     },
     {
-      "id": "STATUS-001",
+      "id": "TECH-004",
+      "type": "tech",
+      "title": "AADS 서버 인프라 전략 보고서",
+      "filename": "TECH-004_aads-서버-인프라-전략-보고서.md",
+      "created_at": "2026-03-02 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS 서버 인프라 전략 보고서  **문서 ID**: INFRA-STRATEGY-001 **작성일**: 2026-03-02 **상태**: CEO 승인 완료  ---  ## 1. 현재 서버 현황  | 항목 | 값 | |------|-----| | 플랫폼 | DigitalOcean | | Droplet | centos-s-1vcpu-2gb-sgp1-01 ",
+      "tags": [
+        "tech",
+        "infra",
+        "strategy",
+        "server"
+      ]
+    },
+    {
+      "id": "STATUS-002",
       "type": "status",
-      "title": "지휘통제소 종합 상황 보고서 (API 맵 포함)",
-      "filename": "STATUS-001_지휘통제소-종합-상황-보고서-api-맵-포함.md",
-      "created_at": "2026-03-06 12:14 KST",
-      "source_session": "genspark_aads_mgr_current",
-      "summary": "# STATUS-001: 지휘통제소 종합 상황 보고서  ## 보고 일시 2026-03-06 KST  ## 시스템 현황 요약 | 서버 | 역할 | 상태 | 포트 | |------|------|------|------| | Server 68 | AADS 메인 (aads.newtalk.kr) | 운영중 | 8100, 8101, 18085 | | Server 11",
+      "title": "AADS 능력 확장 전방위 검토 보고서 001",
+      "filename": "STATUS-002_aads-능력-확장-전방위-검토-보고서-001.md",
+      "created_at": "2026-03-02 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS 능력 확장 — 전방위 검토 보고서  **문서 ID**: CAPABILITY-MAP-001 **작성일**: 2026-03-02 **상태**: CEO 승인 완료  ---  ## 목적  AADS 에이전트가 코드 생성 외에 확장할 수 있는 모든 능력 영역을 전방위로 검토한다.  ## 검토 대상 12개 영역  | # | 영역 | 설명 | Phase | ",
       "tags": [
         "status",
-        "report",
-        "api-map",
+        "capability",
+        "review"
+      ]
+    },
+    {
+      "id": "STATUS-003",
+      "type": "status",
+      "title": "AADS 능력 확장 전방위 검토 보고서 002",
+      "filename": "STATUS-003_aads-능력-확장-전방위-검토-보고서-002.md",
+      "created_at": "2026-03-02 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS 능력 확장 — 무료/자체개발 옵션 비교  **문서 ID**: CAPABILITY-MAP-002 **작성일**: 2026-03-02 **상태**: CEO 승인 완료  ---  ## 목적  CAPABILITY-MAP-001에서 식별한 12개 영역별로 무료 오픈소스 및 자체개발 가능한 옵션을 비교한다.  ## 영역별 최선 무료 옵션  | # | 영역",
+      "tags": [
+        "status",
+        "capability",
+        "review"
+      ]
+    },
+    {
+      "id": "STATUS-004",
+      "type": "status",
+      "title": "AADS 능력 확장 전방위 검토 보고서 003",
+      "filename": "STATUS-004_aads-능력-확장-전방위-검토-보고서-003.md",
+      "created_at": "2026-03-02 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS 능력 확장 — 자체 구축 확정 계획표  **문서 ID**: CAPABILITY-MAP-003 **작성일**: 2026-03-02 **상태**: CEO 승인 완료  ---  ## 목적  최종 결정: 9개 자체구축 + 3개 외부API 확정 및 구축 일정.  ## 자체 구축 (9개)  | # | 영역 | 도구 | 방식 | 구축 일수 | Phase |",
+      "tags": [
+        "status",
+        "capability",
+        "review"
+      ]
+    },
+    {
+      "id": "STATUS-005",
+      "type": "status",
+      "title": "AADS 능력 확장 전방위 검토 보고서 004",
+      "filename": "STATUS-005_aads-능력-확장-전방위-검토-보고서-004.md",
+      "created_at": "2026-03-02 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS 능력 확장 — 자체 구축 vs 외부 서비스 최종 비교 (v4)  **문서 ID**: CAPABILITY-MAP-004-FINAL **작성일**: 2026-03-02 **상태**: CEO 승인 완료 **방침**: 자체 구축 가능한 것은 자체 구축, 하드웨어 투자 대비 외부 서비스가 저렴하면 외부 사용  ---  ## 1. GPU 하드웨어 구축 비",
+      "tags": [
+        "status",
+        "capability",
+        "review"
+      ]
+    },
+    {
+      "id": "PLAN-003",
+      "type": "plan",
+      "title": "AADS Phase0 AI 회사 전체 조직 설계 — 동적 에이전트 팀",
+      "filename": "PLAN-003_aads-phase0-ai-회사-전체-조직-설계-동적-에이전트-팀.md",
+      "created_at": "2026-02-28 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS Phase 0: AI 회사 전체 조직 설계 — 동적 에이전트 팀 + 동적 조직 확장 시스템  - **문서 분류**: 전략 기획 + 기술 설계서 (Phase 1 선행) - **작성일**: 2026-02-28 KST - **버전**: v3.0 (동적 조직 확장 반영) - **이전 버전**: v2.0 aads-phase0-full-company-ag",
+      "tags": [
+        "plan",
+        "phase0",
+        "agents",
+        "organization"
+      ]
+    },
+    {
+      "id": "RESEARCH-002",
+      "type": "research",
+      "title": "AADS 심층 진단 및 진화 기획 보고서 (CEO 보고)",
+      "filename": "RESEARCH-002_aads-심층-진단-및-진화-기획-보고서-ceo-보고.md",
+      "created_at": "2026-02-28 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS 심층 진단 및 진화 기획 보고서 (CEO 보고)  - **작성일**: 2026-02-28 KST - **대상**: CEO - **목적**: 현재 상태 정밀 진단, 경쟁 환경 분석, 목표 아키텍처 및 5단계 로드맵 제안  ---  ## 1. 현재 상태 정밀 진단 (Sprint 1~6 누적)  ### 1.1 Sprint 누적 요약  | Sprint",
+      "tags": [
+        "research",
+        "evolution",
+        "strategy",
+        "ceo"
+      ]
+    },
+    {
+      "id": "RESEARCH-003",
+      "type": "research",
+      "title": "AADS AI 모델 선정 연구 보고",
+      "filename": "RESEARCH-003_aads-ai-모델-선정-연구-보고.md",
+      "created_at": "2026-02-28 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS AI Models Survey (2026-02-28) > 상태: 확정 | 조사 범위: 프론티어 LLM 100+ 모델 | 용도: 에이전트별 모델 할당 근거  ---  ## 1. 조사 목적  AADS 에이전트 체인에 최적의 LLM 모델을 배정하기 위해 2026년 2월 기준 주요 프론티어 모델의 성능, 가격, 컨텍스트 윈도우, 특화 분야를 전수 조사",
+      "tags": [
+        "research",
+        "ai",
+        "models",
+        "survey"
+      ]
+    },
+    {
+      "id": "RESEARCH-004",
+      "type": "research",
+      "title": "AADS 인프라 MCP AppBuilder 연구 조사",
+      "filename": "RESEARCH-004_aads-인프라-mcp-appbuilder-연구-조사.md",
+      "created_at": "2026-02-28 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS Infrastructure · MCP · App-Builder Survey (2026-02-28) > 상태: 확정 | 조사 범위: 샌드박스, PaaS, MCP 생태계, 앱 빌더, 코딩 에이전트  ---  ## 1. 조사 목적  AADS 인프라 구성에 필요한 샌드박스, 배포 플랫폼, MCP 서버, 경쟁 앱 빌더, 코딩 에이전트를 전수 조사하여 최",
+      "tags": [
+        "research",
+        "infra",
+        "mcp",
+        "appbuilder"
+      ]
+    },
+    {
+      "id": "RESEARCH-005",
+      "type": "research",
+      "title": "AADS 오픈소스 도구 연구 조사",
+      "filename": "RESEARCH-005_aads-오픈소스-도구-연구-조사.md",
+      "created_at": "2026-02-28 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS Open-Source Tools Survey (2026-02-28) > 상태: 확정 | 조사 범위: 멀티 에이전트 관련 오픈소스 도구 전수 조사  ---  ## 1. 조사 목적  AADS 구축에 활용 가능한 오픈소스 도구와 모델을 전수 조사하여, 상용 SaaS 대체 가능 여부와 Phase 1 적용 가능성을 평가한다.  ---  ## 2. 수학/",
+      "tags": [
+        "research",
+        "opensource",
+        "tools",
+        "survey"
+      ]
+    },
+    {
+      "id": "PLAN-002",
+      "type": "plan",
+      "title": "AADS 초기 기획 보고서",
+      "filename": "PLAN-002_aads-초기-기획-보고서.md",
+      "created_at": "2026-02-26 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS 초기 기획 보고서 **작성일**: 2026-02-26 **작성자**: Claude (AI Architect) + CEO  ## 비전 자연어 아이디어 입력 → AI가 기획 → 설계 → 개발 → 테스트 → 배포 → 운영 → 고도화까지 전체 소프트웨어 라이프사이클을 자율 수행하는 시스템  ## 핵심 원칙 1. **완전 자동화**: 비개발자가 자연어로",
+      "tags": [
+        "plan",
+        "aads",
+        "initial"
+      ]
+    },
+    {
+      "id": "PLAN-004",
+      "type": "plan",
+      "title": "AADS 프로젝트 관리 규칙",
+      "filename": "PLAN-004_aads-프로젝트-관리-규칙.md",
+      "created_at": "2026-02-26 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS 프로젝트 관리 규칙  ## 작업 보고 체계 - 모든 작업은 시작/완료 시간이 기록된 보고서 생성 - 보고서 위치: `aads-core/logs/YYYY-MM-DD_HH-MM_작업명.md` - Supabase `work_logs` 테이블에 자동 기록 - 보고서 스크립트: `scripts/work_report.sh start/end`  ## Git",
+      "tags": [
+        "plan",
+        "rules",
+        "management"
+      ]
+    },
+    {
+      "id": "PLAN-005",
+      "type": "plan",
+      "title": "SaaS 확장 전략",
+      "filename": "PLAN-005_saas-확장-전략.md",
+      "created_at": "2026-02-26 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS SaaS 확장 전략 **작성일**: 2026-02-26  ## 시장 - 자율 AI 에이전트 시장: $6.1-9.9B (2026) - Cursor ARR $1B, Lovable ARR $300M  ## 가격 | 플랜 | 월 가격 | 프로젝트 | |------|---------|----------| | Starter | $49 | 1 | | Pro",
+      "tags": [
+        "plan",
+        "saas",
+        "strategy"
+      ]
+    },
+    {
+      "id": "RESEARCH-006",
+      "type": "research",
+      "title": "AADS 비용 분석 보고서",
+      "filename": "RESEARCH-006_aads-비용-분석-보고서.md",
+      "created_at": "2026-02-26 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AI 자동매매 SaaS 비용 분석 **작성일**: 2026-02-26  ## 개발 비용 (AADS 활용) | Phase | 기간 | 비용 | |-------|------|------| | 기획·설계 | 1-2주 | $160 | | MVP 개발 | 3-4주 | $1,000-$1,900 | | 테스트·배포 | 1-2주 | $150-$300 | | **합계*",
+      "tags": [
+        "research",
+        "cost",
+        "analysis"
+      ]
+    },
+    {
+      "id": "TECH-003",
+      "type": "tech",
+      "title": "AADS 시스템 아키텍처 v2.0",
+      "filename": "TECH-003_aads-시스템-아키텍처-v20.md",
+      "created_at": "2026-02-26 00:00 KST",
+      "source_session": "server68_aads_docs",
+      "summary": "# AADS 시스템 아키텍처 v2.0 **최종 수정**: 2026-02-26  ## 5-Layer Architecture - Layer 1: CEO Dashboard (Next.js + Supabase Realtime) - Layer 2: API Gateway (FastAPI :8001) - Layer 3: Orchestration (LangGraph + ",
+      "tags": [
+        "tech",
+        "architecture",
         "system"
+      ]
+    },
+    {
+      "id": "TECH-GO100-003",
+      "type": "tech",
+      "title": "GO100 LLM 아키텍처 v2.0",
+      "filename": "TECH-GO100-003_go100-llm-아키텍처-v20.md",
+      "created_at": "2026-02-25 00:00 KST",
+      "source_session": "server114",
+      "summary": "# GO100 백억이 LLM 아키텍처 기술서 v2.0  **문서 ID**: GO100-LLM-ARCHITECTURE-v2.0   **작성일**: 2026-02-25   **작성자**: Claude Opus 4.6 (CEO 지시)   **상태**: CONFIRMED   **저장 경로**: `/root/project-docs/go100/docs/GO100-LL",
+      "tags": [
+        "tech",
+        "go100",
+        "llm"
+      ]
+    },
+    {
+      "id": "PLAN-GO100-001",
+      "type": "plan",
+      "title": "GO100 기획서 v1.0",
+      "filename": "PLAN-GO100-001_go100-기획서-v10.md",
+      "created_at": "2026-02-23 00:00 KST",
+      "source_session": "server114",
+      "summary": "# GO100 기획서 > 최종 업데이트: 2026-02-23 | 문서 버전: v1.0  ## 1. 서비스 비전 - GO100: AI 기반 주식 자동매매 SaaS - 핵심 가치: AI가 전략을 설계, 백테스트, 자동매매까지 원스톱 - 타겟: 주식 투자에 관심있으나 전문 지식 부족한 개인 투자자 - V4.1 코드베이스 공유, 도메인 분리 운영  ## 2. 핵심",
+      "tags": [
+        "plan",
+        "go100"
+      ]
+    },
+    {
+      "id": "TECH-GO100-001",
+      "type": "tech",
+      "title": "GO100 아키텍처 설계서",
+      "filename": "TECH-GO100-001_go100-아키텍처-설계서.md",
+      "created_at": "2026-02-23 00:00 KST",
+      "source_session": "server114",
+      "summary": "# GO100 시스템 아키텍처 > 최종 업데이트: 2026-02-23 | 문서 버전: v1.0  ## 1. 시스템 개요 ``` 사용자 → Nginx → Next.js(:3000) → FastAPI(:8002) → PostgreSQL                                               → Redis                 ",
+      "tags": [
+        "tech",
+        "go100",
+        "architecture"
+      ]
+    },
+    {
+      "id": "PLAN-NT-001",
+      "type": "plan",
+      "title": "뉴톡 V2 통합 서비스 기획서 (NT-V2-PLAN-002-FINAL)",
+      "filename": "PLAN-NT-001_뉴톡-v2-통합-서비스-기획서-nt-v2-plan-002-final.md",
+      "created_at": "2026-02-23 00:00 KST",
+      "source_session": "server114",
+      "summary": "# 뉴톡 V2 통합 서비스 기획서\r \r **문서번호**: NT-V2-PLAN-002-FINAL\r **버전**: 1.0.0\r **최종수정**: 2026-02-23\r **상태**: 확정 – 개발 착수\r \r ---\r \r ## 변경 이력\r | 버전 | 날짜 | 변경 내용 | 작성자 |\r |------|------|-----------|--------|\r | 0.1",
+      "tags": [
+        "plan",
+        "newtalk",
+        "v2"
+      ]
+    },
+    {
+      "id": "PLAN-SF-001",
+      "type": "plan",
+      "title": "ShortFlow v3.0 AI YouTube Shorts 자동화 SaaS 기획서",
+      "filename": "PLAN-SF-001_shortflow-v30-ai-youtube-shorts-자동화-saas-기획서.md",
+      "created_at": "2026-02-22 00:00 KST",
+      "source_session": "server114",
+      "summary": "# ShortFlow v3.0 – AI YouTube Shorts 자동화 SaaS 기획서  > **작성일**: 2026-02-22 > **버전**: v3.0 > **작성자**: ShortFlow 프로젝트팀 > **문서 경로**: /data/shortflow/docs/shortflow_v3.0_plan.md > **상태**: 기획 완료 → 기술·개발 착수 대",
+      "tags": [
+        "plan",
+        "shortflow",
+        "saas"
+      ]
+    },
+    {
+      "id": "PLAN-SF-002",
+      "type": "plan",
+      "title": "StyleFlow v1.0 기획서",
+      "filename": "PLAN-SF-002_styleflow-v10-기획서.md",
+      "created_at": "2026-02-22 00:00 KST",
+      "source_session": "server114",
+      "summary": "# StyleFlow v1.0 – 쇼핑몰 영상 자동화 B2B SaaS 기획서  > **작성일**: 2026-02-22 > **버전**: v1.0 > **작성자**: ShortFlow 프로젝트팀 > **문서 경로**: /data/shortflow/docs/styleflow_v1.0_plan.md > **상태**: 기획 완료 → 기술·개발 착수 대기  --- ",
+      "tags": [
+        "plan",
+        "shortflow",
+        "styleflow"
+      ]
+    },
+    {
+      "id": "TECH-NT-001",
+      "type": "tech",
+      "title": "뉴톡 V2 아키텍처 설계서",
+      "filename": "TECH-NT-001_뉴톡-v2-아키텍처-설계서.md",
+      "created_at": "2026-02-22 00:00 KST",
+      "source_session": "server114",
+      "summary": "# 뉴톡 V2 시스템 아키텍처  **버전**: 2.0   **작성일**: 2026-02-22   **최종갱신**: 2026-02-26 (R3 DM·결제·배송·쇼츠 반영)  ## 1. 전체 구조도 (텍스트)  ``` ┌─────────────────────────────────────────────────────────────────┐ │           ",
+      "tags": [
+        "tech",
+        "newtalk",
+        "architecture"
+      ]
+    },
+    {
+      "id": "TECH-GO100-002",
+      "type": "tech",
+      "title": "GO100 아키텍처 v1.1 상세 설계",
+      "filename": "TECH-GO100-002_go100-아키텍처-v11-상세-설계.md",
+      "created_at": "2026-02-21 00:00 KST",
+      "source_session": "server114",
+      "summary": "# GO100 AI 전략 플랫폼 — 시스템 아키텍처 문서  ``` ================================================================ GO100 AI 전략 플랫폼 (백억이) 시스템 아키텍처 문서 ================================================================",
+      "tags": [
+        "tech",
+        "go100",
+        "architecture"
+      ]
+    },
+    {
+      "id": "RESEARCH-NT-001",
+      "type": "research",
+      "title": "뉴톡 서비스 전체 현황 분석 보고서 (2026-02-21)",
+      "filename": "RESEARCH-NT-001_뉴톡-서비스-전체-현황-분석-보고서-2026-02-21.md",
+      "created_at": "2026-02-21 00:00 KST",
+      "source_session": "server114",
+      "summary": "# 뉴톡 서비스 전체 현황 분석 보고서\r \r **작성일**: 2026-02-21\r **버전**: v1.0\r **작성자**: Claude Code Analysis\r \r ---\r \r ## 📊 1. 서비스 개요\r \r 뉴톡(NewTalk)은 **도매/소매 패션 상품 유통 플랫폼**으로, 동대문 의류 시장을 중심으로 한 B2B/B2C 통합 서비스입니다.\r \r ---",
+      "tags": [
+        "research",
+        "newtalk",
+        "analysis"
+      ]
+    },
+    {
+      "id": "PLAN-GO100-002",
+      "type": "plan",
+      "title": "GO100 LLM AI 레이어 기획문서 (OPUS-LLM-AI-v1 통합본)",
+      "filename": "PLAN-GO100-002_go100-llm-ai-레이어-기획문서-opus-llm-ai-v1-통합본.md",
+      "created_at": "2026-02-19 00:00 KST",
+      "source_session": "server114",
+      "summary": "# OPUS-LLM-AI-v1 | LLM/AI 레이어 기획문서 (통합본)  **문서 ID:** OPUS-LLM-AI-v1-FULL-SPEC **버전:** v2.1.1 **작성일:** 2026-02-19 **최종 수정:** 2026-02-23 **상태:** OPUS-MAIN-v1 승인 대기  ---  ## 목차  ``` 1. 문서 개요 2. 프로젝트 컨텍스트",
+      "tags": [
+        "plan",
+        "go100",
+        "llm",
+        "ai"
+      ]
+    },
+    {
+      "id": "STATUS-006",
+      "type": "status",
+      "title": "월요일 체크사항 (2026-02-10) — KIS 암호화 마이그레이션",
+      "filename": "STATUS-006_월요일-체크사항-2026-02-10-kis-암호화-마이그레이션.md",
+      "created_at": "2026-02-10 00:00 KST",
+      "source_session": "server68_root",
+      "summary": "# 월요일(2026-02-10) 체크사항  ## ✅ 완료 (2026-02-08 토요일)  ### 1. KIS 암호화 마이그레이션 - **app_key**: 4건 암호화 완료 (ID 2는 이미 암호화됨) - **app_secret**: 5건 전체 암호화 완료 (이전 대화에서) - 백업: `kisautotrade.db.bak_20260208_223904` - ",
+      "tags": [
+        "status",
+        "kis",
+        "checklist",
+        "weekly"
       ]
     }
   ]
