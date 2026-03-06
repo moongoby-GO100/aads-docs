@@ -1,5 +1,5 @@
-# AADS HANDOVER v6.1
-최종 업데이트: 2026-03-06 | 버전: v6.1 — AADS-122 Context API lessons 엔드포인트 + 교훈 자동등록
+# AADS HANDOVER v6.2
+최종 업데이트: 2026-03-06 | 버전: v6.2 — AADS-123 Dashboard 교훈 탭 + FLOW 파이프라인 시각화
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -17,7 +17,7 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-122 lessons API + 교훈 자동등록 완료 | 진행중 |
+| AADS | Phase 2 운영 | AADS-123 Dashboard 교훈탭+FLOW 시각화 완료 | 진행중 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
@@ -36,6 +36,13 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 모든 작업: Find → Lay out → Operate → Wrap up
 소규모 수정: Operate → Wrap up만 수행 가능
 상세: shared/rules/flow-rules.md
+
+## AADS-123 완료 사항 (2026-03-06)
+- Dashboard /lessons 페이지: 교훈 카드 그리드, 카테고리/프로젝트 필터, 상세 모달
+- Dashboard /flow 페이지: 프로젝트별 FLOW 4단계 파이프라인 시각화
+- Sidebar: 교훈(💡), FLOW(🔄) 메뉴 추가
+- api.ts: getLessons(), getLesson(), getOpsDirectiveLifecycleByProject() 추가
+- npm build 에러 0건, Docker 재배포 완료
 
 ## AADS-122 완료 사항 (2026-03-06)
 - GET/POST /api/v1/lessons — 교훈 CRUD API
