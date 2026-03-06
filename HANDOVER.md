@@ -475,6 +475,7 @@
 | v5.22 | 2026-03-06 | T-038: Watchdog 에러 자동기록·학습·자동복구 — error_log+recovery_log 테이블(해시 기반 그룹화, occurrence_count 자동증가), POST /watchdog/errors(신규/재발 감지, 자동복구 트리거), PUT /watchdog/errors/{hash}/resolution(해결법 등록 + Experience Memory L3 학습), GET /watchdog/errors(필터 조회), GET /watchdog/summary(인증 불필요 공개), watchdog_daemon.py(systemd aads-watchdog 상시 30초 감시: Docker/API/Nginx/디스크/done큐), memory_helper.sh report_error() 추가, auto_trigger.sh+bridge.py 에러 자동보고, commit 01560fd, push 200 |
 | v5.21 | 2026-03-05 | T-092: 비용 자동 추적 — cost_tracker.py(PRICE_TABLE 6모델, calculate_cost/record_cost/parse_result_file), auto_trigger.sh 비용 추적 연동(exec_duration_ms 계산+cost_tracker.py record 자동 호출), task_cost_log session_duration_ms/source 컬럼 추가, GET /dashboard/costs by_project_model 집계 추가, analytics cost_status 'no_data' 수정, backfill_costs.py 실행(92파일 스캔 성공60 스킵32), DB 총 65건/$18.35, analytics cost=$17.92 status=active, HTTP 200, commit 6efa920, push 완료 |
 | v5.24 | 2026-03-06 | T-100: genspark_bridge.py 완료보고 메시지 재감지 방지 — SKIP_PATTERNS 10개, 자기발송 마커([BRIDGE-SENT]), processed_ids 중복차단(MD5 해시 세트 최대1000), DIRECTIVE 템플릿/규칙설명 구분(작성규칙 텍스트 감지+T-NNN 실수 검증+done폴더 완료확인), auto_trigger RESULT파일 스킵, 무한루프 완전 차단 |
+| v5.25 | 2026-03-06 | T-102: CEO 문서 자동 저장 시스템 — documents.py(GET/POST/DELETE /api/v1/documents 4엔드포인트, _index.json 관리, system_memory ceo_document 저장), bridge.py 문서감지 확장(DOCUMENT_PATTERNS 5종 키워드, classify_document, save_as_document), backfill_ceo_documents.py 소급저장(5건: PLAN-001/TECH-001/TECH-002/RESEARCH-001/STATUS-001), Docker 재빌드, curl 5건 반환 확인 |
 
 ## 지시서 작성규칙
 
