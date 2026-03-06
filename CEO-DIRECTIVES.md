@@ -1,5 +1,5 @@
 # CEO DIRECTIVES – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-05 (v2.6)
+> 최종 업데이트: 2026-03-06 (v2.8)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션에서 필수 읽기. 이 문서의 지시를 위반하는 설계/분석은 무효.
 
@@ -104,6 +104,11 @@
   - nginx: rate_limit 60r/m, gzip, proxy timeout 120s/10s, 보안헤더(X-Frame/X-Content-Type/X-XSS/CORS)
   - systemd: aads.service (oneshot docker compose)
   - backup.sh: 매일 03:00 cron, 7일 자동삭제
+
+### D-016: FLOW 프레임워크
+- 모든 신규 작업은 Find→Layout→Operate→Wrap up 4단계를 따른다.
+- 소규모 버그수정/설정변경은 Operate→Wrap up만 수행 가능.
+- 각 단계 산출물에 parent 필드로 선행 산출물을 참조한다.
 
 ---
 
@@ -252,6 +257,15 @@ HANDOVER: https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md
 - 번호는 프로젝트별 마지막 번호+1 (AADS: 107~, KIS: 168~, GO100: 038~)
 - T-xxx 레거시 ID는 읽기 전용으로 유효, 신규 발행 금지
 
+### R-014: Wrap up 의무화
+- P0/P1: WRAP 결과 파일 필수. 미완료 시 다음 작업 진입 차단.
+- P2(15분 초과): 최소 5분 모니터링 + HTTP 200 확인.
+- P2(15분 이하)/P3: claude_exec.sh 자동 health-check. 실패 시 WRAP 자동 생성.
+
+### R-015: 교훈 등록
+- Wrap up 시 다른 프로젝트에도 적용 가능한 교훈이 있으면 shared/lessons/에 등록.
+- 결과 파일에 ## 교훈 섹션 작성 시 API가 자동 등록.
+
 ---
 
 ## 4. Genspark CEO 통합지휘 대화 규칙
@@ -283,6 +297,11 @@ HANDOVER: {업데이트 완료|미완료}
 ### 9-3. 파일명 규칙
 - 보고서: `{TASK_NAME}-{SEQ}.md` (예: CAPABILITY-MAP-001.md, INFRA-STRATEGY-001.md)
 - 보고서 저장 경로: `/root/aads/aads-docs/reports/`
+- 연구: `{PROJECT}-FIND-{SEQ}_{제목}.md`
+- 설계: `{PROJECT}-LAYOUT-{SEQ}_{제목}.md`
+- 실행: `{PROJECT}-{SEQ}_{제목}.md` (기존 유지)
+- 검증: `{PROJECT}-WRAP-{SEQ}_{제목}.md`
+- 교훈: `L-{SEQ}_{제목}.md`
 
 ### 9-4. push 전 필수 체크리스트
 모든 commit/push 전에 아래 순서를 반드시 실행한다:
@@ -341,3 +360,4 @@ curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongob
 | v2.6 | 2026-03-05 | D-015 추가 — 68서버 프로덕션 유지 결정: 옵션 A (68서버 유지), 도메인 aads.newtalk.kr 고정, Fly.io Phase 3 SaaS 확장 시 재평가. T-032 프로덕션 강화 완료. |
 | v2.5 | 2026-03-04 | D-014 추가 — 콘텐츠 품질 게이트: 자동 배포 콘텐츠 벤치마크 85% 이상 필수, ShortFlow 연동(shortflow_quality_gate.sh), AUTO_PUBLISH/CONDITIONAL/AUTO_REJECT 판정 기준 |
 | v2.7 | 2026-03-06 | AADS-107: R-013 Task ID 접두사 체계 등록 — 프로젝트별 독립 넘버링(AADS/KIS/GO100/SF/NT/SALES/NAS), T-xxx 레거시 신규 발행 금지 |
+| v2.8 | 2026-03-06 | D-016 FLOW 프레임워크, R-014 Wrap up 의무화, R-015 교훈 등록, 9-3 산출물 파일명 확장, 버전 이력 시간순 정렬 |

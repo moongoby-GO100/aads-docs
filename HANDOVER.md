@@ -1,5 +1,5 @@
-# AADS HANDOVER v6.2
-최종 업데이트: 2026-03-06 | 버전: v6.2 — AADS-123 Dashboard 교훈 탭 + FLOW 파이프라인 시각화
+# AADS HANDOVER v6.3
+최종 업데이트: 2026-03-06 | 버전: v6.3 — AADS-124 FLOW 문서화 체계 최종 Wrap up
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -17,7 +17,7 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-123 Dashboard 교훈탭+FLOW 시각화 완료 | 진행중 |
+| AADS | Phase 2 운영 | AADS-124 FLOW 체계 최종 Wrap up | 완료 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
@@ -33,28 +33,19 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 세션 관리: 글로벌 ≤4, 서버별 동적 1~3슬롯
 
 ## FLOW 프레임워크
-모든 작업: Find → Lay out → Operate → Wrap up
+모든 작업: Find → Lay out → Operate → Wrap up (D-016)
 소규모 수정: Operate → Wrap up만 수행 가능
-상세: shared/rules/flow-rules.md
+상세: shared/rules/flow-rules.md | WRAP 게이트: auto_trigger.sh (R-014)
 
-## AADS-123 완료 사항 (2026-03-06)
-- Dashboard /lessons 페이지: 교훈 카드 그리드, 카테고리/프로젝트 필터, 상세 모달
-- Dashboard /flow 페이지: 프로젝트별 FLOW 4단계 파이프라인 시각화
-- Sidebar: 교훈(💡), FLOW(🔄) 메뉴 추가
-- api.ts: getLessons(), getLesson(), getOpsDirectiveLifecycleByProject() 추가
-- npm build 에러 0건, Docker 재배포 완료
-
-## AADS-122 완료 사항 (2026-03-06)
-- GET/POST /api/v1/lessons — 교훈 CRUD API
-- DB: lessons 테이블 생성 (10번째 테이블)
-- 교훈 8건 DB 등록 (L-001~L-008)
-- claude_exec.sh: aads_lesson_check() 자동 등록 함수
-- genspark_bridge.py: 교훈 자동첨부 로직 (_attach_relevant_lessons)
-- 유지보수 모드 첫 실전 적용 (AADS-116)
+## AADS-124 완료 사항 (2026-03-06)
+- CEO-DIRECTIVES v2.8: D-016 FLOW, R-014 Wrap up 의무화, R-015 교훈 등록, 9-3 파일명 확장
+- auto_trigger.sh WRAP 게이트: P0/P1 WRAP 미완료 시 다음 작업 차단 (10분 대기)
+- claude_exec.sh 자동 health-check: P2/P3 완료 후 5분 → pipeline_healthy 확인, 실패 시 WRAP 자동 생성
+- 전체 검증 체크리스트 20개 항목 수행 + PLN-AADS-001-v2 Wrap up 완료
 
 ## 상세 참조
 - AADS 전용 지식: /root/aads/aads-server/docs/knowledge/AADS-KNOWLEDGE.md
 - 공유 교훈: shared/lessons/INDEX.md
-- CEO 지침: CEO-DIRECTIVES.md
+- CEO 지침: CEO-DIRECTIVES.md (v2.8)
 - 이전 HANDOVER 전문: archive/HANDOVER-v5.39-full.md
-- 기술서: TECH-002 (지시서 자동화 시스템)
+- WRAP 보고서: shared/verify/AADS-WRAP-124_FLOW체계전체검증.md
