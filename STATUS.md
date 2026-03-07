@@ -1,7 +1,7 @@
 last_completed: AADS-161
 completed_at: "2026-03-08T14:00:00+09:00"
 result: SUCCESS
-commit_sha: (to be updated after push)
+commit_sha: 85c6100
 report_url: https://github.com/moongoby-GO100/aads-docs/blob/main/reports/AADS-161-RESULT.md
 chat_delivered: true
 next_pending: none
@@ -10,7 +10,7 @@ history:
   - task_id: AADS-161
     completed_at: "2026-03-08T14:00:00+09:00"
     result: SUCCESS
-    commit_sha: (to be updated)
+    commit_sha: 85c6100
   - task_id: AADS-148
     completed_at: "2026-03-08T12:00:00+09:00"
     result: SUCCESS
