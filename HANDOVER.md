@@ -1,5 +1,5 @@
-# AADS HANDOVER v8.8
-최종 업데이트: 2026-03-07 | 버전: v8.8 — AADS-158 Pending 대기큐 정리 (11개 완료·중복 지시서 archived 이동)
+# AADS HANDOVER v8.9
+최종 업데이트: 2026-03-07 | 버전: v8.9 — AADS-159 CEO Chat Playwright 브라우저 자동화 6개 도구 추가
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -49,12 +49,27 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-158 | 완료 |
+| AADS | Phase 2 운영 | AADS-159 | 완료 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
 | SF | 운영중 | SF-015 | 정상 |
 | NAS | 유지보수 | NAS-010 | 정상 |
+
+## AADS-159 주요 변경 (2026-03-07)
+- CEO Chat Playwright 브라우저 자동화 6개 도구 추가 (T-003 Phase 2 확장)
+- ceo_chat_tools.py: browser_navigate/snapshot/screenshot/click/fill/tab_list
+  - 도메인 화이트리스트 하드코딩: *.newtalk.kr, github.com, raw.githubusercontent.com, localhost
+  - 차단 시 "[접근 차단] 허용되지 않은 도메인입니다" 반환
+  - Playwright Python 싱글턴 컨텍스트 (asyncio.Lock, headless Chromium)
+  - graceful degradation: playwright 미설치/초기화 실패 시 "[브라우저 도구 사용 불가]" 반환
+  - 메모리 제한 512MB (--memory-pressure-off), 동시 탭 최대 3개, 세션 타임아웃 60초
+- ceo_chat.py: Intent Classifier 6분류 (browser 추가)
+  - browser 키워드: 스크린샷/페이지/열어/화면/브라우저/사이트/접속
+  - 우선순위: execute > browser > dashboard > diagnosis > research > strategy
+  - send_ceo_message: browser 의도 → _call_anthropic_with_tools 자동 분기
+- supervisord.conf: playwright-mcp 엔트리 추가 (autostart=false, Node.js 옵션)
+- aads-server commit: 1fbb76d
 
 ## AADS-158 주요 변경 (2026-03-07)
 - Pending 대기큐 정리: 11개 완료·중복 지시서 → /root/.genspark/directives/archived/ 이동 (백업)
