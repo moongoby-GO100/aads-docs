@@ -1,5 +1,5 @@
-# AADS HANDOVER v8.7
-최종 업데이트: 2026-03-07 | 버전: v8.7 — AADS-157 CEO Chat v2 Core Engine 연결 (Intent Classifier + Tool-use + Directive Submit)
+# AADS HANDOVER v8.8
+최종 업데이트: 2026-03-07 | 버전: v8.8 — AADS-158 Pending 대기큐 정리 (11개 완료·중복 지시서 archived 이동)
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -49,12 +49,18 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-157 | 완료 |
+| AADS | Phase 2 운영 | AADS-158 | 완료 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
 | SF | 운영중 | SF-015 | 정상 |
 | NAS | 유지보수 | NAS-010 | 정상 |
+
+## AADS-158 주요 변경 (2026-03-07)
+- Pending 대기큐 정리: 11개 완료·중복 지시서 → /root/.genspark/directives/archived/ 이동 (백업)
+- 이동 파일: 065101/065506/121540/141313/141315/141317/142512/142514/142516/142518/142520 (모두 BRIDGE.md)
+- T-AADS-150, T-AADS-148-A/B/C: pending에 부재 (이미 처리됨)
+- STATUS.md: last_completed=AADS-157 → 갱신 완료
 
 ## AADS-157 주요 변경 (2026-03-07)
 - CEO Chat v2 → AADS Core Engine 연결: Intent Classifier + DashboardCollector + Tool-use 루프 + Directive Submit
