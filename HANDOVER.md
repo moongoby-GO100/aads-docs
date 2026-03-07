@@ -1,5 +1,5 @@
-# AADS HANDOVER v8.1
-최종 업데이트: 2026-03-07 | 버전: v8.1 — AADS-145 EFFICIENCY Phase1 파이프라인 고도화
+# AADS HANDOVER v8.2
+최종 업데이트: 2026-03-07 | 버전: v8.2 — AADS-147 STATUS.md 브라우저 자동화 실패 복구 경로
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -49,12 +49,18 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-145 | 완료 |
+| AADS | Phase 2 운영 | AADS-147 | 완료 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
 | SF | 운영중 | SF-015 | 정상 |
 | NAS | 유지보수 | NAS-010 | 정상 |
+
+## 복구 경로 (AADS-147)
+브라우저 자동화 실패 시 → CEO가 매니저 대화창에 "상태확인" 입력
+→ 매니저가 STATUS.md(context_docs) 읽어 chat_delivered=false 완료 작업 인식
+→ report_url 보고서 확인 후 다음 지시 생성 (복구 소요 ~5초)
+STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATUS.md
 
 ## 긴급 이슈
 없음
@@ -70,6 +76,7 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 - D-023: HANDOVER 3계층 분리
 - D-024: 모델 라우팅 (size 기반)
 - D-025: 우선순위큐 impact/effort 정렬
+- D-026: STATUS.md 브라우저 자동화 실패 복구 경로 (AADS-147)
 
 ## 상세 참조
 - 완료 이력: HANDOVER-HISTORY.md (최근 10건)
