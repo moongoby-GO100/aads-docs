@@ -1,4 +1,4 @@
-# 공유 교훈 INDEX (최종: 2026-03-07, 10건)
+# 공유 교훈 INDEX (최종: 2026-03-07, 11건)
 
 ## infra (서버·디스크·Docker·네트워크)
 - L-001: Watchdog 서비스명 불일치 오탐 폭주 [AADS-117] → infra/L-001_watchdog-false-positive.md
@@ -6,6 +6,7 @@
 - L-003: Docker image 누적 → 주간 prune 필요 [AADS] → infra/L-003_docker-prune-schedule.md
 - L-009: 4계층 자기치유 아키텍처 패턴 [AADS-134] → infra/L-009.md
 - L-010: /proc grep 블로킹 + 고아 프로세스 CPU 독점 방지 [AADS-148] → infra/L-010_proc-grep-orphan-process.md
+- L-011: 파이프라인 감사 5대 패턴 (상태롤백/폴러마진/변수순서/AI격리/멀티포트) [AADS-149] → infra/L-011_pipeline-audit-critical-patterns.md
 
 ## api (외부 API·토큰·웹훅·타임아웃)
 - L-004: API 토큰 만료 전 자동갱신 필수 [KIS 9건] → api/L-004_token-refresh-pattern.md

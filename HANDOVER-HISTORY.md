@@ -3,6 +3,23 @@
 
 ---
 
+## AADS-149 완료 사항 (2026-03-07)
+- **파이프라인 전수조사 버그 5건 Wrap 보고서**: reports/AADS-149-WRAP_pipeline-audit-5bugs.md
+- **BUG-1 (Critical)**: auto_trigger.sh — SCP 실패 시 seen_tasks 영구 차단
+  - 수정: SCP 실패 직후 `unset seen_tasks["$task_id"]` 롤백 로직 추가
+- **BUG-2 (High)**: auto_trigger.sh — RESULT 폴러 타임아웃 25분 < HARD_TIMEOUT 30분
+  - 수정: `seq 1 50` → `seq 1 80` (40분, HARD_TIMEOUT + 10분 여유)
+- **BUG-3 (Medium)**: auto_trigger.sh — `aads_lifecycle_queued()` 호출 시 _rt/_title 변수 미정의
+  - 수정: 변수 추출 코드를 lifecycle 호출 앞으로 이동
+- **BUG-4 (Critical)**: claude_exec.sh — Claude가 pending/running 경로 삭제 가능 + /proc grep 금지 없음
+  - 수정: CONTEXT_HEADER에 디렉토리 조작 금지 + /proc grep -r 금지 규칙 주입
+- **BUG-5 (High)**: done_watcher.sh — 서버 114 SSH 포트 7916 미지정
+  - 수정: `get_project_ssh_port()` 함수 추가, SSH/SCP 명령에 `-p/-P` 옵션 적용
+- **교훈 L-011 등록**: shared/lessons/infra/L-011_pipeline-audit-critical-patterns.md (5대 패턴)
+- **적용 서버**: 211(전체), 68(auto_trigger+claude_exec), 114(auto_trigger+claude_exec)
+
+---
+
 ## AADS-145 완료 사항 (2026-03-07)
 - **Tasks 시스템 통합**: scripts/claude_exec.sh + claude_exec.sh(main)
   - CLAUDE_CODE_TASK_LIST_ID 환경변수 자동 생성 및 export

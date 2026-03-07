@@ -1,5 +1,5 @@
-# AADS HANDOVER v8.4
-최종 업데이트: 2026-03-07 | 버전: v8.4 — AADS-148 /proc grep 블로킹 장애 Wrap + 재발방지
+# AADS HANDOVER v8.5
+최종 업데이트: 2026-03-07 | 버전: v8.5 — AADS-149 파이프라인 전수조사 버그 5건 수정 Wrap
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -49,12 +49,19 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-148 | 완료 |
+| AADS | Phase 2 운영 | AADS-149 | 완료 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
 | SF | 운영중 | SF-015 | 정상 |
 | NAS | 유지보수 | NAS-010 | 정상 |
+
+## AADS-149 주요 변경 (2026-03-07)
+- 파이프라인 전수조사 버그 5건 Wrap 보고서: reports/AADS-149-WRAP_pipeline-audit-5bugs.md
+- 교훈 L-011 등록: shared/lessons/infra/L-011_pipeline-audit-critical-patterns.md
+- BUG-1(Critical): auto_trigger.sh seen_tasks 롤백 + BUG-2(High): 폴러 타임아웃 40분 확장
+- BUG-3(Medium): lifecycle 변수 순서 수정 + BUG-4(Critical): CONTEXT_HEADER 파이프라인 보호 규칙
+- BUG-5(High): done_watcher.sh get_project_ssh_port() 서버 114 포트 7916 적용
 
 ## AADS-148 주요 변경 (2026-03-07)
 - /proc grep 블로킹 3일 장애 Wrap 보고서: reports/AADS-148-WRAP_proc-grep-blocking-incident.md
