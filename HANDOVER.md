@@ -1,5 +1,5 @@
-# AADS HANDOVER v10.1
-최종 업데이트: 2026-03-08 | 버전: v10.1 — 이번 세션 전체 작업 반영 + CEO 문서 등록 + 대시보드 문서편집 기능
+# AADS HANDOVER v10.2
+최종 업데이트: 2026-03-08 | 버전: v10.2 — AADS-161 매니저 자기인식 프로토콜 + bridge.py 자동화 명시 + CEO 전달 금지
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -22,6 +22,112 @@
 - **GitHub PAT**: repo+workflow 권한, 만료 2026-05-27
 - **기술 스택**: LangGraph >= 1.0.10, FastAPI, Next.js, PostgreSQL, Docker
 - **E2E 검증 완료**: 3시나리오, 건당 $3.72~$4.03
+
+---
+
+## 매니저 자기인식 프로토콜
+
+### 1-1. 나는 누구인가
+- **정체성**: AADS 전담 AI 매니저 (Genspark AI)
+- **역할**: CEO 지시 수신 → 지시서 발행 → 결과 검증 → CEO 보고
+- **권한 제한**: CEO 승인 없이 작업 생성·변경·삭제 불가, 코드 작성·SSH 접속 금지
+- **관할**: AADS 프로젝트 전체
+
+### 1-2. 이 채팅창이 내 채팅창인가
+- **확인 ①**: 채팅 제목 또는 CEO 첫 메시지에 "AADS" 포함
+- **확인 ②**: Task ID 접두사 AADS-xxx 일치
+- **확인 ③**: 참조 문서 URL이 aads-docs 리포지토리
+- **불일치 시**: "⚠️ 프로젝트 불일치 감지" 경고 출력 후 작업 수행 금지
+
+### 1-3. 세션 시작 프로토콜
+1. HANDOVER.md 읽기
+2. HANDOVER-RULES.md 읽기
+3. CEO-DIRECTIVES.md 읽기
+4. 마지막 완료/다음 대기 작업 확인
+5. CEO에 세션 시작 보고
+
+### AADS 매니저 채팅 URL
+- https://www.genspark.ai/agents?id=3d86d6f3-09a7-41b2-b91b-762a55512458
+
+---
+
+## 지시서 자동화 파이프라인 (bridge.py)
+
+### 전체 흐름
+1. 매니저가 채팅창에 >>>DIRECTIVE_START ~ >>>DIRECTIVE_END 출력
+2. bridge.py 자동 감지 (10초 폴링, 서버 211)
+3. /root/.genspark/directives/pending/ 자동 저장
+4. auto_trigger.sh 검증 (WORKDIR 권한, 중복 체크, 의존성)
+5. claude_exec.sh 실행 (모델 자동 라우팅)
+
+### 절대 금지 (D-037, R-022)
+- 매니저가 CEO에게 "이 지시서를 전달해 주세요" 금지
+- 매니저가 CEO에게 "bridge에 넣어 주세요" 금지
+- 매니저가 CEO에게 "파일을 저장해 주세요" 금지
+- 기타 지시서 전달을 CEO에게 요청하는 모든 행위 금지
+
+### 올바른 흐름
+- 매니저는 지시서 블록(>>>DIRECTIVE_START ~ >>>DIRECTIVE_END)을 채팅창에 출력만 하면 됨
+- 나머지는 bridge.py → auto_trigger.sh → claude_exec.sh 자동화 시스템이 처리
+- CEO 개입 불필요
+
+### 지시서 작성 예시
+
+**S 작업 예시:**
+```
+>>>DIRECTIVE_START
+TASK_ID: AADS-170
+TITLE: STATUS.md 타임존 수정
+PRIORITY: P2-MEDIUM
+SIZE: S
+IMPACT: L
+EFFORT: L
+MODEL: sonnet
+REVIEW_REQUIRED: false
+ASSIGNEE: Claude (서버 68, /root/aads)
+DESCRIPTION: STATUS.md의 타임스탬프를 KST로 통일
+SUCCESS_CRITERIA: 모든 timestamp이 +09:00 형식
+>>>DIRECTIVE_END
+```
+
+**M 작업 예시:**
+```
+>>>DIRECTIVE_START
+TASK_ID: AADS-171
+TITLE: 대시보드 Watchdog 페이지 UI 개선
+PRIORITY: P1-HIGH
+SIZE: M
+IMPACT: M
+EFFORT: M
+MODEL: sonnet
+REVIEW_REQUIRED: false
+ASSIGNEE: Claude (서버 68, /root/aads)
+DESCRIPTION: /watchdog 페이지에 서비스 상태 카드 + 에러 히스토리 테이블 추가
+SUCCESS_CRITERIA: 1) 서비스 카드 6개 표시, 2) 에러 테이블 최근 20건 표시, 3) 30초 자동 갱신
+>>>DIRECTIVE_END
+```
+
+**XL 작업 예시:**
+```
+>>>DIRECTIVE_START
+TASK_ID: AADS-172
+TITLE: Agent Teams 파일럿 구현
+PRIORITY: P1-HIGH
+SIZE: XL
+IMPACT: H
+EFFORT: H
+MODEL: opus
+REVIEW_REQUIRED: true
+ASSIGNEE: Claude (서버 68, /root/aads)
+parallel_group: AADS-172-A (graphs/), AADS-172-B (agents/), AADS-172-C (tests/)
+files_owned:
+  A: graphs/team_lead.py, graphs/team_worker.py
+  B: agents/coordinator.py, agents/specialist.py
+  C: tests/test_team_*.py
+DESCRIPTION: Agent Teams 아키텍처 구현 - 팀 리드 + 팀원 구조
+SUCCESS_CRITERIA: 1) 팀 리드 DAG 실행, 2) 팀원 병렬 처리, 3) E2E 테스트 통과
+>>>DIRECTIVE_END
+```
 
 ---
 
@@ -100,6 +206,19 @@
 
 ---
 
+## 6개 프로젝트 매니저 채팅 라우팅 테이블
+
+| 프로젝트 | 매니저 채팅 URL | Task ID 접두사 | 서버 |
+|----------|----------------|----------------|------|
+| AADS | https://www.genspark.ai/agents?id=3d86d6f3-09a7-41b2-b91b-762a55512458 | AADS-xxx | 68 |
+| KIS | https://www.genspark.ai/agents?id=77de652f-ca8c-4edb-b841-4ca3726b7bb4 | KIS-xxx | 211 |
+| GO100 | https://www.genspark.ai/agents?id=167071cf-c8b5-476a-8953-6168dd6c910c | GO100-xxx | 211 |
+| SF | (CEO 확인 필요) | SF-xxx | 114 |
+| NTV2 | (CEO 확인 필요) | NT-xxx | 114 |
+| NAS | (CEO 확인 필요) | NAS-xxx | Cafe24 |
+
+---
+
 ## 진행 중 작업 상세
 
 없음 (이번 세션 작업 모두 완료)
@@ -134,7 +253,7 @@
 
 ---
 
-## CEO-DIRECTIVES 전문 요약 (v3.3)
+## CEO-DIRECTIVES 전문 요약 (v3.4)
 
 ### 섹션 1: 사고방식 원칙
 - D-001: 단순 사고 금지 — 하나를 던지면 10을 생각하고 연구해서 반영
@@ -168,6 +287,9 @@
 - D-029: Writer/Reviewer — P0/P1 review_required:true 시 리뷰 세션 자동 스폰 (AADS-146)
 - **[NEW] D-033**: Core 문서 운영 원칙 섹션 상시 유지 — 삭제/축약 불가
 - **[NEW] D-034**: HANDOVER 업데이트 WRAP 게이트 — git diff에 HANDOVER.md 미포함 시 차단
+- **[NEW] D-035**: bridge.py 자동 감지 원칙 — 매니저가 채팅창에 지시서 출력 → bridge.py 자동 감지·추출·저장. CEO 전달 요청 금지.
+- **[NEW] D-036**: 매니저 자기인식 의무 — 세션 시작 시 3가지 검증(프로젝트명, Task ID, 문서 URL) 수행 필수
+- **[NEW] D-037**: CEO 전달 요청 금지 — 매니저→CEO 지시서 전달 요청 절대 금지. 위반 시 지시서 무효.
 
 ### 섹션 2: 기술적 지시
 - T-001: 멀티 에이전트 아키텍처 — LangGraph Native StateGraph, langgraph-supervisor 금지
@@ -204,6 +326,7 @@
 - R-019: 중복 태스크 차단
 - R-020: 의존성(DEPENDS_ON) 선행 충족 후 실행
 - **[NEW] R-021**: HANDOVER 업데이트 의무 강화 — 토큰 절약 목적 생략 = R-VIOLATION
+- **[NEW] R-022**: CEO 전달 요청 금지 위반 — R-VIOLATION. 지시서 무효 + 재작성
 
 ---
 
@@ -288,9 +411,9 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 | HANDOVER-RULES.md | https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER-RULES.md | 파이프라인, 매니저/작업자 규칙, 지시서 포맷, 효율성 전략, 비용 규칙 |
 | HANDOVER-HISTORY.md | https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER-HISTORY.md | 최근 10건 완료 작업 상세 이력 |
 | HANDOVER-ARCHIVE.md | https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER-ARCHIVE.md | 전체 이력 보관소 + 4계층 자기치유 상세 |
-| CEO-DIRECTIVES.md (v3.3) | https://github.com/moongoby-GO100/aads-docs/blob/main/CEO-DIRECTIVES.md | CEO 지시 전문 (D-001~D-034, R-001~R-021, T-001~T-011) |
-| WORKFLOW-PIPELINE.md (v3.2) | https://github.com/moongoby-GO100/aads-docs/blob/main/shared/rules/WORKFLOW-PIPELINE.md | 8단계 파이프라인 상세 + 라우팅 + 모델 라우팅 |
-| RULE-MATRIX.md (v1.2) | https://github.com/moongoby-GO100/aads-docs/blob/main/shared/rules/RULE-MATRIX.md | 23규칙 x 8단계 매핑 매트릭스 |
+| CEO-DIRECTIVES.md (v3.4) | https://github.com/moongoby-GO100/aads-docs/blob/main/CEO-DIRECTIVES.md | CEO 지시 전문 (D-001~D-037, R-001~R-022, T-001~T-011) |
+| WORKFLOW-PIPELINE.md (v3.3) | https://github.com/moongoby-GO100/aads-docs/blob/main/shared/rules/WORKFLOW-PIPELINE.md | 8단계 파이프라인 상세 + 라우팅 + 모델 라우팅 |
+| RULE-MATRIX.md (v1.3) | https://github.com/moongoby-GO100/aads-docs/blob/main/shared/rules/RULE-MATRIX.md | 23규칙 x 8단계 매핑 매트릭스 |
 | STATUS.md | https://github.com/moongoby-GO100/aads-docs/blob/main/STATUS.md | 실시간 작업 상태 (last_completed, next_pending) |
 | AADS-KNOWLEDGE.md | /root/aads/aads-server/docs/knowledge/AADS-KNOWLEDGE.md | AADS 전용 지식 |
 | AADS_ARCHITECTURE_v1.0 | https://github.com/moongoby-GO100/aads-docs/blob/main/architecture/AADS_ARCHITECTURE_v1.0.md | 시스템 아키텍처 (인프라, API 50+, DB 13테이블) |
@@ -303,6 +426,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v10.2 | 2026-03-08 | AADS-161 | 매니저 자기인식 프로토콜, bridge.py 자동화 파이프라인, 6개 프로젝트 라우팅 테이블, D-035~D-037/R-022 추가 |
 | v10.1 | 2026-03-08 | AADS-148 | 이번 세션: 대시보드 문서편집+자동push, project-docs API, CEO문서/TZ 미반영분 추가 |
 | v10.0 | 2026-03-08 | AADS-148 | 4계층 재구성, D-023 v2 적용, 토큰 상한 폐기, RULES 신규생성 |
 | v9.0 | 2026-03-07 | AADS-160 | CEO 직접 검수: 버그수정 4건 + 모델드롭박스 + KST 동기화 |

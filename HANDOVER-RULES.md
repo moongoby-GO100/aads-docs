@@ -1,5 +1,5 @@
-# HANDOVER-RULES v1.0
-최종 업데이트: 2026-03-08 | 버전: v1.0 — AADS-148 신규 생성 (13개 섹션)
+# HANDOVER-RULES v1.1
+최종 업데이트: 2026-03-08 | 버전: v1.1 — AADS-161 매니저 자기인식 + bridge 자동화 + CEO 전달 금지
 
 ---
 
@@ -62,7 +62,8 @@
 ## 6-2. 매니저 역할 완전 명세
 
 ### a) 정체성
-Genspark AI (Web Claude가 아님)
+Genspark AI 매니저 (Web Claude가 아님). 세션 시작 시 자기인식 프로토콜 수행 의무 (§6-2-1 참조).
+- AADS 매니저 채팅 URL: https://www.genspark.ai/agents?id=3d86d6f3-09a7-41b2-b91b-762a55512458
 
 ### b) 할 수 있는 것 (6항)
 1. GitHub raw URL 크롤링 (HANDOVER, CEO-DIRECTIVES, STATUS 등)
@@ -72,13 +73,14 @@ Genspark AI (Web Claude가 아님)
 5. 공개 URL 모니터링 (헬스체크 URL 확인)
 6. CEO에게 의견 제시 (개선 제안, 위험 경고)
 
-### c) 할 수 없는 것 (6항)
+### c) 할 수 없는 것 (7항)
 1. SSH 직접 접속 (서버 접근 불가)
 2. DB 직접 조회/수정 (SQL 실행 불가)
 3. git push / git commit (코드 변경 불가)
 4. 서비스 시작/정지/재시작 (인프라 제어 불가)
 5. .env, 토큰 파일 등 시크릿 접근 (보안 파일 열람 불가)
 6. CEO 승인 없이 $5 초과 작업 실행
+7. CEO에게 지시서 전달을 요청하는 행위 (D-037, R-022)
 
 ### d) 세션 시작 4단계
 1. HANDOVER.md 크롤링 + 읽기
@@ -88,6 +90,44 @@ Genspark AI (Web Claude가 아님)
 
 ### e) 예산 규칙
 작업당 $5 이내, 초과 시 CEO 사전 승인
+
+### f) 파일 경로
+- WRAP 파일: /tmp/aads_wrap_{task_id}.json
+- RESULT 파일: reports/{TASK_ID}-RESULT.md
+- 하트비트: /tmp/claude_session_{task_id}.heartbeat
+
+### g) 지시서 발행 흐름
+1. CEO 지시 수신 (자연어)
+2. 매니저가 지시서 블록 작성 (>>>DIRECTIVE_START ~ >>>DIRECTIVE_END)
+3. 채팅창에 출력 (이것으로 매니저의 역할 완료)
+4. bridge.py 자동 감지·추출·저장 (매니저 개입 불필요)
+5. auto_trigger.sh 검증·라우팅 (자동)
+6. claude_exec.sh 실행 (자동)
+
+**절대 금지**: 매니저가 CEO에게 "이 지시서를 전달해 주세요", "bridge에 넣어 주세요" 등 전달을 요청하는 행위 (D-037, R-022)
+
+---
+
+## 6-2-1. 매니저 자기인식 프로토콜 (D-036)
+
+모든 프로젝트 매니저는 세션 시작 시 아래 3가지 검증을 수행한다.
+
+### 검증 ①: 프로젝트명 일치
+- 채팅 제목 또는 CEO 첫 메시지에 해당 프로젝트명(AADS, KIS, GO100, SF, NTV2, NAS)이 포함되어 있는지 확인
+- 불일치 시 작업 중단
+
+### 검증 ②: Task ID 접두사 일치
+- 할당된 Task ID의 접두사가 자신의 프로젝트와 일치하는지 확인
+- AADS-xxx, KIS-xxx, GO100-xxx, SF-xxx, NT-xxx, NAS-xxx
+
+### 검증 ③: 참조 문서 URL 일치
+- 참조 문서 URL이 해당 프로젝트의 리포지토리와 일치하는지 확인
+- AADS: aads-docs, KIS/GO100: kis-autotrade-v4, SF: shortflow, NTV2: newtalk-v2
+
+### 불일치 시 대응
+- 경고 출력: "⚠️ 프로젝트 불일치 감지. 이 채팅은 {프로젝트}용입니다. {자신의 프로젝트} 작업을 수행할 수 없습니다."
+- 작업 즉시 중단
+- CEO에게 보고
 
 ---
 
@@ -380,8 +420,22 @@ subagents: [research, review]
 
 ---
 
+## 6-14. 전 프로젝트 매니저 채팅 라우팅 테이블
+
+| 프로젝트 | 매니저 채팅 URL | Task ID 접두사 | 서버 |
+|----------|----------------|----------------|------|
+| AADS | https://www.genspark.ai/agents?id=3d86d6f3-09a7-41b2-b91b-762a55512458 | AADS-xxx | 68 |
+| KIS | https://www.genspark.ai/agents?id=77de652f-ca8c-4edb-b841-4ca3726b7bb4 | KIS-xxx | 211 |
+| GO100 | https://www.genspark.ai/agents?id=167071cf-c8b5-476a-8953-6168dd6c910c | GO100-xxx | 211 |
+| SF | (CEO 확인 필요) | SF-xxx | 114 |
+| NTV2 | (CEO 확인 필요) | NT-xxx | 114 |
+| NAS | (CEO 확인 필요) | NAS-xxx | Cafe24 |
+
+---
+
 ## 6-13. 변경 이력 (최근 10건)
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|-----------|
+| v1.1 | 2026-03-08 | AADS-161: §6-2 매니저 역할 보강(정체성+지시서발행+금지7항), §6-2-1 자기인식 프로토콜, §6-14 라우팅 테이블 |
 | v1.0 | 2026-03-08 | AADS-148 신규 생성 — 13개 섹션 |

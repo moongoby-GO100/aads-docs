@@ -1,5 +1,5 @@
-# WORKFLOW-PIPELINE v3.2
-최종 업데이트: 2026-03-08 | 버전: v3.2 — AADS-148 Step 6 HANDOVER 업데이트 검증 게이트 추가
+# WORKFLOW-PIPELINE v3.3
+최종 업데이트: 2026-03-08 | 버전: v3.3 — AADS-161 Step 2 bridge 자동 감지 명시 + CEO 전달 불필요
 
 ## 개요
 AADS 자율 개발 시스템의 8단계 파이프라인 정의.
@@ -11,9 +11,9 @@ AADS 자율 개발 시스템의 8단계 파이프라인 정의.
 
 | 단계 | 이름 | 주체 | 설명 |
 |------|------|------|------|
-| 1 | CEO 지시 | CEO (moongoby) | CEO가 Genspark AI채팅 매니저에 지시하면 Bridge 감지 디렉티브 지시서 작성 |
-| 2 | 지시서 작성 | Genspark AI채팅 매니저 | Genspark AI채팅 매니저가 직접 Bridge 감지 디렉티브 지시서 작성 |
-| 3 | Bridge 감지 | bridge.py (서버 211) | pending 디렉토리 파일 감지 → auto_trigger 라우팅 |
+| 1 | CEO 지시 | CEO (moongoby) | CEO가 Genspark AI채팅 매니저에 지시 |
+| 2 | 지시서 작성 | Genspark AI채팅 매니저 | 매니저가 >>>DIRECTIVE_START ~ >>>DIRECTIVE_END 블록을 채팅창에 출력. CEO에게 전달 요청 금지 (D-037). |
+| 3 | Bridge 감지 | bridge.py (서버 211) | pending 디렉토리 파일 감지 → auto_trigger 라우팅. bridge.py가 자동 감지하여 pending/에 저장. CEO 수동 전달 불필요. |
 | 4 | 사전 검증 | auto_trigger.sh | WORKDIR 권한, 중복 체크, 의존성(DEPENDS_ON) 충족 확인 |
 | 5 | 우선순위 전송 | auto_trigger.sh | 프로젝트별 서버 라우팅, SCP 전송, SSH claude_exec.sh 실행 |
 | 6 | Claude 실행 | claude_exec.sh | claudebot 계정에서 Claude Code 실행, 하트비트, 타임아웃 관리 |
@@ -40,6 +40,8 @@ bridge.py (서버 211)
      ├── SF / NTV2 / NAS → 서버 114 (SSH) → claude_exec.sh
      └── NTV2 라우팅: rfree-009 (114.207.244.86) 확인 후 반영
 ```
+
+> **참고 (D-037)**: 매니저는 지시서 블록을 채팅창에 출력하기만 하면 됨. bridge.py가 자동 감지·추출·저장하며, CEO에게 전달을 요청하는 것은 금지. 위반 시 R-022 적용.
 
 ### 서버 라우팅 매핑
 | 프로젝트 | 서버 | IP | WORKDIR |
@@ -116,8 +118,8 @@ bridge.py (서버 211)
 ---
 
 ## 참조
-- RULE-MATRIX.md: 규칙 x 8단계 매핑 (v1.2)
+- RULE-MATRIX.md: 규칙 x 8단계 매핑 (v1.3)
 - HANDOVER.md: 프로젝트별 최신 상태 (Core)
 - HANDOVER-RULES.md: 파이프라인, 매니저/작업자 규칙, 효율성 전략
 - HANDOVER-HISTORY.md: 최근 완료 태스크 상세
-- CEO-DIRECTIVES.md: D-016~D-034, R-001~R-021
+- CEO-DIRECTIVES.md: D-016~D-037, R-001~R-022
