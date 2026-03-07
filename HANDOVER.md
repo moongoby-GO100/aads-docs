@@ -1,5 +1,5 @@
-# AADS HANDOVER v6.8
-최종 업데이트: 2026-03-07 | 버전: v6.8 — AADS-141 이벤트 기반 즉시 투입 + 시맨틱 루프 에스컬레이션 + 텔레그램 4종 알림
+# AADS HANDOVER v6.9
+최종 업데이트: 2026-03-07 | 버전: v6.9 — AADS-142 하트비트 시스템 3서버 전체 배포 + E2E 검증 + CEO-DIRECTIVES v3.1
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -32,7 +32,7 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 자동복구: **15건** 상시 가동 (기존 12 + 신규 3: recovery_graph + escalation_engine + circuit_breaker)
 세션 관리: 글로벌 ≤4, 서버별 동적 1~3슬롯
 
-## 4계층 자기치유 체계 (AADS-131~141, 2026-03-07)
+## 4계층 자기치유 체계 (AADS-131~142, 2026-03-07)
 | 계층 | 컴포넌트 | 주기/타임아웃 | 위치 |
 |------|---------|-------------|------|
 | L1 | claude_exec 하트비트 + inotifywait | 이벤트 기반 | 3서버 공통 |
@@ -44,6 +44,12 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 | L2 | bridge_monitor | 60초 | 서버 211 |
 | L3 | meta_watchdog.sh | cron */1 | 서버 211 |
 | L4 | UptimeRobot / GitHub Actions | 외부 | 외부 |
+
+**AADS-142 변경 (하트비트 3서버 전체 배포 + E2E 검증 + CEO-DIRECTIVES v3.1)**:
+- deploy_heartbeat_3servers.sh: 3서버 일괄 배포 스크립트 (inotify-tools/jq 설치 + systemd 등록)
+- CEO-DIRECTIVES v3.1: D-018 개정(하트비트 기반 L1) + D-021 신규(세션 관리 원칙) 배포
+- E2E 검증: 파일럿 B-1(완료 흐름 4초), B-2(Tier2 시뮬레이션 150초), B-3(3건 즉시투입 2초) 완료
+- 서버 68: session_watchdog RUNNING(PID 6166), meta_watchdog 감시 포함, HC=200 ✅
 
 **AADS-141 변경 (이벤트 기반 즉시 투입 + 에스컬레이션)**:
 - auto_trigger.sh: /tmp/aads_trigger_next.signal 감지 → 즉시 투입 (크론 대기 없음), 크론 fallback 유지
@@ -75,6 +81,16 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 소규모 수정: Operate → Wrap up만 수행 가능
 상세: shared/rules/flow-rules.md | WRAP 게이트: auto_trigger.sh (R-014)
 
+## AADS-140~142 완료 사항 (2026-03-07)
+- **AADS-140**: claude_exec 하트비트(inotifywait + git status fallback) + session_watchdog.sh(Tier2/3) 구현
+- **AADS-141**: signal 기반 즉시 투입 + 시맨틱 루프 에스컬레이션 + PARTIAL 보고서 + 텔레그램 4종 알림
+- **AADS-142**: 하트비트 시스템 3서버 배포 + E2E 파일럿 검증 + CEO-DIRECTIVES v3.1 배포
+  - 서버 68: session_watchdog RUNNING, meta_watchdog 감시, HC HTTP 200 ✅
+  - 배포 스크립트: scripts/deploy_heartbeat_3servers.sh (root 실행 전용)
+  - B-1 파일럿: 완료 흐름 4초 내 확인 ✅
+  - B-2 멈춤 시뮬레이션: 150초 Tier2 대상 설정 ✅
+  - B-3 처리량: 3건 즉시 투입 2초 ✅
+
 ## AADS-130 최종 완료 사항 (2026-03-06 Wrap-up)
 - **E2E 3시나리오 검증 완료**: AI 퍼포먼스 마케팅 SaaS / K-12 교육 플랫폼 / 이커머스 셀러 도구
   - 각 시나리오: strategy_reports ✅ + project_plans ✅ + debate_logs ✅ + artifacts 6건 ✅
@@ -93,18 +109,34 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 - AADS-128: Full-Cycle Graph (ideation+execution 서브그래프 통합), project_artifacts DB, artifacts API
 - AADS-129: CEO 체크포인트 UI 4페이지 (select-item, approve-plan, full-cycle, reports)
 
-## CEO-DIRECTIVES 원칙 (현행 v3.0)
+## 하트비트 기반 세션 관리 (AADS-140~142, D-021)
+
+| 항목 | 값 |
+|------|-----|
+| 하트비트 발신 | inotifywait 또는 git status fallback |
+| 감시 주기 | 10초 (session_watchdog.sh) |
+| 경고 기준 | 60초 미갱신 |
+| Tier 2 진단 | 120초 → CPU + 시맨틱루프 판별 → kill + 재시작 |
+| Tier 3 강제종료 | 300초 → kill + recovery_logs 기록 |
+| 하드 타임아웃 | 2시간 (안전망) |
+| 완료 즉시 투입 | signal 파일 → auto_trigger.sh (크론 대기 없음) |
+| 텔레그램 알림 | 4종: Tier2(⚠️), Tier3(🔴), Tier4(🚨), 완료(✅) |
+
+## CEO-DIRECTIVES 원칙 (현행 v3.1)
 - D-016: FLOW 프레임워크 (Find→Layout→Operate→Wrap up) 모든 작업 의무
 - D-017: 소스코드 모듈화 원칙 — agents/graphs/models/services 4개 디렉토리 독립 모듈
-- D-018: 4계층 자기치유 원칙 — L1~L4 모든 프로세스 타임아웃+감시 의무
+- D-016: FLOW 프레임워크 (Find→Layout→Operate→Wrap up) 모든 작업 의무
+- D-017: 소스코드 모듈화 원칙 — agents/graphs/models/services 4개 디렉토리 독립 모듈
+- D-018: 4계층 자기치유 원칙 — L1 하트비트 기반(60/120/300초), L1.5 session_watchdog, L2~L4 감시 체계
 - D-019: 서버 상호 감시 의무화 — 3서버 2분 주기 크로스 모니터링
 - D-020: 복구 이력 DB 의무화 — recovery_logs 테이블 기록
+- D-021: 하트비트 기반 세션 관리 — claude_exec 하트비트, 10초 감시, 이벤트 기반 투입
 - R-016: 서킷브레이커 준수 — 3회 실패 시 5분 쿨다운
 - 모든 산출물 DB화 원칙: project_artifacts 테이블 통합 저장
 
 ## 상세 참조
 - AADS 전용 지식: /root/aads/aads-server/docs/knowledge/AADS-KNOWLEDGE.md
 - 공유 교훈: shared/lessons/INDEX.md
-- CEO 지침: CEO-DIRECTIVES.md (v2.8)
+- CEO 지침: CEO-DIRECTIVES.md (v3.1)
 - 이전 HANDOVER 전문: archive/HANDOVER-v5.39-full.md
 - WRAP 보고서: AADS-130_WRAPUP_REPORT.md
