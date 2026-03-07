@@ -11,14 +11,15 @@ AADS 자율 개발 시스템의 8단계 파이프라인 정의.
 
 | 단계 | 이름 | 주체 | 설명 |
 |------|------|------|------|
-| 1 | CEO 지시 | CEO (moongoby) | Genspark 에이전트 채팅 또는 직접 Bridge 디렉티브 작성 |
-| 2 | Bridge 감지 | bridge.py (서버 211) | pending 디렉토리 파일 감지 → auto_trigger 라우팅 |
-| 3 | 사전 검증 | auto_trigger.sh | WORKDIR 권한, 중복 체크, 의존성(DEPENDS_ON) 충족 확인 |
-| 4 | 우선순위 전송 | auto_trigger.sh | 프로젝트별 서버 라우팅, SCP 전송, SSH claude_exec.sh 실행 |
-| 5 | Claude 실행 | claude_exec.sh | claudebot 계정에서 Claude Code 실행, 하트비트, 타임아웃 관리 |
-| 6 | 결과 보고 | claude_exec.sh | RESULT_FILE 생성, commit SHA 기록, HANDOVER 업데이트 검증(D-034), Telegram 알림 |
-| 7 | DB 기록 | AADS API | recovery_logs, directive_lifecycle, usage_logger 기록 |
-| 8 | 교차 검증 | session_watchdog + 3서버 | git-push HTTP 200 확인, 교차 모니터링, 에스컬레이션 |
+| 1 | CEO 지시 | CEO (moongoby) | CEO가 Genspark AI채팅 매니저에 지시하면 Bridge 감지 디렉티브 지시서 작성 |
+| 2 | 지시서 작성 | Genspark AI채팅 매니저 | Genspark AI채팅 매니저가 직접 Bridge 감지 디렉티브 지시서 작성 |
+| 3 | Bridge 감지 | bridge.py (서버 211) | pending 디렉토리 파일 감지 → auto_trigger 라우팅 |
+| 4 | 사전 검증 | auto_trigger.sh | WORKDIR 권한, 중복 체크, 의존성(DEPENDS_ON) 충족 확인 |
+| 5 | 우선순위 전송 | auto_trigger.sh | 프로젝트별 서버 라우팅, SCP 전송, SSH claude_exec.sh 실행 |
+| 6 | Claude 실행 | claude_exec.sh | claudebot 계정에서 Claude Code 실행, 하트비트, 타임아웃 관리 |
+| 7 | 결과 보고 | claude_exec.sh | RESULT_FILE 생성, commit SHA 기록, HANDOVER 업데이트 검증(D-034), Telegram 알림 |
+| 8 | DB 기록 | AADS API | recovery_logs, directive_lifecycle, usage_logger 기록 |
+| 9 | 교차 검증 | session_watchdog + 3서버 | git-push HTTP 200 확인, 교차 모니터링, 에스컬레이션 |
 
 ---
 
@@ -26,6 +27,8 @@ AADS 자율 개발 시스템의 8단계 파이프라인 정의.
 
 ```
 CEO 지시 (Genspark 채팅)
+     ↓
+Genspark AI채팅 매니저 Bridge 감지 디렉티브 지시서 작성
      ↓
 bridge.py (서버 211)
      ├── pending 디렉토리 파일 저장: /root/.genspark/directives/pending/
