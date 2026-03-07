@@ -1,5 +1,5 @@
-# AADS HANDOVER v8.9
-최종 업데이트: 2026-03-07 | 버전: v8.9 — AADS-159 CEO Chat Playwright 브라우저 자동화 6개 도구 추가
+# AADS HANDOVER v9.0
+최종 업데이트: 2026-03-07 | 버전: v9.0 — CEO 직접 검수: 버그수정 4건 + 모델드롭박스 + KST 동기화
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -49,12 +49,24 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-159 | 완료 |
+| AADS | Phase 2 운영 | AADS-160 (CEO 검수) | 완료 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
 | SF | 운영중 | SF-015 | 정상 |
 | NAS | 유지보수 | NAS-010 | 정상 |
+
+## AADS-160 CEO 직접 검수 + 버그수정 + UI개선 (2026-03-07)
+- CEO 직접 AADS-157/158/159 검수 → 버그 4건 발견 및 수정
+- **CEO Chat TypeError 2건**: logger.info structlog kwargs → f-string 변환 (9f496d1, 3d7d80d)
+- **Dashboard React Error #31**: object를 React children으로 렌더링 → typeof 체크 + JSON.stringify (49311d1)
+- **Ops toLocaleString/toFixed crash**: undefined 값에 메서드 호출 → nullish coalescing (49311d1, 33fa3ed)
+- **모델 선택 드롭박스**: 버튼 7개 → select 드롭박스 29개 모델 (auto+Anthropic 11+OpenAI 11+Google 6) (af082cb)
+- **KST 타임존 동기화**: 8개 파일 날짜를 Asia/Seoul timezone으로 통일 (fd51915)
+  - ceo-chat, conversations, reports, ProjectCard, CheckpointList, select-item, managers, SSEMonitor
+  - conversations: 수동 KST_OFFSET 계산 → native toLocaleString timezone 교체
+- aads-server commits: 9f496d1, 3d7d80d
+- aads-dashboard commits: 49311d1, 33fa3ed, af082cb, fd51915
 
 ## AADS-159 주요 변경 (2026-03-07)
 - CEO Chat Playwright 브라우저 자동화 6개 도구 추가 (T-003 Phase 2 확장)
