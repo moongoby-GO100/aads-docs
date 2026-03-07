@@ -1,12 +1,7 @@
 {
-  "updated_at": "2026-03-08T05:49:52.903439+09:00",
+  "updated_at": "2026-03-08T06:54:29.265333+09:00",
   "updated_by": "dashboard",
   "trigger_messages": {
-    "AADS": "[AADS] 안녕하세요. AADS Phase 2 운영 상태를 확인하고 다음 태스크를 진행해주세요. 최근: AADS-160 (CEO 검수 완료). HANDOVER.md + HANDOVER-RULES.md + CEO-DIRECTIVES.md를 참조하세요.",
-    "GO100": "[GO100] 안녕하세요. GO100 AI 자동매매 현황을 확인하고 다음 태스크를 진행해주세요. 최근 태스크: GO100-023. GO100-HANDOVER.md를 참조하세요.",
-    "KIS": "[KIS] 안녕하세요. KIS V4.1 API 연동 상태를 확인하고 다음 태스크를 진행해주세요. 최근 태스크: KIS-041. KIS-HANDOVER.md를 참조하세요.",
-    "ShortFlow": "[SF] 안녕하세요. ShortFlow 영상 생성 현황을 확인하고 다음 태스크를 진행해주세요. 최근 태스크: SF-015. SF-HANDOVER.md를 참조하세요.",
-    "NewTalk": "[NTV2] 안녕하세요. NewTalk V2 Phase 1 환경 구축 진행 상황을 확인해주세요. 최근 태스크: NT-001 (대기). NTV2-HANDOVER.md + NTV2-CEO-DIRECTIVES.md를 참조하세요.",
-    "NAS": "[NAS] 안녕하세요. NAS 유지보수 현황을 확인하고 다음 태스크를 진행해주세요. 최근 태스크: NAS-010. NAS-HANDOVER.md + NAS-CEO-DIRECTIVES.md를 참조하세요."
+    "AADS": "[AADS] 테스트 트리거 메시지 - 검증용"
   }
 }
