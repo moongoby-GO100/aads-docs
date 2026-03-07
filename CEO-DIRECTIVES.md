@@ -1,5 +1,5 @@
 # CEO DIRECTIVES – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-07 (v3.1)
+> 최종 업데이트: 2026-03-07 (v3.2)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션에서 필수 읽기. 이 문서의 지시를 위반하는 설계/분석은 무효.
 
@@ -139,6 +139,42 @@
 - 작업 완료 시 즉시 슬롯 해제 + 다음 작업 투입 (이벤트 기반).
 - 시맨틱 루프(동일 패턴 10회 반복)는 Tier 2에서 감지·kill한다.
 - 고정 타임아웃을 예측하지 말고, 진행을 관찰하라.
+
+### D-022: 지시서 포맷 v2.0 (AADS-144, 2026-03-07)
+- **필수 필드**: task_id / project / priority / size / description / success_criteria
+- **선택 필드** (생략 시 기본값 적용):
+  - parallel_group: 병렬 실행 그룹명 (기본: 없음)
+  - files_owned: 작업 대상 파일 목록 (기본: 없음)
+  - impact: H / M / L (기본: M) — 비즈니스 영향도
+  - effort: H / M / L (기본: M) — 구현 비용/난이도
+  - model: claude 모델명 (기본: sonnet) — D-024 라우팅 참조
+  - review_required: true / false (기본: false)
+  - subagents: 사용할 서브에이전트 목록 (기본: 없음)
+- **기본값 규칙**: 선택 필드 생략 시 claude_exec.sh가 기본값 적용하여 실행
+
+### D-023: HANDOVER 3계층 분리 (AADS-144, 2026-03-07)
+- **Core** (HANDOVER.md): 현재 상태·규칙·서버 현황만. ≤1500토큰 필수 유지.
+- **HISTORY** (HANDOVER-HISTORY.md): 최근 완료 태스크 상세 (최근 10건).
+- **ARCHIVE** (HANDOVER-ARCHIVE.md): 구버전 상세 이력.
+- Core 업데이트 시 상세 내용은 HISTORY로 이동. HISTORY가 10건 초과 시 ARCHIVE로 이동.
+- AI 작업자는 세션 시작 시 Core만 필수 읽기. HISTORY/ARCHIVE는 필요 시 참조.
+
+### D-024: 모델 라우팅 기준 (AADS-144, 2026-03-07)
+- **XS** (단순 문서 수정, 1파일 이하): `claude-haiku-4-5` — 최저비용
+- **S** (소규모 수정, 1~3파일): `claude-sonnet-4-6` — 기본
+- **M** (중규모 기능, 다중 파일): `claude-sonnet-4-6` — 기본
+- **L** (대규모 기능, 시스템 설계): `claude-sonnet-4-6` 또는 `claude-opus-4-6`
+- **XL** (전체 시스템, E2E): `claude-opus-4-6` — 최고품질
+- 지시서 `model:` 필드로 오버라이드 가능. 미지정 시 size 기반 자동 라우팅.
+- claude_exec.sh가 지시서 `model:` 필드 → size 기반 자동 선택 → fallback sonnet 순서 적용.
+
+### D-025: 우선순위큐 impact/effort 정렬 (AADS-144, 2026-03-07)
+- 동일 priority 내 태스크는 impact/effort 점수로 정렬한다.
+- **impact 점수**: H=3, M=2, L=1
+- **effort 점수**: H=1, M=2, L=3 (낮은 effort가 높은 점수 — 빠른 완료 우선)
+- **정렬 점수** = impact_score × 10 + effort_score
+- 점수 높은 태스크를 먼저 실행 (P0 내에서 H-impact/L-effort 우선).
+- impact/effort 미지정 시 기본값 M/M (점수=22) 적용.
 
 ---
 
@@ -400,3 +436,4 @@ curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongob
 | v2.8 | 2026-03-06 | D-016 FLOW 프레임워크, R-014 Wrap up 의무화, R-015 교훈 등록, 9-3 산출물 파일명 확장, 버전 이력 시간순 정렬 |
 | v3.0 | 2026-03-06 | AADS-134: D-018(4계층 자기치유), D-019(서버 상호 감시), D-020(복구 이력 DB), R-016(서킷브레이커 준수) — 대시보드 Recovery+Servers 페이지, project_healing.py |
 | v3.1 | 2026-03-07 | AADS-140~142: D-018 개정(하트비트 기반 L1 전환, 30분→이벤트 감시), D-021 신규(하트비트 세션 관리 원칙) — session_watchdog 3서버 배포 |
+| v3.2 | 2026-03-07 | AADS-144: D-022(지시서 포맷 v2.0), D-023(HANDOVER 3계층 분리), D-024(모델 라우팅), D-025(우선순위큐 impact/effort 정렬) |
