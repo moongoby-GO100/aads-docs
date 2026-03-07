@@ -1,5 +1,5 @@
 # CEO DIRECTIVES – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-08 (v3.4)
+> 최종 업데이트: 2026-03-08 (v3.5)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션에서 필수 읽기. 이 문서의 지시를 위반하는 설계/분석은 무효.
 
@@ -198,6 +198,24 @@
 - **정렬 점수** = impact_score × 10 + effort_score
 - 점수 높은 태스크를 먼저 실행 (P0 내에서 H-impact/L-effort 우선).
 - impact/effort 미지정 시 기본값 M/M (점수=22) 적용.
+
+### D-030: QA 에이전트 의무화 (AADS-163, 2026-03-08)
+- **모든 claude_exec 작업 완료 후 QA 에이전트 자동 실행 의무화**
+- QA 에이전트: test-writer 서브에이전트 (`/root/aads/.claude/agents/test-writer.md`)
+- 실행 순서: Claude 코드 수정 완료 → QA 에이전트 → (PASS) → 디자인 에이전트 → RESULT_FILE 생성
+- QA FAIL 시: 자동 재작업 최대 2회 → 재QA → 2회 초과 시 FAIL 보고 + 서킷브레이커 카운트+1
+- RESULT_FILE에 `qa_status: PASS | FAIL` 필드 필수 기록
+- **예외 없음** — 모든 프로젝트, 모든 우선순위에 공통 적용
+
+### D-031: 디자인 검증 의무화 (AADS-163, 2026-03-08)
+- **QA PASS 후 디자인 에이전트 자동 실행 의무화**
+- 디자인 에이전트: doc-writer 서브에이전트 (`/root/aads/.claude/agents/doc-writer.md`)
+- 판정 기준:
+  - `DESIGN_VERDICT: PASS` — UI/UX 변경 없거나 검증 완료
+  - `DESIGN_VERDICT: REVIEW_NEEDED` — CEO 검토 필요 (이유 포함)
+- REVIEW_NEEDED 시: aads_queue_msg로 CEO Chat 보고 + Telegram 알림 → 60초 대기 → 타임아웃 시 PASS 처리
+- RESULT_FILE에 `design_status: PASS | PASS_TIMEOUT | REVIEW_NEEDED` 필드 필수 기록
+- **예외 없음** — UI 관련 작업(대시보드, Frontend)은 반드시 디자인 검증
 
 ### D-033: Core 문서 운영 원칙 섹션 상시 유지 (AADS-148, 2026-03-08)
 - HANDOVER.md 최상단에 "이 문서의 운영 원칙" 섹션을 상시 유지한다.
@@ -494,6 +512,7 @@ curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongob
 
 | 버전 | 날짜 | 변경 |
 |------|------|------|
+| v3.5 | 2026-03-08 | AADS-163: D-030(QA 에이전트 의무화), D-031(디자인 검증 의무화) — 개발→QA→디자인 3단계 품질 게이트 통합 |
 | v3.4 | 2026-03-08 | AADS-161: §0 운영 원칙 신규, D-035(bridge 자동 감지), D-036(매니저 자기인식), D-037(CEO 전달 금지), R-022(위반 처리), §4 Genspark 자동화 규칙 신규 |
 | v1.0 | 2026-02-28 | 초판 — D-001~D-008, T-001~T-006, 절대 규칙 |
 | v1.1 | 2026-02-28 | 절대 규칙 추가: R-NEW-1 브라우저 URL 보고, R-NEW-2 완료 보고 형식 |
