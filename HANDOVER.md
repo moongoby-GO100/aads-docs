@@ -1,5 +1,5 @@
-# AADS HANDOVER v8.6
-최종 업데이트: 2026-03-07 | 버전: v8.6 — AADS-156 CEO Chat 모델 라우팅 수정 + 28개 지원 모델 + 402 fallback
+# AADS HANDOVER v8.7
+최종 업데이트: 2026-03-07 | 버전: v8.7 — AADS-157 CEO Chat v2 Core Engine 연결 (Intent Classifier + Tool-use + Directive Submit)
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -49,12 +49,23 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-156 | 완료 |
+| AADS | Phase 2 운영 | AADS-157 | 완료 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
 | SF | 운영중 | SF-015 | 정상 |
 | NAS | 유지보수 | NAS-010 | 정상 |
+
+## AADS-157 주요 변경 (2026-03-07)
+- CEO Chat v2 → AADS Core Engine 연결: Intent Classifier + DashboardCollector + Tool-use 루프 + Directive Submit
+- classify_intent(): 5분류 (dashboard/diagnosis/research/execute/strategy) — 의도별 자동 라우팅
+- DashboardCollector: 6소스 병렬 수집 (health, STATUS.md, projects, 세션비용, 태스크현황) + system_prompt 주입
+- _call_anthropic_with_tools(): tool-use while 루프 (max 5 iter), tool_use block → execute_tool → 결과 재전달
+- ceo_chat_tools.py 신규: read_file(화이트리스트), read_github, search_logs(100줄/10KB), query_db(SELECT전용), fetch_url(20KB)
+- directives.py 신규: POST /api/v1/directives/submit → D-022 포맷 파일 생성 → bridge.py 파이프라인 투입
+- _handle_execute_intent(): LLM 지시서 JSON 생성 → parse → submit_directive_sync() 직접 호출
+- 응답에 intent 필드 추가 (dashboard/diagnosis/research/execute/strategy)
+- aads-server commit: 65edfde
 
 ## AADS-156 주요 변경 (2026-03-07)
 - CEO Chat 모델 패스스루: 프론트 model 선택값 → 백엔드 직접 사용 (MODEL_ID_MAP 제거)
