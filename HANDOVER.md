@@ -1,5 +1,5 @@
-# AADS HANDOVER v6.6
-최종 업데이트: 2026-03-06 | 버전: v6.6 — AADS-134 4계층 자기치유 통합 + 대시보드 Recovery/Servers + CEO-DIRECTIVES v3.0
+# AADS HANDOVER v6.8
+최종 업데이트: 2026-03-07 | 버전: v6.8 — AADS-141 이벤트 기반 즉시 투입 + 시맨틱 루프 에스컬레이션 + 텔레그램 4종 알림
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -32,16 +32,33 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 자동복구: **15건** 상시 가동 (기존 12 + 신규 3: recovery_graph + escalation_engine + circuit_breaker)
 세션 관리: 글로벌 ≤4, 서버별 동적 1~3슬롯
 
-## 4계층 자기치유 체계 (AADS-131~134, 2026-03-06)
+## 4계층 자기치유 체계 (AADS-131~141, 2026-03-07)
 | 계층 | 컴포넌트 | 주기/타임아웃 | 위치 |
 |------|---------|-------------|------|
-| L1 | claude_exec 내장 타이머 | 30분 하드 타임아웃 | 3서버 공통 |
+| L1 | claude_exec 하트비트 + inotifywait | 이벤트 기반 | 3서버 공통 |
+| L1 | claude_exec 하드 타임아웃 (안전망) | 2시간 | 3서버 공통 |
 | L1 | bridge 셀프체크 | 60초 | 서버 211 |
+| L1.5 | session_watchdog.sh | 10초 주기 | 3서버 공통 |
 | L2 | watchdog_daemon | 30초 | 서버 68 |
 | L2 | pipeline_monitor | 2분 | 서버 211 |
 | L2 | bridge_monitor | 60초 | 서버 211 |
 | L3 | meta_watchdog.sh | cron */1 | 서버 211 |
 | L4 | UptimeRobot / GitHub Actions | 외부 | 외부 |
+
+**AADS-141 변경 (이벤트 기반 즉시 투입 + 에스컬레이션)**:
+- auto_trigger.sh: /tmp/aads_trigger_next.signal 감지 → 즉시 투입 (크론 대기 없음), 크론 fallback 유지
+- session_watchdog: trigger_post_processing()에서 signal 생성 + auto_trigger 즉시 호출
+- 시맨틱 루프 에스컬레이션: PARTIAL 보고서 자동 생성 (10개 패턴+토큰+권고)
+- recovery_logs DB: issue_type='semantic_loop' 기록
+- CLAUDE.md 주입: 재시작 시 이전 실패 패턴 + 다른 접근법 지시
+- 텔레그램 4종: Tier2(⚠️), Tier3(🔴), Tier4(🚨), 완료(✅)
+- 슬롯 관리: check_global_slots() 글로벌 ≤4 + trigger_decisions.log 기록
+
+**AADS-140 변경 (D-018 L1 전환)**:
+- 기존: 고정 30분 하드 타임아웃 → 좀비 30분 방치 문제
+- 신규: 하트비트 이벤트 기반 (120초 무반응 Tier2, 300초 Tier3)
+- session_watchdog.sh: Tier2 CPU+시맨틱루프 통합판별, Tier3 강제종료+복구
+- 하드 타임아웃은 7200초(2시간)로 연장, 안전망 역할만
 
 **서버 상호감시**: 211↔68↔114 삼각형 크로스 모니터링, 2분 주기
 **복구 의존성**: recovery_graph.py 위상정렬 기반
