@@ -1,5 +1,5 @@
-# AADS HANDOVER v8.3
-최종 업데이트: 2026-03-07 | 버전: v8.3 — AADS-146 병렬화+5프로젝트 확산+대시보드
+# AADS HANDOVER v8.4
+최종 업데이트: 2026-03-07 | 버전: v8.4 — AADS-148 /proc grep 블로킹 장애 Wrap + 재발방지
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -49,12 +49,19 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-146 | 완료 |
+| AADS | Phase 2 운영 | AADS-148 | 완료 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
 | SF | 운영중 | SF-015 | 정상 |
 | NAS | 유지보수 | NAS-010 | 정상 |
+
+## AADS-148 주요 변경 (2026-03-07)
+- /proc grep 블로킹 3일 장애 Wrap 보고서: reports/AADS-148-WRAP_proc-grep-blocking-incident.md
+- 교훈 L-010 등록: shared/lessons/infra/L-010_proc-grep-orphan-process.md
+- claude_exec.sh: PGID kill (`kill -- -$PGID`) + /proc grep 금지 CONTEXT_HEADER 주입
+- session_watchdog.sh: check_orphan_processes() — ppid=1 AND elapsed>3600s 자동 kill
+- aads-docs commit: b96e6f7 | aads-server commit: 2b7b16d
 
 ## AADS-146 주요 변경 (2026-03-07)
 - Worktree 병렬: auto_trigger.sh `_parallel_worktree()` + merge_worktree.sh
