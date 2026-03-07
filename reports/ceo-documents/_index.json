@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-03-07 20:16 KST",
-  "total_documents": 34,
+  "generated_at": "2026-03-07 21:05 KST",
+  "total_documents": 35,
   "documents": [
     {
       "id": "TECH-002",
@@ -491,6 +491,23 @@
         "session",
         "bugfix",
         "AADS"
+      ]
+    },
+    {
+      "id": "TECH-CHART-001",
+      "type": "tech",
+      "title": "KIS AutoTrade V4 & GO100 차트/대시보드 웹 경로 맵",
+      "filename": "TECH-CHART-001_kis-autotrade-v4-go100-차트대시보드-웹-경로-맵.md",
+      "created_at": "2026-03-07 21:05 KST",
+      "source_session": "ceo-direct-20260307",
+      "summary": "# KIS AutoTrade V4 & GO100 — 차트/대시보드 웹 경로 맵 최종 업데이트: 2026-03-07 | 작성: Claude Opus 4.6 (CEO 직접 지시)  ---  ## 1. 서비스 현황  | 서비스 | 포트 | 프로세스 | 상태 | |--------|------|---------|------| | KIS Frontend (Next.j",
+      "tags": [
+        "tech",
+        "chart",
+        "dashboard",
+        "KIS",
+        "GO100",
+        "web"
       ]
     }
   ]
