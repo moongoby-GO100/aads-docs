@@ -1,5 +1,5 @@
 # CEO DIRECTIVES – AADS (Autonomous AI Development System)
-> 최종 업데이트: 2026-03-07 (v3.2)
+> 최종 업데이트: 2026-03-08 (v3.3)
 > 관리자: CEO (moongoby)
 > 용도: 모든 AI 세션에서 필수 읽기. 이 문서의 지시를 위반하는 설계/분석은 무효.
 
@@ -152,12 +152,16 @@
   - subagents: 사용할 서브에이전트 목록 (기본: 없음)
 - **기본값 규칙**: 선택 필드 생략 시 claude_exec.sh가 기본값 적용하여 실행
 
-### D-023: HANDOVER 3계층 분리 (AADS-144, 2026-03-07)
-- **Core** (HANDOVER.md): 현재 상태·규칙·서버 현황만. ≤1500토큰 필수 유지.
-- **HISTORY** (HANDOVER-HISTORY.md): 최근 완료 태스크 상세 (최근 10건).
-- **ARCHIVE** (HANDOVER-ARCHIVE.md): 구버전 상세 이력.
-- Core 업데이트 시 상세 내용은 HISTORY로 이동. HISTORY가 10건 초과 시 ARCHIVE로 이동.
-- AI 작업자는 세션 시작 시 Core만 필수 읽기. HISTORY/ARCHIVE는 필요 시 참조.
+### D-023 v2: HANDOVER 4계층 운영 원칙 (AADS-148, 2026-03-08)
+- 1. 토큰 상한을 두지 않는다. Core(HANDOVER.md)와 Rules(HANDOVER-RULES.md)에 토큰 제한을 적용하지 않는다.
+- 2. 비용을 아끼지 말고 최신화하라. 토큰 절약을 이유로 정보를 생략하거나 축약하지 않는다.
+- 3. 중요 내용은 빠짐없이 반영하라. "이 정도는 알겠지"라고 가정하지 않는다.
+- 4. 성과 기준은 "CEO 질문 0회"이다.
+- 5. 불필요한 중복과 장황함만 제거한다. 정보 자체를 줄이는 것은 금지한다.
+- **4계층**: Core(HANDOVER.md) + Rules(HANDOVER-RULES.md) + History(HANDOVER-HISTORY.md) + Archive(HANDOVER-ARCHIVE.md)
+- Core와 Rules는 매 세션 필수 읽기. History/Archive는 필요 시 참조.
+- 버전 이력: Core에 최근 10건 유지, 11건째부터 History로 이동.
+- History: 최근 완료 작업 10건 유지, 11건째부터 Archive로 이동.
 
 ### D-024: 모델 라우팅 기준 (AADS-144, 2026-03-07)
 - **XS** (단순 문서 수정, 1파일 이하): `claude-haiku-4-5` — 최저비용
@@ -175,6 +179,11 @@
 - **정렬 점수** = impact_score × 10 + effort_score
 - 점수 높은 태스크를 먼저 실행 (P0 내에서 H-impact/L-effort 우선).
 - impact/effort 미지정 시 기본값 M/M (점수=22) 적용.
+
+### D-033: Core 문서 운영 원칙 섹션 상시 유지 (AADS-148, 2026-03-08)
+- HANDOVER.md 최상단에 "이 문서의 운영 원칙" 섹션을 상시 유지한다.
+- 이 섹션은 어떤 작업에서도 삭제하거나 축약할 수 없다.
+- 내용: 토큰 상한 없음, 생략 금지, CEO 질문 0회 기준, 업데이트 의무, 비용 비교 경고.
 
 ---
 
@@ -332,6 +341,16 @@ HANDOVER: https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md
 - Wrap up 시 다른 프로젝트에도 적용 가능한 교훈이 있으면 shared/lessons/에 등록.
 - 결과 파일에 ## 교훈 섹션 작성 시 API가 자동 등록.
 
+### R-021: HANDOVER 업데이트 의무 강화 (AADS-148, 2026-03-08)
+- 작업 완료 판정 시 HANDOVER.md 업데이트 여부를 필수 검증.
+- Step 6 WRAP 게이트에서 git diff에 HANDOVER.md 미포함 시 작업 완료 불인정.
+- 토큰 절약 목적 정보 생략 = R-VIOLATION.
+
+### D-034: HANDOVER 업데이트 WRAP 게이트 (AADS-148, 2026-03-08)
+- 작업 완료 판정 시 HANDOVER.md 업데이트 여부를 Step 6 WRAP 게이트에서 자동 검증한다.
+- git diff에 HANDOVER.md 변경이 포함되지 않으면 WRAP 게이트 차단.
+- 이 검증은 모든 프로젝트에 공통 적용한다.
+
 ### R-016: 서킷브레이커 준수 (AADS-134, 2026-03-06)
 - 동일 서버/프로젝트에서 3회 연속 작업 실패 시 5분(300초) 쿨다운 의무.
 - 쿨다운 중 해당 서버/프로젝트에 신규 작업 투입 금지.
@@ -436,4 +455,5 @@ curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongob
 | v2.8 | 2026-03-06 | D-016 FLOW 프레임워크, R-014 Wrap up 의무화, R-015 교훈 등록, 9-3 산출물 파일명 확장, 버전 이력 시간순 정렬 |
 | v3.0 | 2026-03-06 | AADS-134: D-018(4계층 자기치유), D-019(서버 상호 감시), D-020(복구 이력 DB), R-016(서킷브레이커 준수) — 대시보드 Recovery+Servers 페이지, project_healing.py |
 | v3.1 | 2026-03-07 | AADS-140~142: D-018 개정(하트비트 기반 L1 전환, 30분→이벤트 감시), D-021 신규(하트비트 세션 관리 원칙) — session_watchdog 3서버 배포 |
+| v3.3 | 2026-03-08 | AADS-148: D-023 v2 교체(4계층 운영 원칙), D-033(Core 운영 원칙 상시 유지), D-034(HANDOVER WRAP 게이트), R-021(업데이트 의무 강화) |
 | v3.2 | 2026-03-07 | AADS-144: D-022(지시서 포맷 v2.0), D-023(HANDOVER 3계층 분리), D-024(모델 라우팅), D-025(우선순위큐 impact/effort 정렬) |

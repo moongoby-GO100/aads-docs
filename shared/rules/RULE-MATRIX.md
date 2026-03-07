@@ -1,6 +1,6 @@
-# RULE-MATRIX v1.1
-최종 업데이트: 2026-03-07 | 버전: v1.1 — AADS-144 D-022~D-025 추가
-19개 규칙 × 8단계 파이프라인 적용 매핑
+# RULE-MATRIX v1.2
+최종 업데이트: 2026-03-08 | 버전: v1.2 — AADS-148 D-023 v2 교체 + D-033/D-034/R-021 추가
+23개 규칙 x 8단계 파이프라인 적용 매핑
 
 ---
 
@@ -31,9 +31,12 @@
 | **R-019** | 중복 태스크 차단 (task_id 기반) | ➖ | ✅ | ✅ | ✅ | ➖ | ➖ | ⚠️ | ✅ |
 | **R-020** | 의존성(DEPENDS_ON) 선행 충족 후 실행 | ➖ | ✅ | ✅ | ✅ | ➖ | ➖ | ➖ | ⚠️ |
 | **D-022** | 지시서 포맷 v2.0 (필수6+선택7 필드) | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | ➖ | ⚠️ |
-| **D-023** | HANDOVER 3계층 (Core/HISTORY/ARCHIVE) | ➖ | ➖ | ➖ | ➖ | ✅ | ✅ | ➖ | ✅ |
+| **D-023 v2** | HANDOVER 4계층 운영 원칙 | ➖ | ➖ | ➖ | ➖ | ✅ | ✅ | ➖ | ✅ |
 | **D-024** | 모델 라우팅 (XS→haiku, S/M→sonnet, L/XL→opus) | ✅ | ➖ | ✅ | ✅ | ✅ | ➖ | ⚠️ | ⚠️ |
 | **D-025** | 우선순위큐 impact/effort 정렬 | ✅ | ✅ | ✅ | ✅ | ➖ | ➖ | ➖ | ⚠️ |
+| **D-033** | Core 운영 원칙 섹션 상시 유지 | ➖ | ➖ | ➖ | ➖ | ✅ | ✅ | ➖ | ✅ |
+| **D-034** | HANDOVER 업데이트 WRAP 게이트 | ➖ | ➖ | ➖ | ➖ | ⚠️ | ✅ | ✅ | ✅ |
+| **R-021** | HANDOVER 업데이트 의무 강화 | ➖ | ➖ | ➖ | ➖ | ✅ | ✅ | ➖ | ✅ |
 
 ---
 
@@ -65,7 +68,7 @@
 
 ---
 
-## 규칙 목록 (현행 v3.2)
+## 규칙 목록 (현행 v3.3)
 
 | ID | 출처 | 설명 | 적용 범위 |
 |----|------|------|----------|
@@ -85,6 +88,9 @@
 | R-019 | AADS 규칙 | 중복 태스크 차단 | auto_trigger.sh |
 | R-020 | AADS 규칙 | 의존성 선행 충족 | auto_trigger.sh |
 | D-022 | CEO-DIRECTIVES v3.2 | 지시서 포맷 v2.0 | 모든 지시서 작성자 |
-| D-023 | CEO-DIRECTIVES v3.2 | HANDOVER 3계층 분리 | 모든 AI 작업자 |
+| D-023 v2 | CEO-DIRECTIVES v3.3 | HANDOVER 4계층 운영 원칙 | 모든 AI 작업자 |
 | D-024 | CEO-DIRECTIVES v3.2 | 모델 라우팅 | claude_exec.sh |
-| D-025 | CEO-DIRECTIVES v3.2 | impact/effort 정렬 | auto_trigger.sh |
+| D-025 | CEO-DIRECTIVES v3.3 | impact/effort 정렬 | auto_trigger.sh |
+| D-033 | CEO-DIRECTIVES v3.3 | Core 운영 원칙 섹션 상시 유지 | 모든 AI 작업자 |
+| D-034 | CEO-DIRECTIVES v3.3 | HANDOVER 업데이트 WRAP 게이트 | claude_exec + auto_trigger |
+| R-021 | AADS-148 | HANDOVER 업데이트 의무 강화 | 모든 AI 작업자 |

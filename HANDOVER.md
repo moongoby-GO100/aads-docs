@@ -1,60 +1,213 @@
-# AADS HANDOVER v9.0
-최종 업데이트: 2026-03-07 | 버전: v9.0 — CEO 직접 검수: 버그수정 4건 + 모델드롭박스 + KST 동기화
+# AADS HANDOVER v10.0
+최종 업데이트: 2026-03-08 | 버전: v10.0 — AADS-148 4계층 재구성, D-023 v2 적용, 토큰 상한 폐기
+
+## 이 문서의 운영 원칙
+- 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
+- 중요 내용은 빠짐없이 반영하라. 생략 금지.
+- 이 문서를 읽고 CEO에게 추가 질문 없이 즉시 업무 수행이 가능해야 한다.
+- 모든 작업 완료 시 반드시 이 문서를 업데이트하라.
+- CEO 재설명 1회 비용 > 문서 토큰 비용 100회분임을 명심하라.
+
+---
 
 ## 시스템 개요
-AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
-대시보드: https://aads.newtalk.kr/
-리포: aads-docs, aads-server, aads-dashboard (moongoby-GO100)
-GitHub PAT: repo+workflow, 만료 2026-05-27
 
-## 작업 파이프라인 (8단계)
-| 단계 | 이름 | 주체 |
-|------|------|------|
-| 1 | CEO 지시 | CEO (Genspark 에이전트 또는 직접 작성) |
-| 2 | Bridge 감지 | bridge.py (서버 211, pending 저장) |
-| 3 | 사전 검증 | auto_trigger.sh (WORKDIR·중복·의존성) |
-| 4 | 우선순위 전송 | auto_trigger.sh (프로젝트별 서버 라우팅) |
-| 5 | Claude 실행 | claude_exec.sh (claudebot, 하트비트, 2h 타임아웃) |
-| 6 | 결과 보고 | claude_exec.sh (RESULT_FILE + commit_sha 기록) |
-| 7 | DB 기록 | AADS API (recovery_logs, lifecycle, usage) |
-| 8 | 교차 검증 | session_watchdog + 3서버 (git-push HTTP 200 확인) |
+- **AADS 정의**: Autonomous AI Development System — 멀티 AI 에이전트 자율 개발 시스템
+- **아키텍처**: CEO→PM→개발자→QA→운영 역할 분리 멀티 에이전트
+- **대시보드**: https://aads.newtalk.kr/
+- **GitHub 리포**:
+  - aads-docs: https://github.com/moongoby-GO100/aads-docs (문서/지시서/보고서)
+  - aads-server: https://github.com/moongoby-GO100/aads-server (백엔드 FastAPI)
+  - aads-dashboard: https://github.com/moongoby-GO100/aads-dashboard (프론트 Next.js)
+- **GitHub PAT**: repo+workflow 권한, 만료 2026-05-27
+- **기술 스택**: LangGraph >= 1.0.10, FastAPI, Next.js, PostgreSQL, Docker
+- **E2E 검증 완료**: 3시나리오, 건당 $3.72~$4.03
 
-상세: shared/rules/WORKFLOW-PIPELINE.md
+---
 
-## 매니저 권한 한계
-- 매니저(Genspark AI)는 **CEO 지시 없이 임의 태스크를 생성·변경 불가**
-- HANDOVER.md 수정 권한: CEO만 (매니저 read-only)
-- 서버 접근: 매니저는 SSH 직접 접근 불가 — auto_trigger.sh 통해서만
-- 예산 한도: 태스크당 $5 이하 (D-004). 초과 시 CEO 승인 필수
+## 서버 현황 (3대 전체)
 
-## AI 작업자 규칙
-- **R-001**: 작업 완료 후 HANDOVER.md 업데이트 의무
-- **D-016**: 모든 작업 FLOW 프레임워크 준수 (Find→Layout→Operate→Wrap up)
-- **D-022**: 지시서 포맷 v2.0 준수 (필수 6필드 + 선택 7필드)
-- **D-023**: HANDOVER Core ≤1500토큰 유지. 상세는 HISTORY/ARCHIVE로
-- **D-024**: model 필드 또는 size 기반 자동 라우팅 (XS→haiku, S/M→sonnet, L/XL→opus)
-- **D-025**: 동일 priority 내 impact/effort 점수 높은 순 실행
-- **R-014**: WRAP 보고서 생성 후 auto_trigger WRAP 게이트 통과 필수
-- **R-016**: 서킷브레이커 준수 — 3회 연속 실패 시 5분 쿨다운
-- 작업 디렉토리 이탈 금지: 지정된 WORKDIR 외부 파일 생성 불가
-- git-push 의무: 작업 완료 후 commit + push + SHA RESULT_FILE 기록
+### 서버 211 (211.188.51.113)
+- 역할: Hub 서버 (Bridge, auto_trigger, pipeline_monitor)
+- OS: Ubuntu
+- 주요 서비스: bridge.py, auto_trigger.sh, pipeline_monitor, session_watchdog, meta_watchdog
+- 담당 프로젝트: KIS, GO100
+- WORKDIR: /root/kis-autotrade-v4
 
-## 서버 현황
-| 서버 | IP | 역할 | 프로젝트 |
-|------|-----|------|----------|
-| 211 | 211.188.51.113 | Hub(Bridge, auto_trigger, pipeline_monitor) | KIS, GO100 |
-| 68 | 68.183.183.11 | AADS Backend(FastAPI, PostgreSQL, Dashboard) | AADS |
-| 114 | 116.120.58.155 | 실행 서버 | SF, NTV2 |
+### 서버 68 (68.183.183.11)
+- 역할: AADS Backend
+- OS: Ubuntu
+- 주요 서비스: FastAPI, PostgreSQL, Dashboard (Docker Compose)
+- 담당 프로젝트: AADS
+- WORKDIR: /root/aads
+- session_watchdog: PID 6166, HC=200
 
-## 프로젝트 현황
-| 프로젝트 | Phase | 최근 태스크 | 상태 |
-|----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-160 (CEO 검수) | 완료 |
-| KIS | V4.1 운영 | KIS-041 | 정상 |
-| GO100 | 운영중 | GO100-023 | 정상 |
-| NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
-| SF | 운영중 | SF-015 | 정상 |
-| NAS | 유지보수 | NAS-010 | 정상 |
+### 서버 114 (116.120.58.155)
+- 역할: 실행 서버
+- OS: Ubuntu
+- 주요 서비스: ShortFlow, NTV2
+- 담당 프로젝트: SF, NTV2, NAS
+- WORKDIR: SF=/data/shortflow, NTV2=/srv/newtalk-v2
+
+### 서버 간 모니터링
+211↔68↔114 삼각 구조, 2분 주기 크로스 모니터링
+
+---
+
+## 6개 프로젝트 상태
+
+### a) AADS — Phase 2 운영
+- 최근: AADS-160 (CEO 직접 검수 + 버그수정 4건 + 모델드롭박스 + KST 동기화) 완료
+- 서버: 68
+- 도구: Claude
+- 헬스체크: https://aads.newtalk.kr/
+- 특수: LLM 15회/작업 이하, langgraph-supervisor 사용 금지
+
+### b) SF/ShortFlow — 운영중
+- 최근: SF-015
+- 서버: 114
+- 도구: Cursor/Claude
+- 헬스체크: https://shotflow.newtalk.kr/api/health/
+- 특수: gemini-2.0-flash 사용 금지(404), OAuth 토큰 비공개 유지
+
+### c) GO100 — 운영중
+- 최근: GO100-023
+- 서버: 211
+- 도구: Cursor
+- 헬스체크: https://go100.newtalk.kr/manager/snapshot.json
+- 특수: V4.1 코드 변경 불가, strategy-cards 변경 CEO 승인
+
+### d) KIS — V4.1 운영
+- 최근: KIS-041
+- 서버: 211
+- 도구: Cursor
+- 헬스체크: HANDOVER 다중 엔드포인트
+- 특수: GO100과 동일 서버/동일 제약
+
+### e) NTV2 — Phase 1
+- 최근: NT-001 (대기)
+- 서버: 114
+- 도구: Claude
+- 헬스체크: http://114.207.244.86:8080/api/health
+- 특수: Laravel 12, Docker 재시작 제한
+
+### f) NAS — 유지보수
+- 최근: NAS-010
+- 서버: Cafe24
+- 도구: Claude
+- 헬스체크: 미정
+- 특수: claudebot 사용자만 허용, Flask/FastAPI
+
+---
+
+## 진행 중 작업 상세
+
+현재 활성 작업: AADS-148 (HANDOVER 4계층 전면 재작성 + D-023 v2 운영 원칙 + 문서 검증 반영)
+- 담당: 서버 68
+- 내용: 6개 문서 생성/수정 (HANDOVER.md, HANDOVER-RULES.md, CEO-DIRECTIVES.md, RULE-MATRIX.md, WORKFLOW-PIPELINE.md, STATUS.md)
+
+---
+
+## 대기 작업 큐
+
+(AADS-148 완료 후 STATUS.md에서 next_pending 갱신 예정)
+
+---
+
+## 보류/차단 항목 전체
+
+| 항목 | 사유 | 해제 조건 | CEO 승인 필요 |
+|------|------|-----------|--------------|
+| NTV2 History 채널 OAuth | CEO 채널 ID/이메일 필요 | CEO가 채널 정보 제공 | 예 |
+| Supabase 스키마 | CEO가 001_saas_schema.sql 실행 필요 | CEO 직접 실행 | 예 |
+| CLOVA Voice TTS | Naver Cloud 계정 필요 | CEO가 계정 생성/제공 | 예 |
+| Ubuntu 22.04 업그레이드 | Python 3.11 필요 시 | CEO 승인 후 진행 | 예 |
+
+---
+
+## 긴급 주의사항
+
+- **GitHub PAT 만료**: 2026-05-27 (잔여 약 80일)
+- **디스크 사용률**: 서버 114 = 79% (649GB/875GB) — 70% 초과 시 정리 권장
+- **현재 장애**: 없음
+- **절대 금지**: .env 커밋 금지, DB DROP 금지, 미승인 서비스 재시작 금지
+- **OAuth 토큰**: 전체 만료 상태 — 재인증 필요 시 브라우저 통해 수행
+- **Cloudflare**: OAuth 후 proxied DNS 유지
+
+---
+
+## CEO-DIRECTIVES 전문 요약 (v3.3)
+
+### 섹션 1: 사고방식 원칙
+- D-001: 단순 사고 금지 — 하나를 던지면 10을 생각하고 연구해서 반영
+- D-002: 사소한 것도 빠짐없이 — 누락 없이 비교
+- D-003: AADS의 본질 — AI 에이전트 조직 시뮬레이션, 단일 앱 빌더와 다름
+- D-004: 비용 효율 최우선 — 월 $23~$63 목표, 프롬프트 캐싱+배치 활용
+- D-005: 컨텍스트 패키지 시스템 — HANDOVER.md가 생명줄
+- D-006: 교차검증 필수 — 결과 무비판 수용 금지
+- D-007: 도구 vs 에이전트 구분 — Cursor=도구, AADS 내부=에이전트
+- D-008: 속도 우선 — MVP 먼저 배포, 이후 반복 개선
+- D-009: 현실적 자율성 인식 — 멀티 에이전트 실패율 41-87%, 점진적 확대
+- D-010: 사용자 중심 체크포인트 — 6단계 CEO 개입 지점
+- D-011: Sandbox 2단계 전략 — Docker 로컬 기본, 대형은 사용자 서버 SSH
+- D-012: 인프라 컨설팅 서비스 — Architect Agent 서버 사양 제안
+- D-013: Frontend Dual Strategy — 2026년 Genspark+Dashboard 병행
+- D-014: 콘텐츠 품질 게이트 — 벤치마크 85% 이상 필수
+- D-015: 68서버 프로덕션 유지 결정 — aads.newtalk.kr 고정
+- D-016: FLOW 프레임워크 — Find→Layout→Operate→Wrap up
+- D-017: 소스코드 모듈화 원칙 — agents/graphs/models/services 분리
+- D-018: 4계층 자기치유 — L1 하트비트 기반
+- D-019: 서버 상호 감시 — 3서버 2분 크로스
+- D-020: 복구 이력 DB 의무화 — recovery_logs
+- D-021: 하트비트 기반 세션 관리
+- D-022: 지시서 포맷 v2.0 — 필수 6필드 + 선택 7필드
+- **[NEW] D-023 v2**: HANDOVER 4계층 운영 원칙 — 토큰 상한 없음, 생략 금지, CEO 질문 0회 기준
+- D-024: 모델 라우팅 — XS→haiku, S/M→sonnet, L/XL→opus
+- D-025: 우선순위큐 impact/effort 정렬
+- D-026: STATUS.md 브라우저 자동화 실패 복구 경로 (AADS-147)
+- D-027: Worktree 병렬 실행 — parallel_group 필드 감지 시 자동 분기 (AADS-146)
+- D-028: 서브에이전트 패턴 — subagents 필드 기반 보안/테스트/문서 에이전트 (AADS-146)
+- D-029: Writer/Reviewer — P0/P1 review_required:true 시 리뷰 세션 자동 스폰 (AADS-146)
+- **[NEW] D-033**: Core 문서 운영 원칙 섹션 상시 유지 — 삭제/축약 불가
+- **[NEW] D-034**: HANDOVER 업데이트 WRAP 게이트 — git diff에 HANDOVER.md 미포함 시 차단
+
+### 섹션 2: 기술적 지시
+- T-001: 멀티 에이전트 아키텍처 — LangGraph Native StateGraph, langgraph-supervisor 금지
+- T-002: 에이전트 역할 구성 — 8 에이전트 (Supervisor/Architect/PM/Developer/QA/Judge/DevOps/Researcher)
+- T-003: MCP 서버 스택 — Phase 1 필수 7개 + Phase 2 확장 3개
+- T-004: 샌드박스 전략 — Docker 로컬 기본, SSH 원격 대형
+- T-005: AADS 기술 스택 — LangGraph + FastAPI + Next.js + PostgreSQL
+- T-006: 로드맵 — Phase 0~6 점진적 자율성 확대
+- T-007: 에이전트 간 통신 프로토콜 — TaskSpec JSON
+- T-008: Judge Agent 품질 게이트 — pass/fail/conditional_pass
+- T-009: 점진적 자율성 게이트 — 성공률 90% 이상 시 자동 승인 전환
+- T-010: 수익 모델 — SaaS 티어 Free~Enterprise
+- T-011: 5-Layer Memory Architecture — L1~L5
+
+### 섹션 3: 절대 규칙
+- R-001: HANDOVER 업데이트 없이 완료 선언 금지
+- R-002: 보고서 GitHub push + HTTP 200 확인
+- R-003: .env/시크릿/API키 커밋 금지
+- R-004: 프로덕션 DB 직접 편집 금지
+- R-005: 서버 서비스 임의 재시작 금지
+- R-006: CEO-DIRECTIVES 위반 설계/분석 무효
+- R-007: 기존 서비스 중단/변경 CEO 승인 필수
+- R-008: CEO 보고 시 GitHub 브라우저 경로 사용
+- R-009: 작업 완료 보고 형식 준수
+- R-010: langgraph-supervisor 프로덕션 사용 금지
+- R-011: Supabase 직접 연결(5432) 사용, Supavisor/PgBouncer 금지
+- R-012: 작업당 LLM 호출 최대 15회
+- R-013: Task ID 접두사 체계 — AADS/KIS/GO100/SF/NT/SALES/NAS
+- R-014: Wrap up 의무화 — WRAP 게이트
+- R-015: 교훈 등록 — shared/lessons/
+- R-016: 서킷브레이커 준수 — 3회 실패 → 5분 쿨다운
+- R-017: git-push 감시 — commit SHA + HTTP 200
+- R-018: WORKDIR 이탈 금지
+- R-019: 중복 태스크 차단
+- R-020: 의존성(DEPENDS_ON) 선행 충족 후 실행
+- **[NEW] R-021**: HANDOVER 업데이트 의무 강화 — 토큰 절약 목적 생략 = R-VIOLATION
+
+---
 
 ## AADS-160 CEO 직접 검수 + 버그수정 + UI개선 (2026-03-07)
 - CEO 직접 AADS-157/158/159 검수 → 버그 4건 발견 및 수정
@@ -63,72 +216,26 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 - **Ops toLocaleString/toFixed crash**: undefined 값에 메서드 호출 → nullish coalescing (49311d1, 33fa3ed)
 - **모델 선택 드롭박스**: 버튼 7개 → select 드롭박스 29개 모델 (auto+Anthropic 11+OpenAI 11+Google 6) (af082cb)
 - **KST 타임존 동기화**: 8개 파일 날짜를 Asia/Seoul timezone으로 통일 (fd51915)
-  - ceo-chat, conversations, reports, ProjectCard, CheckpointList, select-item, managers, SSEMonitor
-  - conversations: 수동 KST_OFFSET 계산 → native toLocaleString timezone 교체
 - aads-server commits: 9f496d1, 3d7d80d
 - aads-dashboard commits: 49311d1, 33fa3ed, af082cb, fd51915
 
 ## AADS-159 주요 변경 (2026-03-07)
 - CEO Chat Playwright 브라우저 자동화 6개 도구 추가 (T-003 Phase 2 확장)
 - ceo_chat_tools.py: browser_navigate/snapshot/screenshot/click/fill/tab_list
-  - 도메인 화이트리스트 하드코딩: *.newtalk.kr, github.com, raw.githubusercontent.com, localhost
-  - 차단 시 "[접근 차단] 허용되지 않은 도메인입니다" 반환
-  - Playwright Python 싱글턴 컨텍스트 (asyncio.Lock, headless Chromium)
-  - graceful degradation: playwright 미설치/초기화 실패 시 "[브라우저 도구 사용 불가]" 반환
-  - 메모리 제한 512MB (--memory-pressure-off), 동시 탭 최대 3개, 세션 타임아웃 60초
-- ceo_chat.py: Intent Classifier 6분류 (browser 추가)
-  - browser 키워드: 스크린샷/페이지/열어/화면/브라우저/사이트/접속
-  - 우선순위: execute > browser > dashboard > diagnosis > research > strategy
-  - send_ceo_message: browser 의도 → _call_anthropic_with_tools 자동 분기
-- supervisord.conf: playwright-mcp 엔트리 추가 (autostart=false, Node.js 옵션)
+- 도메인 화이트리스트: *.newtalk.kr, github.com, raw.githubusercontent.com, localhost
+- Playwright Python 싱글턴 컨텍스트 (asyncio.Lock, headless Chromium)
 - aads-server commit: 1fbb76d
 
 ## AADS-158 주요 변경 (2026-03-07)
-- Pending 대기큐 정리: 11개 완료·중복 지시서 → /root/.genspark/directives/archived/ 이동 (백업)
-- 이동 파일: 065101/065506/121540/141313/141315/141317/142512/142514/142516/142518/142520 (모두 BRIDGE.md)
-- T-AADS-150, T-AADS-148-A/B/C: pending에 부재 (이미 처리됨)
+- Pending 대기큐 정리: 11개 완료/중복 지시서 → archived/ 이동
 - STATUS.md: last_completed=AADS-157 → 갱신 완료
 
 ## AADS-157 주요 변경 (2026-03-07)
 - CEO Chat v2 → AADS Core Engine 연결: Intent Classifier + DashboardCollector + Tool-use 루프 + Directive Submit
-- classify_intent(): 5분류 (dashboard/diagnosis/research/execute/strategy) — 의도별 자동 라우팅
-- DashboardCollector: 6소스 병렬 수집 (health, STATUS.md, projects, 세션비용, 태스크현황) + system_prompt 주입
-- _call_anthropic_with_tools(): tool-use while 루프 (max 5 iter), tool_use block → execute_tool → 결과 재전달
-- ceo_chat_tools.py 신규: read_file(화이트리스트), read_github, search_logs(100줄/10KB), query_db(SELECT전용), fetch_url(20KB)
-- directives.py 신규: POST /api/v1/directives/submit → D-022 포맷 파일 생성 → bridge.py 파이프라인 투입
-- _handle_execute_intent(): LLM 지시서 JSON 생성 → parse → submit_directive_sync() 직접 호출
-- 응답에 intent 필드 추가 (dashboard/diagnosis/research/execute/strategy)
+- classify_intent(): 5분류 (dashboard/diagnosis/research/execute/strategy)
+- ceo_chat_tools.py: read_file, read_github, search_logs, query_db, fetch_url
+- directives.py: POST /api/v1/directives/submit
 - aads-server commit: 65edfde
-
-## AADS-156 주요 변경 (2026-03-07)
-- CEO Chat 모델 패스스루: 프론트 model 선택값 → 백엔드 직접 사용 (MODEL_ID_MAP 제거)
-- 하드코딩 제거: claude-*-4-5 → claude-opus-4-6/claude-sonnet-4-6 직접 사용
-- SUPPORTED_MODELS 28개: Claude 11 + GPT 11 + Gemini 6 + GET /ceo-chat/models 엔드포인트
-- 402 fallback: ANTHROPIC_API_KEY_2 자동 전환 (credit_balance_too_low)
-- OpenAI 직접 호출: _call_openai() 추가 (GPT-5/gpt-5-mini 등 직접 라우팅)
-- ModelSelector.tsx: 5개 → 7개 최신 모델 (Haiku 4.5, GPT-5 추가, Gemini 2.5 Flash)
-- aads-server commit: 0576e79 | aads-dashboard commit: 5cd39d6
-
-## AADS-149 주요 변경 (2026-03-07)
-- 파이프라인 전수조사 버그 5건 Wrap 보고서: reports/AADS-149-WRAP_pipeline-audit-5bugs.md
-- 교훈 L-011 등록: shared/lessons/infra/L-011_pipeline-audit-critical-patterns.md
-- BUG-1(Critical): auto_trigger.sh seen_tasks 롤백 + BUG-2(High): 폴러 타임아웃 40분 확장
-- BUG-3(Medium): lifecycle 변수 순서 수정 + BUG-4(Critical): CONTEXT_HEADER 파이프라인 보호 규칙
-- BUG-5(High): done_watcher.sh get_project_ssh_port() 서버 114 포트 7916 적용
-
-## AADS-148 주요 변경 (2026-03-07)
-- /proc grep 블로킹 3일 장애 Wrap 보고서: reports/AADS-148-WRAP_proc-grep-blocking-incident.md
-- 교훈 L-010 등록: shared/lessons/infra/L-010_proc-grep-orphan-process.md
-- claude_exec.sh: PGID kill (`kill -- -$PGID`) + /proc grep 금지 CONTEXT_HEADER 주입
-- session_watchdog.sh: check_orphan_processes() — ppid=1 AND elapsed>3600s 자동 kill
-- aads-docs commit: b96e6f7 | aads-server commit: 2b7b16d
-
-## AADS-146 주요 변경 (2026-03-07)
-- Worktree 병렬: auto_trigger.sh `_parallel_worktree()` + merge_worktree.sh
-- 서브에이전트: .claude/agents/ security-reviewer/test-writer/doc-writer + claude_exec.sh subagents 파싱
-- Writer/Reviewer: `_spawn_review_session()` — P0/P1 review_required:true 시 자동 리뷰
-- 5프로젝트 HANDOVER v1.1: D-022~D-025 추가 (GO100/KIS/SF/NTV2/NAS)
-- 대시보드: /api/v1/managers 엔드포인트 + 3단계 fallback
 
 ## 복구 경로 (AADS-147)
 브라우저 자동화 실패 시 → CEO가 매니저 대화창에 "상태확인" 입력
@@ -136,29 +243,34 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 → report_url 보고서 확인 후 다음 지시 생성 (복구 소요 ~5초)
 STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATUS.md
 
-## 긴급 이슈
-없음
+---
 
-## CEO-DIRECTIVES 현행 원칙 (v3.2)
-- D-016: FLOW 프레임워크 (Find→Layout→Operate→Wrap up)
-- D-017: 소스코드 모듈화 (agents/graphs/models/services)
-- D-018: 4계층 자기치유 (L1 하트비트 기반)
-- D-019: 서버 상호 감시 (3서버 2분 크로스)
-- D-020: 복구 이력 DB 의무화
-- D-021: 하트비트 기반 세션 관리
-- D-022: 지시서 포맷 v2.0
-- D-023: HANDOVER 3계층 분리
-- D-024: 모델 라우팅 (size 기반)
-- D-025: 우선순위큐 impact/effort 정렬
-- D-026: STATUS.md 브라우저 자동화 실패 복구 경로 (AADS-147)
-- D-027: Worktree 병렬 실행 — parallel_group 필드 감지 시 자동 분기 (AADS-146)
-- D-028: 서브에이전트 패턴 — subagents 필드 기반 보안/테스트/문서 에이전트 활성화 (AADS-146)
-- D-029: Writer/Reviewer — P0/P1 review_required:true 시 리뷰 세션 자동 스폰 (AADS-146)
+## 참조 문서 링크
 
-## 상세 참조
-- 완료 이력: HANDOVER-HISTORY.md (최근 10건)
-- 구버전 이력: HANDOVER-ARCHIVE.md
-- AADS 전용 지식: /root/aads/aads-server/docs/knowledge/AADS-KNOWLEDGE.md
-- CEO 지침: CEO-DIRECTIVES.md (v3.2)
-- 워크플로우: shared/rules/WORKFLOW-PIPELINE.md (v3.1)
-- 규칙 매트릭스: shared/rules/RULE-MATRIX.md (v1.1)
+| 문서 | GitHub 브라우저 URL | 설명 |
+|------|---------------------|------|
+| HANDOVER-RULES.md | https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER-RULES.md | 파이프라인, 매니저/작업자 규칙, 지시서 포맷, 효율성 전략, 비용 규칙 |
+| HANDOVER-HISTORY.md | https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER-HISTORY.md | 최근 10건 완료 작업 상세 이력 |
+| HANDOVER-ARCHIVE.md | https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER-ARCHIVE.md | 전체 이력 보관소 + 4계층 자기치유 상세 |
+| CEO-DIRECTIVES.md (v3.3) | https://github.com/moongoby-GO100/aads-docs/blob/main/CEO-DIRECTIVES.md | CEO 지시 전문 (D-001~D-034, R-001~R-021, T-001~T-011) |
+| WORKFLOW-PIPELINE.md (v3.2) | https://github.com/moongoby-GO100/aads-docs/blob/main/shared/rules/WORKFLOW-PIPELINE.md | 8단계 파이프라인 상세 + 라우팅 + 모델 라우팅 |
+| RULE-MATRIX.md (v1.2) | https://github.com/moongoby-GO100/aads-docs/blob/main/shared/rules/RULE-MATRIX.md | 23규칙 x 8단계 매핑 매트릭스 |
+| STATUS.md | https://github.com/moongoby-GO100/aads-docs/blob/main/STATUS.md | 실시간 작업 상태 (last_completed, next_pending) |
+| AADS-KNOWLEDGE.md | /root/aads/aads-server/docs/knowledge/AADS-KNOWLEDGE.md | AADS 전용 지식 |
+
+---
+
+## 버전 이력 (최근 10건)
+
+| 버전 | 날짜 | Task ID | 변경 요약 |
+|------|------|---------|-----------|
+| v10.0 | 2026-03-08 | AADS-148 | 4계층 재구성, D-023 v2 적용, 토큰 상한 폐기, RULES 신규생성 |
+| v9.0 | 2026-03-07 | AADS-160 | CEO 직접 검수: 버그수정 4건 + 모델드롭박스 + KST 동기화 |
+| v8.2 | 2026-03-07 | AADS-159 | CEO Chat Playwright 브라우저 자동화 6개 도구 |
+| v8.1 | 2026-03-07 | AADS-158 | Pending 대기큐 정리 11건 archived 이동 |
+| v8.0 | 2026-03-07 | AADS-157 | CEO Chat v2 Core Engine 연결, Intent Classifier |
+| v7.9 | 2026-03-07 | AADS-156 | CEO Chat 모델 패스스루, SUPPORTED_MODELS 28개 |
+| v7.8 | 2026-03-07 | AADS-149 | 파이프라인 전수조사 버그 5건 수정 |
+| v7.7 | 2026-03-07 | AADS-148 | /proc grep 블로킹 3일 장애 수정 |
+| v7.6 | 2026-03-07 | AADS-146 | Worktree 병렬, 서브에이전트, Writer/Reviewer |
+| v7.5 | 2026-03-07 | AADS-145 | Tasks 시스템, 투기적 실행, 컨텍스트 자동관리 |

@@ -1,5 +1,5 @@
-# WORKFLOW-PIPELINE v3.1
-최종 업데이트: 2026-03-07 | 버전: v3.1 — AADS-144 D-024 모델 라우팅 추가
+# WORKFLOW-PIPELINE v3.2
+최종 업데이트: 2026-03-08 | 버전: v3.2 — AADS-148 Step 6 HANDOVER 업데이트 검증 게이트 추가
 
 ## 개요
 AADS 자율 개발 시스템의 8단계 파이프라인 정의.
@@ -16,7 +16,7 @@ AADS 자율 개발 시스템의 8단계 파이프라인 정의.
 | 3 | 사전 검증 | auto_trigger.sh | WORKDIR 권한, 중복 체크, 의존성(DEPENDS_ON) 충족 확인 |
 | 4 | 우선순위 전송 | auto_trigger.sh | 프로젝트별 서버 라우팅, SCP 전송, SSH claude_exec.sh 실행 |
 | 5 | Claude 실행 | claude_exec.sh | claudebot 계정에서 Claude Code 실행, 하트비트, 타임아웃 관리 |
-| 6 | 결과 보고 | claude_exec.sh | RESULT_FILE 생성, commit SHA 기록, Telegram 알림 |
+| 6 | 결과 보고 | claude_exec.sh | RESULT_FILE 생성, commit SHA 기록, HANDOVER 업데이트 검증(D-034), Telegram 알림 |
 | 7 | DB 기록 | AADS API | recovery_logs, directive_lifecycle, usage_logger 기록 |
 | 8 | 교차 검증 | session_watchdog + 3서버 | git-push HTTP 200 확인, 교차 모니터링, 에스컬레이션 |
 
@@ -94,6 +94,16 @@ bridge.py (서버 211)
 
 ---
 
+## Step 6 추가: HANDOVER 업데이트 검증 (D-034, R-021)
+
+- 검증 방법: git diff --cached 또는 git log -1 --name-only에서 HANDOVER.md 포함 여부 확인
+- PASS 조건: HANDOVER.md가 변경 파일 목록에 포함
+- FAIL 처리: WRAP 게이트 차단, 작업자에게 "HANDOVER.md를 업데이트하세요" 메시지 출력, 재시도
+- 로그: "HANDOVER_UPDATE_CHECK: PASS" 또는 "HANDOVER_UPDATE_CHECK: FAIL"
+- 이 검증은 모든 프로젝트 공통 (AADS, SF, GO100, KIS, NTV2, NAS)
+
+---
+
 ## NTV2 라우팅 확인
 
 - 기본 경로: server-114 (116.120.58.155), 포트 7916
@@ -103,7 +113,8 @@ bridge.py (서버 211)
 ---
 
 ## 참조
-- RULE-MATRIX.md: 규칙 × 8단계 매핑 (v1.1)
+- RULE-MATRIX.md: 규칙 x 8단계 매핑 (v1.2)
 - HANDOVER.md: 프로젝트별 최신 상태 (Core)
+- HANDOVER-RULES.md: 파이프라인, 매니저/작업자 규칙, 효율성 전략
 - HANDOVER-HISTORY.md: 최근 완료 태스크 상세
-- CEO-DIRECTIVES.md: D-016~D-025, R-001~R-016
+- CEO-DIRECTIVES.md: D-016~D-034, R-001~R-021
