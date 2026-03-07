@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-03-08T06:54:27.547730+09:00",
+  "updated_at": "2026-03-08T06:55:01.439727+09:00",
   "updated_by": "dashboard",
   "project_docs": {
     "AADS": [
@@ -18,6 +18,84 @@
       {
         "label": "STATUS",
         "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/STATUS.md"
+      },
+      {
+        "label": "RULE-MATRIX",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/shared/rules/RULE-MATRIX.md"
+      },
+      {
+        "label": "WORKFLOW",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/shared/rules/WORKFLOW-PIPELINE.md"
+      }
+    ],
+    "GO100": [
+      {
+        "label": "HANDOVER",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/GO100-HANDOVER.md"
+      },
+      {
+        "label": "AADS HANDOVER",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md"
+      },
+      {
+        "label": "CEO-DIRECTIVES",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/CEO-DIRECTIVES.md"
+      }
+    ],
+    "KIS": [
+      {
+        "label": "HANDOVER",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/KIS-HANDOVER.md"
+      },
+      {
+        "label": "AADS HANDOVER",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md"
+      },
+      {
+        "label": "CEO-DIRECTIVES",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/CEO-DIRECTIVES.md"
+      }
+    ],
+    "ShortFlow": [
+      {
+        "label": "HANDOVER",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/SF-HANDOVER.md"
+      },
+      {
+        "label": "AADS HANDOVER",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md"
+      },
+      {
+        "label": "CEO-DIRECTIVES",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/CEO-DIRECTIVES.md"
+      }
+    ],
+    "NewTalk": [
+      {
+        "label": "HANDOVER",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/NTV2-HANDOVER.md"
+      },
+      {
+        "label": "CEO-DIRECTIVES",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/NTV2-CEO-DIRECTIVES.md"
+      },
+      {
+        "label": "AADS HANDOVER",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md"
+      }
+    ],
+    "NAS": [
+      {
+        "label": "HANDOVER",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/NAS-HANDOVER.md"
+      },
+      {
+        "label": "CEO-DIRECTIVES",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/NAS-CEO-DIRECTIVES.md"
+      },
+      {
+        "label": "AADS HANDOVER",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md"
       }
     ]
   }
