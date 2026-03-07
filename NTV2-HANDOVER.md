@@ -1,5 +1,5 @@
-# NTV2 (NewTalk V2) HANDOVER v1.0
-최종 업데이트: 2026-03-07 | 버전: v1.0 — AADS-143 신규 생성
+# NTV2 (NewTalk V2) HANDOVER v1.1
+최종 업데이트: 2026-03-07 | 버전: v1.1 — AADS-146 D-022~D-025 추가
 > 배포 대상: NTV2 repo (서버 114, /srv/newtalk-v2/HANDOVER.md) — 신규 생성
 
 ## 시스템 개요
@@ -41,6 +41,10 @@ NTV2 라우팅 특이사항:
 - **D-016**: 모든 작업 FLOW 프레임워크 준수 (Find→Layout→Operate→Wrap up)
 - **D-018**: L1 하트비트 기반 세션 관리 (60/120/300초 임계값)
 - **D-021**: 하트비트 발신 의무 — inotifywait 또는 git status fallback
+- **D-022**: 지시서 포맷 v2.0 준수 (필수 6필드 + 선택 7필드)
+- **D-023**: HANDOVER Core ≤1500토큰 유지. 상세는 HISTORY/ARCHIVE로
+- **D-024**: model 필드 또는 size 기반 자동 라우팅 (XS→haiku, S/M→sonnet, L/XL→opus)
+- **D-025**: 동일 priority 내 impact/effort 점수 높은 순 실행
 - **R-014**: WRAP 보고서 생성 후 auto_trigger WRAP 게이트 통과 필수
 - **R-016**: 서킷브레이커 준수 — 3회 연속 실패 시 5분 쿨다운
 - 작업 디렉토리 이탈 금지: /srv/newtalk-v2 외부 파일 생성 불가
@@ -48,7 +52,7 @@ NTV2 라우팅 특이사항:
 
 ## CEO-DIRECTIVES 참조
 NTV2 전용 규칙: aads-docs/NTV2-CEO-DIRECTIVES.md
-공통 규칙: D-016~D-021, R-001~R-016 (aads-docs/CEO-DIRECTIVES.md)
+공통 규칙: D-016~D-025, R-001~R-016 (aads-docs/CEO-DIRECTIVES.md)
 
 ## 프로젝트 현황
 | 항목 | 값 |

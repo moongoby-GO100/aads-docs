@@ -1,5 +1,5 @@
-# GO100 HANDOVER v1.0
-최종 업데이트: 2026-03-07 | 버전: v1.0 — AADS-143 HANDOVER 표준화
+# GO100 HANDOVER v1.1
+최종 업데이트: 2026-03-07 | 버전: v1.1 — AADS-146 D-022~D-025 추가
 > 배포 대상: GO100 repo (서버 211, /root/kis-autotrade-v4/HANDOVER.md)
 
 ## 시스템 개요
@@ -36,6 +36,10 @@ WORKDIR: /root/kis-autotrade-v4
 - **D-016**: 모든 작업 FLOW 프레임워크 준수 (Find→Layout→Operate→Wrap up)
 - **D-018**: L1 하트비트 기반 세션 관리 (60/120/300초 임계값)
 - **D-021**: 하트비트 발신 의무 — inotifywait 또는 git status fallback
+- **D-022**: 지시서 포맷 v2.0 준수 (필수 6필드 + 선택 7필드)
+- **D-023**: HANDOVER Core ≤1500토큰 유지. 상세는 HISTORY/ARCHIVE로
+- **D-024**: model 필드 또는 size 기반 자동 라우팅 (XS→haiku, S/M→sonnet, L/XL→opus)
+- **D-025**: 동일 priority 내 impact/effort 점수 높은 순 실행
 - **R-014**: WRAP 보고서 생성 후 auto_trigger WRAP 게이트 통과 필수
 - **R-016**: 서킷브레이커 준수 — 3회 연속 실패 시 5분 쿨다운
 - 작업 디렉토리 이탈 금지: /root/kis-autotrade-v4 외부 파일 생성 불가
