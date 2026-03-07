@@ -1,5 +1,5 @@
-# AADS HANDOVER v10.0
-최종 업데이트: 2026-03-08 | 버전: v10.0 — AADS-148 4계층 재구성, D-023 v2 적용, 토큰 상한 폐기
+# AADS HANDOVER v10.1
+최종 업데이트: 2026-03-08 | 버전: v10.1 — 이번 세션 전체 작업 반영 + CEO 문서 등록 + 대시보드 문서편집 기능
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -57,7 +57,7 @@
 ## 6개 프로젝트 상태
 
 ### a) AADS — Phase 2 운영
-- 최근: AADS-160 (CEO 직접 검수 + 버그수정 4건 + 모델드롭박스 + KST 동기화) 완료
+- 최근: AADS-148 세션 (4계층 문서 재구성 + 대시보드 문서편집 기능 + project-docs API) 진행 중
 - 서버: 68
 - 도구: Claude
 - 헬스체크: https://aads.newtalk.kr/
@@ -102,15 +102,13 @@
 
 ## 진행 중 작업 상세
 
-현재 활성 작업: AADS-148 (HANDOVER 4계층 전면 재작성 + D-023 v2 운영 원칙 + 문서 검증 반영)
-- 담당: 서버 68
-- 내용: 6개 문서 생성/수정 (HANDOVER.md, HANDOVER-RULES.md, CEO-DIRECTIVES.md, RULE-MATRIX.md, WORKFLOW-PIPELINE.md, STATUS.md)
+없음 (이번 세션 작업 모두 완료)
 
 ---
 
 ## 대기 작업 큐
 
-(AADS-148 완료 후 STATUS.md에서 next_pending 갱신 예정)
+없음 (CEO 지시 대기)
 
 ---
 
@@ -209,6 +207,44 @@
 
 ---
 
+## 이번 세션 작업 (2026-03-08)
+
+### 1. AADS-148: HANDOVER 4계층 전면 재작성
+- HANDOVER.md v10.0 전면 재작성 (11개 섹션, 운영 원칙 최상단, 토큰 상한 폐기)
+- HANDOVER-RULES.md v1.0 신규 생성 (13개 섹션, 파이프라인/매니저/작업자/효율성12전략)
+- CEO-DIRECTIVES.md v3.3 (D-023 v2 교체, D-033/D-034/R-021 신규)
+- RULE-MATRIX.md v1.2 (19→23규칙)
+- WORKFLOW-PIPELINE.md v3.2 (Step 6 HANDOVER_UPDATE_CHECK 게이트)
+- aads-docs commit: 3edeeca
+
+### 2. 대시보드 채널 카드 문서 링크 + 편집 기능
+- 각 프로젝트 카드에 중요 문서 링크 뱃지 추가 (HANDOVER/RULES/CEO-DIRECTIVES/STATUS 등)
+- **"편집" 버튼** → 모달에서 문서 추가/삭제/수정 가능
+- **저장 + Push**: DB 저장 + aads-docs/shared/project-docs.json 자동 commit+push
+- 데이터 소스 3단계 폴백: DB → GitHub raw JSON → 하드코딩 기본값
+- 30초 주기 자동 갱신 (작업자 수정 실시간 반영)
+- aads-dashboard commits: 024ce1e, 31b01b3
+
+### 3. project-docs 백엔드 API
+- `POST /api/v1/ops/sync-project-docs`: DB 저장 + git auto-push
+- `GET /api/v1/ops/project-docs`: DB에서 프로젝트별 문서 링크 조회
+- aads-server commit: 8185ccd
+
+### 4. CEO 문서 등록 (2026-03-07, 기존 미반영분)
+- TECH-ARCH-001: AADS 시스템 아키텍처 v1.0 (인프라, API 50+, DB 13테이블, 에이전트 8개)
+- TECH-PIPE-001: LangGraph 8-에이전트 파이프라인 기술 감사 (전체 구현 완료)
+- STATUS-SESSION-001: CEO 직접 검수 세션 보고서 (버그 4건 + 모델드롭박스 + KST)
+- TECH-CHART-001: KIS/GO100 차트 대시보드 웹 경로 맵
+- architecture/ 디렉토리 신규: AADS_ARCHITECTURE_v1.0.md, LANGGRAPH_PIPELINE_AUDIT_v1.0.md
+- aads-docs commits: 10c2ec3, ff9c620
+
+### 5. Docker TZ 수정 (2026-03-07, 기존 미반영분)
+- 전 컨테이너 TZ=Asia/Seoul 설정 (aads-server Dockerfile + docker-compose)
+- aads-dashboard Dockerfile에 tzdata 설치 (Alpine KST 동기화)
+- aads-server commit: 7bd1516 | aads-dashboard commit: 52c8486
+
+---
+
 ## AADS-160 CEO 직접 검수 + 버그수정 + UI개선 (2026-03-07)
 - CEO 직접 AADS-157/158/159 검수 → 버그 4건 발견 및 수정
 - **CEO Chat TypeError 2건**: logger.info structlog kwargs → f-string 변환 (9f496d1, 3d7d80d)
@@ -257,6 +293,9 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 | RULE-MATRIX.md (v1.2) | https://github.com/moongoby-GO100/aads-docs/blob/main/shared/rules/RULE-MATRIX.md | 23규칙 x 8단계 매핑 매트릭스 |
 | STATUS.md | https://github.com/moongoby-GO100/aads-docs/blob/main/STATUS.md | 실시간 작업 상태 (last_completed, next_pending) |
 | AADS-KNOWLEDGE.md | /root/aads/aads-server/docs/knowledge/AADS-KNOWLEDGE.md | AADS 전용 지식 |
+| AADS_ARCHITECTURE_v1.0 | https://github.com/moongoby-GO100/aads-docs/blob/main/architecture/AADS_ARCHITECTURE_v1.0.md | 시스템 아키텍처 (인프라, API 50+, DB 13테이블) |
+| LANGGRAPH_PIPELINE_AUDIT | https://github.com/moongoby-GO100/aads-docs/blob/main/architecture/LANGGRAPH_PIPELINE_AUDIT_v1.0.md | 8-에이전트 파이프라인 기술 감사 |
+| project-docs.json | https://github.com/moongoby-GO100/aads-docs/blob/main/shared/project-docs.json | 대시보드 문서 링크 설정 (자동 push) |
 
 ---
 
@@ -264,6 +303,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v10.1 | 2026-03-08 | AADS-148 | 이번 세션: 대시보드 문서편집+자동push, project-docs API, CEO문서/TZ 미반영분 추가 |
 | v10.0 | 2026-03-08 | AADS-148 | 4계층 재구성, D-023 v2 적용, 토큰 상한 폐기, RULES 신규생성 |
 | v9.0 | 2026-03-07 | AADS-160 | CEO 직접 검수: 버그수정 4건 + 모델드롭박스 + KST 동기화 |
 | v8.2 | 2026-03-07 | AADS-159 | CEO Chat Playwright 브라우저 자동화 6개 도구 |
@@ -273,4 +313,3 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 | v7.8 | 2026-03-07 | AADS-149 | 파이프라인 전수조사 버그 5건 수정 |
 | v7.7 | 2026-03-07 | AADS-148 | /proc grep 블로킹 3일 장애 수정 |
 | v7.6 | 2026-03-07 | AADS-146 | Worktree 병렬, 서브에이전트, Writer/Reviewer |
-| v7.5 | 2026-03-07 | AADS-145 | Tasks 시스템, 투기적 실행, 컨텍스트 자동관리 |
