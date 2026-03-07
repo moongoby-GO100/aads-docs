@@ -1,5 +1,5 @@
-# WORKFLOW-PIPELINE v3.3
-최종 업데이트: 2026-03-08 | 버전: v3.3 — AADS-161 Step 2 bridge 자동 감지 명시 + CEO 전달 불필요
+# WORKFLOW-PIPELINE v3.4
+최종 업데이트: 2026-03-08 | 버전: v3.4 — AADS-163 6단계 QA+디자인 검증 추가
 
 ## 개요
 AADS 자율 개발 시스템의 8단계 파이프라인 정의.
@@ -16,7 +16,7 @@ AADS 자율 개발 시스템의 8단계 파이프라인 정의.
 | 3 | Bridge 감지 | bridge.py (서버 211) | pending 디렉토리 파일 감지 → auto_trigger 라우팅. bridge.py가 자동 감지하여 pending/에 저장. CEO 수동 전달 불필요. |
 | 4 | 사전 검증 | auto_trigger.sh | WORKDIR 권한, 중복 체크, 의존성(DEPENDS_ON) 충족 확인 |
 | 5 | 우선순위 전송 | auto_trigger.sh | 프로젝트별 서버 라우팅, SCP 전송, SSH claude_exec.sh 실행 |
-| 6 | Claude 실행 | claude_exec.sh | claudebot 계정에서 Claude Code 실행, 하트비트, 타임아웃 관리 |
+| 6 | Claude 실행 + QA + 디자인 검증 | claude_exec.sh | claudebot 계정에서 Claude Code 실행 → QA 에이전트(test-writer, D-030) → 디자인 에이전트(doc-writer, D-031) → RESULT_FILE 생성 |
 | 7 | 결과 보고 | claude_exec.sh | RESULT_FILE 생성, commit SHA 기록, HANDOVER 업데이트 검증(D-034), Telegram 알림 |
 | 8 | DB 기록 | AADS API | recovery_logs, directive_lifecycle, usage_logger 기록 |
 | 9 | 교차 검증 | session_watchdog + 3서버 | git-push HTTP 200 확인, 교차 모니터링, 에스컬레이션 |
