@@ -1,5 +1,5 @@
-# AADS HANDOVER v8.2
-최종 업데이트: 2026-03-07 | 버전: v8.2 — AADS-147 STATUS.md 브라우저 자동화 실패 복구 경로
+# AADS HANDOVER v8.3
+최종 업데이트: 2026-03-07 | 버전: v8.3 — AADS-146 병렬화+5프로젝트 확산+대시보드
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -49,12 +49,19 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-147 | 완료 |
+| AADS | Phase 2 운영 | AADS-146 | 완료 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
 | SF | 운영중 | SF-015 | 정상 |
 | NAS | 유지보수 | NAS-010 | 정상 |
+
+## AADS-146 주요 변경 (2026-03-07)
+- Worktree 병렬: auto_trigger.sh `_parallel_worktree()` + merge_worktree.sh
+- 서브에이전트: .claude/agents/ security-reviewer/test-writer/doc-writer + claude_exec.sh subagents 파싱
+- Writer/Reviewer: `_spawn_review_session()` — P0/P1 review_required:true 시 자동 리뷰
+- 5프로젝트 HANDOVER v1.1: D-022~D-025 추가 (GO100/KIS/SF/NTV2/NAS)
+- 대시보드: /api/v1/managers 엔드포인트 + 3단계 fallback
 
 ## 복구 경로 (AADS-147)
 브라우저 자동화 실패 시 → CEO가 매니저 대화창에 "상태확인" 입력
@@ -77,6 +84,9 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - D-024: 모델 라우팅 (size 기반)
 - D-025: 우선순위큐 impact/effort 정렬
 - D-026: STATUS.md 브라우저 자동화 실패 복구 경로 (AADS-147)
+- D-027: Worktree 병렬 실행 — parallel_group 필드 감지 시 자동 분기 (AADS-146)
+- D-028: 서브에이전트 패턴 — subagents 필드 기반 보안/테스트/문서 에이전트 활성화 (AADS-146)
+- D-029: Writer/Reviewer — P0/P1 review_required:true 시 리뷰 세션 자동 스폰 (AADS-146)
 
 ## 상세 참조
 - 완료 이력: HANDOVER-HISTORY.md (최근 10건)
