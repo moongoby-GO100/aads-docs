@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-03-06 14:50 KST",
-  "total_documents": 31,
+  "generated_at": "2026-03-07 20:16 KST",
+  "total_documents": 34,
   "documents": [
     {
       "id": "TECH-002",
@@ -446,6 +446,51 @@
         "kis",
         "checklist",
         "weekly"
+      ]
+    },
+    {
+      "id": "TECH-ARCH-001",
+      "type": "tech",
+      "title": "AADS 시스템 아키텍처 v1.0",
+      "filename": "TECH-ARCH-001_aads-시스템-아키텍처-v10.md",
+      "created_at": "2026-03-07 20:16 KST",
+      "source_session": "ceo-direct-20260307",
+      "summary": "# AADS 시스템 아키텍처 v1.0 최종 업데이트: 2026-03-07 | 작성: Claude Opus 4.6 (CEO 직접 지시)  ---  ## 1. 시스템 개요  **AADS (Autonomous AI Development System)**: 멀티 AI 에이전트 자율 개발 플랫폼 - 8개 전문 에이전트가 LangGraph StateGraph 위에서 ",
+      "tags": [
+        "tech",
+        "architecture",
+        "AADS"
+      ]
+    },
+    {
+      "id": "TECH-PIPE-001",
+      "type": "tech",
+      "title": "LangGraph 8-에이전트 파이프라인 기술 감사 보고서 v1.0",
+      "filename": "TECH-PIPE-001_langgraph-8-에이전트-파이프라인-기술-감사-보고서-v10.md",
+      "created_at": "2026-03-07 20:16 KST",
+      "source_session": "ceo-direct-20260307",
+      "summary": "# AADS LangGraph 8-에이전트 파이프라인 기술 감사 보고서 v1.0 일시: 2026-03-07 | 작성: Claude Opus 4.6 (CEO 직접 지시)  ---  ## 1. 감사 결론 (Executive Summary)  **판정: 전체 구현 완료, 즉시 활용 가능 ✅**  | 항목 | 판정 | 근거 | |------|------|-----",
+      "tags": [
+        "tech",
+        "langgraph",
+        "pipeline",
+        "audit",
+        "AADS"
+      ]
+    },
+    {
+      "id": "STATUS-SESSION-001",
+      "type": "status",
+      "title": "CEO 직접 검수 세션 보고서 2026-03-07",
+      "filename": "STATUS-SESSION-001_ceo-직접-검수-세션-보고서-2026-03-07.md",
+      "created_at": "2026-03-07 20:16 KST",
+      "source_session": "ceo-direct-20260307",
+      "summary": "# AADS 세션 작업 보고서 — 2026-03-07  ## 세션 개요 - 일시: 2026-03-07 - 작업자: Claude Opus 4.6 (CEO 직접 지시) - 범위: AADS-157/158/159 검수 + 버그 수정 + UI 개선 + KST 동기화 - 서버: server-68 (68.183.183.11) — Docker 컨테이너  ---  ## 1",
+      "tags": [
+        "status",
+        "session",
+        "bugfix",
+        "AADS"
       ]
     }
   ]
