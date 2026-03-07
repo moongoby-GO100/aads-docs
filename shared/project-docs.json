@@ -1,0 +1,24 @@
+{
+  "updated_at": "2026-03-08T06:54:27.547730+09:00",
+  "updated_by": "dashboard",
+  "project_docs": {
+    "AADS": [
+      {
+        "label": "HANDOVER",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER.md"
+      },
+      {
+        "label": "RULES",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/HANDOVER-RULES.md"
+      },
+      {
+        "label": "CEO-DIRECTIVES",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/CEO-DIRECTIVES.md"
+      },
+      {
+        "label": "STATUS",
+        "url": "https://github.com/moongoby-GO100/aads-docs/blob/main/STATUS.md"
+      }
+    ]
+  }
+}
