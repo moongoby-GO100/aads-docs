@@ -69,84 +69,49 @@
 
 ## 3. 8-Stage 작업 파이프라인
 
-```
-┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐
-│ 1. CEO  │──►│ 2.Bridge│──►│ 3.검증   │──►│ 4.라우팅 │
-│ 지시서   │   │ 감지    │   │ WORKDIR  │   │ 서버별   │
-│ D-022   │   │ 10s폴링 │   │ 중복/의존│   │ SSH전송  │
-└─────────┘   └─────────┘   └─────────┘   └────┬────┘
-                                                │
-┌─────────┐   ┌─────────┐   ┌─────────┐   ┌────▼────┐
-│ 8.교차  │◄──│ 7. DB   │◄──│ 6.결과  │◄──│ 5.실행  │
-│ 검증    │   │ 기록    │   │ 보고    │   │ Claude  │
-│ 3서버   │   │ recovery│   │ SHA기록 │   │ 2h제한  │
-└─────────┘   └─────────┘   └─────────┘   └─────────┘
+```mermaid
+flowchart LR
+    A["1. CEO 지시서\n(D-022 포맷)"] --> B["2. Bridge 감지\n(10s 폴링)"]
+    B --> C["3. 검증\n(WORKDIR/중복/의존)"]
+    C --> D["4. 라우팅\n(서버별 SSH전송)"]
+    D --> E["5. 실행\n(Claude 2h제한)"]
+    E --> F["6. 결과 보고\n(SHA기록)"]
+    F --> G["7. DB 기록\n(recovery)"]
+    G --> H["8. 교차검증\n(3서버)"]
 ```
 
 ### 지시서 상태 흐름
-```
-pending → running → done → archived
-                 ↘ cancelled
-                 ↘ blocked (DEPENDS_ON 미충족)
+
+```mermaid
+stateDiagram-v2
+    [*] --> pending
+    pending --> running
+    running --> done
+    running --> cancelled
+    running --> blocked : DEPENDS_ON 미충족
+    done --> archived
 ```
 
 ---
 
 ## 4. LangGraph 에이전트 파이프라인
 
-```
-START
-  │
-  ▼
-┌──────────────────┐
-│ PM (요구사항)     │  Claude Sonnet 4.6
-│ → TaskSpec JSON  │  12필드 구조화
-└────────┬─────────┘
-         │ interrupt (CEO 승인)
-         ▼
-┌──────────────────┐
-│ Supervisor       │  Claude Opus 4.6
-│ → 라우팅 결정     │  복잡도 판단
-└────────┬─────────┘
-         │
-    ┌────┴────┬────────────┐
-    ▼         ▼            ▼
-┌────────┐ ┌──────────┐ ┌──────────┐
-│Research│ │Strategist│ │Architect │  Claude Opus 4.6
-│Gemini  │ │Gemini+   │ │PRD/설계   │
-│2.5Flash│ │Opus      │ │Phase Plan│
-└────────┘ └────┬─────┘ └────┬─────┘
-                │ debate      │
-           ┌────▼─────┐      │
-           │ Planner  │      │
-           │ 합의도출  │      │
-           └──────────┘      │
-                             ▼
-                    ┌──────────────┐
-                    │ Developer    │  Claude Sonnet 4.6
-                    │ 코드 생성     │  + Docker Sandbox
-                    └──────┬───────┘
-                           │
-                           ▼
-                    ┌──────────────┐
-                    │ QA           │  Claude Sonnet 4.6
-                    │ 테스트 생성   │  + 실행 검증
-                    └──────┬───────┘
-                           │
-                           ▼
-                    ┌──────────────┐
-                    │ Judge        │  Gemini 3.1 Pro
-                    │ 독립 검증     │  Pass/Fail/Conditional
-                    └──────┬───────┘
-                           │ (실패 시 Developer로 재시도, 최대 3회)
-                           ▼
-                    ┌──────────────┐
-                    │ DevOps       │  GPT-5 mini
-                    │ 배포 스크립트  │  Health Check
-                    └──────┬───────┘
-                           │
-                           ▼
-                         END
+```mermaid
+flowchart TD
+    START([START]) --> PM["PM\n요구사항 → TaskSpec JSON\nClaude Sonnet 4.6"]
+    PM -->|interrupt: CEO 승인| SUP["Supervisor\n라우팅 결정 · 복잡도 판단\nClaude Opus 4.6"]
+    SUP --> RES["Researcher\n온디맨드 리서치\nGemini 2.5 Flash"]
+    SUP --> STR["Strategist\n전략 분석\nGemini+Opus"]
+    SUP --> ARCH["Architect\nPRD · 설계 · Phase Plan\nClaude Opus 4.6"]
+    STR -->|debate| PLN["Planner\n합의 도출\nClaude Sonnet 4.6"]
+    ARCH --> DEV["Developer\n코드 생성\nClaude Sonnet 4.6 + Docker Sandbox"]
+    PLN --> DEV
+    RES --> DEV
+    DEV --> QA["QA\n테스트 생성 · 실행 검증\nClaude Sonnet 4.6"]
+    QA --> JDG["Judge\n독립 검증\nGemini 3.1 Pro"]
+    JDG -->|실패 시 최대 3회 재시도| DEV
+    JDG -->|pass| OPS["DevOps\n배포 스크립트 · Health Check\nGPT-5 mini"]
+    OPS --> END([END])
 ```
 
 ### 에이전트별 모델 매트릭스
