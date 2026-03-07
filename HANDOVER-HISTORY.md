@@ -3,6 +3,26 @@
 
 ---
 
+## AADS-145 완료 사항 (2026-03-07)
+- **Tasks 시스템 통합**: scripts/claude_exec.sh + claude_exec.sh(main)
+  - CLAUDE_CODE_TASK_LIST_ID 환경변수 자동 생성 및 export
+  - 지시서 실행 시 ~/.claude/tasks/{task_id}.json 생성 (in_progress → done/failed)
+  - 세션 복구: Tasks JSON 상태 체크로 PENDING/DONE 이중관리 제거
+  - auto_trigger.sh: _process_directive에 Tasks 상태 사전 조회 추가
+- **투기적 실행 (AADS-141 확장)**:
+  - 하트비트 "type":"final_commit" 이벤트 추가 (scripts/claude_exec.sh)
+  - /tmp/aads_final_commit_{task_id}.signal 파일로 신호 전달
+  - auto_trigger.sh: _speculative_preload() 함수 — final_commit 감지 시 다음 작업 git pull 병렬 실행
+  - 후처리 실패시 _preload_fail 플래그로 프리로드 취소
+- **컨텍스트 자동관리**:
+  - claude_exec.sh(main): _ctx_monitor() 백그라운드 — JSON output-format token usage 파싱
+  - 70% 도달: 로그에 /compact 권고 기록
+  - 90% 도달: 중간 결과 저장 + 재시작 프롬프트로 재실행
+  - scripts/claude_exec.sh: 행 수 기반 토큰 추정 모니터링 + tee로 출력 캡처
+  - 2회 연속 Edit 실패 감지 → CTX-EDIT-FAIL 경고
+
+---
+
 ## AADS-144 완료 사항 (2026-03-07)
 - **CEO-DIRECTIVES v3.2**: D-022~D-025 신규 추가
   - D-022: 지시서 포맷 v2.0 (필수/선택 필드 + 기본값 체계)

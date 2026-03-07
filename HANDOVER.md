@@ -1,5 +1,5 @@
-# AADS HANDOVER v8.0
-최종 업데이트: 2026-03-07 | 버전: v8.0 — AADS-144 D-023 3계층 분리 적용 (Core ≤1500토큰)
+# AADS HANDOVER v8.1
+최종 업데이트: 2026-03-07 | 버전: v8.1 — AADS-145 EFFICIENCY Phase1 파이프라인 고도화
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -49,7 +49,7 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-144 | 완료 |
+| AADS | Phase 2 운영 | AADS-145 | 완료 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
