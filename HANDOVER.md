@@ -1,5 +1,5 @@
-# AADS HANDOVER v10.3
-최종 업데이트: 2026-03-08 | 버전: v10.3 — AADS-164 CEO Chat Agent Individual Call System (10 intents)
+# AADS HANDOVER v10.4
+최종 업데이트: 2026-03-08 | 버전: v10.4 — AADS-162 Design Verification Agent
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -438,6 +438,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v10.4 | 2026-03-08 | AADS-162 | Design Verification Agent: design_reviews DB table, 5 baseline screenshots, design-reviewer agent wrapper |
 | v10.3 | 2026-03-08 | AADS-164 | CEO Chat Agent Individual Call System: 10 intents, qa/design/design_fix/architect 핸들러, agent_executions DB |
 | v10.2 | 2026-03-08 | AADS-161 | 매니저 자기인식 프로토콜, bridge.py 자동화 파이프라인, 6개 프로젝트 라우팅 테이블, D-035~D-037/R-022 추가 |
 | v10.1 | 2026-03-08 | AADS-148 | 이번 세션: 대시보드 문서편집+자동push, project-docs API, CEO문서/TZ 미반영분 추가 |
