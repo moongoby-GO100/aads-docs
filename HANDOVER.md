@@ -1,5 +1,5 @@
-# AADS HANDOVER v8.5
-최종 업데이트: 2026-03-07 | 버전: v8.5 — AADS-149 파이프라인 전수조사 버그 5건 수정 Wrap
+# AADS HANDOVER v8.6
+최종 업데이트: 2026-03-07 | 버전: v8.6 — AADS-156 CEO Chat 모델 라우팅 수정 + 28개 지원 모델 + 402 fallback
 
 ## 시스템 개요
 AADS (Autonomous AI Development System): 멀티 AI 에이전트 자율 개발 시스템
@@ -49,12 +49,21 @@ GitHub PAT: repo+workflow, 만료 2026-05-27
 ## 프로젝트 현황
 | 프로젝트 | Phase | 최근 태스크 | 상태 |
 |----------|-------|------------|------|
-| AADS | Phase 2 운영 | AADS-149 | 완료 |
+| AADS | Phase 2 운영 | AADS-156 | 완료 |
 | KIS | V4.1 운영 | KIS-041 | 정상 |
 | GO100 | 운영중 | GO100-023 | 정상 |
 | NTV2 | Phase 1 | NT-001 환경구축 | 대기 |
 | SF | 운영중 | SF-015 | 정상 |
 | NAS | 유지보수 | NAS-010 | 정상 |
+
+## AADS-156 주요 변경 (2026-03-07)
+- CEO Chat 모델 패스스루: 프론트 model 선택값 → 백엔드 직접 사용 (MODEL_ID_MAP 제거)
+- 하드코딩 제거: claude-*-4-5 → claude-opus-4-6/claude-sonnet-4-6 직접 사용
+- SUPPORTED_MODELS 28개: Claude 11 + GPT 11 + Gemini 6 + GET /ceo-chat/models 엔드포인트
+- 402 fallback: ANTHROPIC_API_KEY_2 자동 전환 (credit_balance_too_low)
+- OpenAI 직접 호출: _call_openai() 추가 (GPT-5/gpt-5-mini 등 직접 라우팅)
+- ModelSelector.tsx: 5개 → 7개 최신 모델 (Haiku 4.5, GPT-5 추가, Gemini 2.5 Flash)
+- aads-server commit: 0576e79 | aads-dashboard commit: 5cd39d6
 
 ## AADS-149 주요 변경 (2026-03-07)
 - 파이프라인 전수조사 버그 5건 Wrap 보고서: reports/AADS-149-WRAP_pipeline-audit-5bugs.md
