@@ -3,6 +3,20 @@
 
 ---
 
+## AADS-171 완료 사항 (2026-03-08)
+- **LiteLLM Proxy Docker 설치**: docker-compose.prod.yml에 aads-litellm 서비스 추가 (ghcr.io/berriai/litellm:main-latest, port 4000, mem 512m, aads_network)
+- **litellm-config.yaml**: Gemini 3종(flash-lite/flash/pro) + Claude 3종(haiku/sonnet/opus) 모델 등록, 일 $5 예산 상한, spend_logs 활성화
+- **model_router.py 확장**: INTENT_MODEL_MAP(18 인텐트) + resolve_intent_model() 비동기 함수 + check_monthly_budget_warning()
+  - 일 $5 초과 시 claude-opus → claude-sonnet 자동 다운그레이드
+  - 월 $150 초과 시 경고 로그
+- **신규 API 엔드포인트**:
+  - GET /api/v1/chat/cost-summary — LiteLLM spend/logs 기반 일별/월별 비용 요약 + Opus 차단 여부
+  - GET /api/v1/chat/intent-model-map — 인텐트→모델 매핑 테이블 확인
+- **.env.example 업데이트**: GEMINI_API_KEY, LITELLM_MASTER_KEY, LITELLM_BASE_URL, 예산 변수 추가
+- **aads-server commit**: 5f62e5e — https://github.com/moongoby-GO100/aads-server/commit/5f62e5e
+
+---
+
 ## AADS-161 완료 사항 (2026-03-08)
 - **AADS 문서 전체 업데이트**: 매니저 자기인식 프로토콜 + bridge.py 자동화 명시 + CEO 전달 금지
 - **HANDOVER.md v10.2**: 매니저 자기인식 프로토콜 섹션, 지시서 자동화 파이프라인 섹션, 6개 프로젝트 라우팅 테이블 추가
