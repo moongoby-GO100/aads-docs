@@ -550,9 +550,10 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - **버그 3 — stale closure**: `onDone` 콜백에서 `sseState` 참조 → 리액트 배치 업데이트로 null. 수정: `StreamMeta` 인터페이스 추가, onDone 파라미터로 직접 전달
 - **버그 4 — msgs.reverse() 오류**: 백엔드 `ORDER BY created_at ASC` 반환 → 역순 렌더링. 수정: `.reverse()` 제거
 - **추가 구현**: 30초 AbortController 타임아웃 + 폴링 fallback (SSE 실패 시 3초 후 GET /chat/messages)
-- **파일 수정**: `useChatSSE.ts`, `useChatSession.ts`, `chatApi.ts`, `ceo-chat/page.tsx`
-- **타입 체크**: `npx tsc --noEmit` 오류 없음 ✓
-- **aads-dashboard commit**: f61f793
+- **버그 5 — chat/page.tsx SSE 타입 오류**: `ev.type === "token"` / `ev.text` 사용 → 백엔드 실제 이벤트 `"delta"` / `ev.content`. `"message_done"` → `"done"` 수정. 30초 타임아웃 + 폴링 fallback 추가.
+- **파일 수정**: `useChatSSE.ts`, `useChatSession.ts`, `chatApi.ts`, `ceo-chat/page.tsx`, `chat/page.tsx`
+- **타입 체크**: `npx tsc --noEmit` 오류 없음 ✓, `npm run build` 성공 ✓
+- **aads-dashboard commits**: f61f793 (SSE 핵심 4파일) | 21d4410 (chat/page.tsx SSE 타입 수정+타임아웃)
 
 ## AADS-180 Chat API 배포 긴급 수정 — Docker 재빌드 + API 검증 완료 (2026-03-08)
 
