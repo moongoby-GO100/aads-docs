@@ -1,5 +1,5 @@
-# AADS HANDOVER v12.6
-최종 업데이트: 2026-03-08 | 버전: v12.6 — AADS-184 채팅 도구 연동 구현 완료
+# AADS HANDOVER v12.7
+최종 업데이트: 2026-03-08 | 버전: v12.7 — AADS-185 CEO Chat 전면 재설계 완료
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -566,6 +566,33 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - **검증**: /directives/all 200 (43건, 서버 68), /ops/server-summary 200, npx tsc 오류 없음, npm run build 성공
 - aads-server commit: 102984d | aads-dashboard commit: 49289ac
 
+## AADS-185 CEO Chat 전면 재설계 완료 (2026-03-08)
+
+- **개요**: AADS-170/180~184 패치 접근 폐기 → Context Engineering + Tool Use API + Gemini 검색/리서치 전면 재설계
+- **백엔드 Core (185-A)**:
+  - `context_builder.py` 재작성: 3계층 (Layer1 정적 ~1500토큰 캐싱, Layer2 동적 ~300토큰, Layer3 히스토리 압축)
+  - `intent_router.py` 신규: Gemini Flash-Lite로 인텐트 분류 (10개 인텐트 → LiteLLM/Gemini/Claude 라우팅)
+  - `model_selector.py` 신규: LiteLLM 프록시(Gemini) vs Anthropic SDK 직접(Claude Tool Use + Extended Thinking + Prompt Caching)
+  - `compaction_service.py` 신규: 20턴 초과 시 Claude Haiku 자동 요약 압축
+  - `chat_service.py` send_message_stream 전면 재작성: 3계층→압축→인텐트→도구→스트리밍 파이프라인
+  - `migrations/021_chat_185_schema.sql`: chat_messages 6컬럼 추가 (intent/model_used/tools_called/cost/tokens_in/tokens_out/is_compacted/thinking_summary) + session_notes 신규
+- **도구+검색 (185-B)**:
+  - `tool_registry.py` 신규: 10개 도구 Anthropic Tool Use 포맷 (system/action/search 그룹)
+  - `tool_executor.py` 전면 재작성: ToolExecutor 클래스 + 10초 타임아웃 + 6000자 제한
+  - `gemini_search_service.py` 신규: Gemini Flash + Google Search Grounding → CitationCard 데이터
+  - `gemini_research_service.py` 신규: Gemini Deep Research 비동기 SSE 스트리밍
+  - `brave_search_service.py` 신규: Brave Search API 폴백 검색
+- **프론트엔드 (185-C)**:
+  - `useChatSSE.ts` 확장: thinking/tool_use/tool_result/research.start/progress/complete 이벤트 + ToolUseEvent 타입
+  - `ChatStream.tsx` 확장: ToolEventBlock(접이식)/ThinkingIndicator/CitationCard/ResearchProgress 통합
+  - `ThinkingIndicator.tsx` 신규: Extended Thinking 접이식 + 타이핑 애니메이션
+  - `CitationCard.tsx` 신규: 검색 출처 카드 (favicon + 제목 + URL), 최대 5개
+  - `ResearchProgress.tsx` 신규: Deep Research 진행 바 + "보고서 보기" 버튼
+  - `chatApi.ts` SSEChunk 타입 확장 (11개 이벤트 타입)
+  - `docker-compose.yml`: GEMINI_API_KEY/BRAVE_API_KEY/LITELLM 환경변수 추가
+- **TypeScript 빌드**: tsc --noEmit 오류 없음 (0 errors)
+- **비용 목표**: 일반 80% Gemini ~$0.004/건, 시스템 15% Sonnet ~$0.03/건, 분석 5% Opus ~$0.15/건
+
 ## AADS-184 채팅 도구 연동 구현 완료 (2026-03-08)
 
 - **문제**: 채팅 AI가 인텐트만 분류하고 실제 도구 호출 없이 추측 기반 응답
@@ -754,6 +781,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v12.7 | 2026-03-08 | AADS-185 | CEO Chat 전면 재설계: 3계층Context+IntentRouter+ModelSelector+ToolUse+GeminiSearch+DeepResearch+프론트엔드3컴포넌트 |
 | v12.6 | 2026-03-08 | AADS-184 | 채팅 도구 연동: chat_tools.py(9도구)+tool_executor.py(24인텐트맵)+chat_service.py 파이프라인+sources컬럼+fallback |
 | v12.5 | 2026-03-08 | AADS-183 | 채팅 프롬프트 풍부화: context_builder.py 신규+chat_service.py workspace 컨텍스트 주입+7개 워크스페이스 system_prompt 업데이트+DB 적용 |
 | v12.3 | 2026-03-08 | AADS-182 | Chat SSE 렌더링 긴급 수정: 버퍼 파싱+done 필드 매핑+StreamMeta stale closure+reverse() 제거+30초 타임아웃+폴링 fallback |
