@@ -1,5 +1,21 @@
 # AADS HANDOVER HISTORY
-최종 업데이트: 2026-03-08 | D-023 4계층 분리 — 최근 완료 태스크 상세 기록
+최종 업데이트: 2026-03-09 | D-023 4계층 분리 — 최근 완료 태스크 상세 기록
+
+---
+
+## 채팅 서버검색+프론트 반영 (2026-03-09)
+
+- **목적**: 채팅창에서 클로드봇에게 서버(SSH) 파일 검색 지시 가능 + 작업현황 확인용 웰컴 칩 추가
+- **백엔드**:
+  - `tool_registry.py`: `list_remote_dir` 도구 스키마 추가, `read_remote_file`에 `project`+`path` 반영
+  - `tool_executor.py`: `_list_remote_dir`(ceo_chat_tools.tool_list_remote_dir), `_read_remote_file`(project+path → ceo_chat_tools)
+  - 인텐트 매핑: `server_file` → list_remote_dir/read_remote_file
+  - `intent_router.py`: 인텐트 `server_file` 추가, 키워드 폴백(서버 검색, 원격 서버, SSH 파일, KIS/SF/NTV2 서버)
+- **프론트**:
+  - `ChatStream.tsx`: `_TOOL_DISPLAY_NAMES`에 list_remote_dir "서버 파일 검색 (SSH)", read_remote_file "원격 서버 파일 읽기"
+  - `ActionChips.tsx`: 웰컴 칩 "작업현황", "서버 파일 검색" 추가; 동적 칩(서버/원격/작업 관련)
+- **배포**: 2026-03-09 68서버 `docker compose -f docker-compose.prod.yml build aads-server aads-dashboard` 후 `up -d` 완료
+- **보고서**: aads-docs/reports/chat_server_search_frontend_report_20260306.md
 
 ---
 

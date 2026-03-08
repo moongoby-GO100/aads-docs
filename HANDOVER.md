@@ -1,5 +1,5 @@
-# AADS HANDOVER v12.7
-최종 업데이트: 2026-03-08 | 버전: v12.7 — AADS-185 CEO Chat 전면 재설계 완료
+# AADS HANDOVER v12.8
+최종 업데이트: 2026-03-09 | 버전: v12.8 — 채팅 서버검색(SSH)+프론트 웰컴 칩 반영·배포 완료
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -593,6 +593,13 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
   - `pyproject.toml`: `google-genai>=1.0.0` 의존성 추가 (이번 세션)
 - **TypeScript 빌드**: tsc --noEmit 오류 없음 (0 errors)
 - **비용 목표**: 일반 80% Gemini ~$0.004/건, 시스템 15% Sonnet ~$0.03/건, 분석 5% Opus ~$0.15/건
+- **확장 (2026-03-09)**: 채팅창 서버(SSH) 파일 검색 반영·배포 완료
+  - 백엔드: `tool_registry.py`에 `list_remote_dir` 도구 추가, `read_remote_file`에 `project`+`path` 필수화
+  - `tool_executor.py`: `_list_remote_dir`/`_read_remote_file`(ceo_chat_tools 연동), 인텐트 `server_file` 매핑
+  - `intent_router.py`: 인텐트 `server_file` 및 키워드 폴백(서버 검색, 원격 서버, SSH 파일, KIS/SF/NTV2 서버)
+  - 프론트: `ChatStream.tsx` 도구 표시명 `list_remote_dir`→"서버 파일 검색 (SSH)", `read_remote_file`→"원격 서버 파일 읽기"
+  - `ActionChips.tsx`: 웰컴 칩 "작업현황", "서버 파일 검색" 추가; 동적 칩(서버 파일 검색·원격 파일 읽기·작업 이력 더)
+  - 배포: 2026-03-09 68서버 docker compose build+up 완료. 보고서: reports/chat_server_search_frontend_report_20260306.md
 
 ## AADS-184 채팅 도구 연동 구현 완료 (2026-03-08)
 
@@ -782,6 +789,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v12.8 | 2026-03-09 | AADS-185 확장 | 채팅 서버검색 list_remote_dir·read_remote_file+인텐트 server_file, 웰컴 칩 작업현황/서버 파일 검색, 배포 완료 |
 | v12.7 | 2026-03-08 | AADS-185 | CEO Chat 전면 재설계: 3계층Context+IntentRouter+ModelSelector+ToolUse+GeminiSearch+DeepResearch+프론트엔드3컴포넌트 |
 | v12.6 | 2026-03-08 | AADS-184 | 채팅 도구 연동: chat_tools.py(9도구)+tool_executor.py(24인텐트맵)+chat_service.py 파이프라인+sources컬럼+fallback |
 | v12.5 | 2026-03-08 | AADS-183 | 채팅 프롬프트 풍부화: context_builder.py 신규+chat_service.py workspace 컨텍스트 주입+7개 워크스페이스 system_prompt 업데이트+DB 적용 |
