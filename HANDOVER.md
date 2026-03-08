@@ -1,5 +1,5 @@
-# AADS HANDOVER v12.5
-최종 업데이트: 2026-03-08 | 버전: v12.5 — AADS-183 채팅 시스템 프롬프트 풍부화 완료
+# AADS HANDOVER v12.6
+최종 업데이트: 2026-03-08 | 버전: v12.6 — AADS-184 채팅 도구 연동 구현 완료
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -566,6 +566,39 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - **검증**: /directives/all 200 (43건, 서버 68), /ops/server-summary 200, npx tsc 오류 없음, npm run build 성공
 - aads-server commit: 102984d | aads-dashboard commit: 49289ac
 
+## AADS-184 채팅 도구 연동 구현 완료 (2026-03-08)
+
+- **문제**: 채팅 AI가 인텐트만 분류하고 실제 도구 호출 없이 추측 기반 응답
+- **구현**: 인텐트→도구 호출→실제 데이터 수집→LLM에 주입→정확한 응답 파이프라인
+- **신규 파일 1**: `aads-server/app/services/chat_tools.py`
+  - 9개 도구 함수: health_check / dashboard_query / search_web / read_github_file /
+    query_database / read_remote_file / fetch_url / generate_directive / list_workspaces_sessions
+  - health_check: quick_health + _check_db + _check_disk + SSH 병렬 조회 (경량 8초 이내)
+  - dashboard_query: directives 폴더 스캔 + DB 최근 완료 10건
+  - search_web: Brave Search API (BRAVE_API_KEY 환경변수 필요)
+  - read_github_file: raw.githubusercontent.com + GITHUB_PAT, HANDOVER 등 키워드 자동 매핑
+  - query_database: asyncpg SELECT 전용, INSERT/UPDATE/DELETE/DROP 차단
+  - read_remote_file: ceo_chat_tools.py 기존 SSH 보안 함수 재사용
+  - fetch_url: 내부 네트워크 차단, 외부 URL 허용
+  - generate_directive: >>>DIRECTIVE_START 포맷 자동 생성, 다음 task_id 추정
+  - list_workspaces_sessions: DB 직접 조회
+- **신규 파일 2**: `aads-server/app/services/tool_executor.py`
+  - INTENT_TOOL_MAP: 24개 인텐트 → 도구 매핑 (casual/strategy 등 = 도구 없음)
+  - execute_tools(): 병렬 실행 (개별 10초 / 전체 15초 타임아웃)
+  - build_tool_injection(): "[시스템 도구 조회 결과 — ...]" 포맷 변환
+  - has_tools_for_intent(): fallback 접두사 판단용
+- **수정 파일**: `aads-server/app/services/chat_service.py`
+  - execute_tools(intent, content, workspace_id_str) 호출 추가
+  - tool_injection: 현재 user 메시지에 합산 (Anthropic API 연속 user 메시지 불가)
+  - sources 컬럼에 도구 결과 JSON 저장
+  - fallback_prefix: 도구 실패 시 "현재 도구 조회가 실패하여 제한된 정보로 답변합니다" 접두사
+- **검증 결과**:
+  - "오늘 완료된 작업" → dashboard 인텐트 → dashboard_query 실행 → 실제 DB 데이터 기반 응답 ✓
+  - "안녕" → casual 인텐트 → 도구 없음 → 빠른 응답 ✓
+  - "서버 상태 확인해" → dashboard 인텐트 → dashboard_query → has_sources=true ✓
+  - sources 컬럼 JSON 저장 확인 ✓
+- aads-server commit: 81647df
+
 ## AADS-183 채팅 시스템 프롬프트 풍부화 완료 (2026-03-08)
 
 - **문제**: 채팅 AI가 AADS 시스템, 프로젝트, 서버 정보를 전혀 모르는 상태에서 응답
@@ -721,6 +754,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v12.6 | 2026-03-08 | AADS-184 | 채팅 도구 연동: chat_tools.py(9도구)+tool_executor.py(24인텐트맵)+chat_service.py 파이프라인+sources컬럼+fallback |
 | v12.5 | 2026-03-08 | AADS-183 | 채팅 프롬프트 풍부화: context_builder.py 신규+chat_service.py workspace 컨텍스트 주입+7개 워크스페이스 system_prompt 업데이트+DB 적용 |
 | v12.3 | 2026-03-08 | AADS-182 | Chat SSE 렌더링 긴급 수정: 버퍼 파싱+done 필드 매핑+StreamMeta stale closure+reverse() 제거+30초 타임아웃+폴링 fallback |
 | v12.4 | 2026-03-08 | AADS-181 | 전체 프로젝트 통합 API: server_registry+cross_server_checker+/directives/all+/ops/server-summary+SSE cross_server_directives+TaskTable+useTaskPolling+/tasks 페이지 3서버 연동 |
