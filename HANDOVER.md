@@ -1,5 +1,5 @@
-# AADS HANDOVER v12.1
-최종 업데이트: 2026-03-08 | 버전: v12.1 — AADS-179 infra-check Docker 환경 호환성 수정
+# AADS HANDOVER v12.3
+최종 업데이트: 2026-03-08 | 버전: v12.3 — AADS-182 Chat SSE 스트리밍 렌더링 긴급 수정 완료
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -542,6 +542,32 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - **백엔드**: ClaudeCleanupRequest에 dry_run 필드 추가 — True시 스크립트 실행 없이 최신 보고서만 반환
 - aads-server commit: fbe5b75 | aads-dashboard commit: 4c12a57
 
+## AADS-182 Chat SSE 스트리밍 + 메시지 렌더링 긴급 수정 완료 (2026-03-08)
+
+- **문제**: `/chat` 페이지에서 메시지 전송 후 AI 응답이 화면에 표시되지 않음 (백엔드 API 정상, 프론트엔드 렌더링 버그)
+- **버그 1 — SSE 파싱 버퍼 없음**: 단순 `raw.split("\n")` 방식 → 청크 잘림 시 이벤트 손실. 수정: `\n\n` 기준 버퍼 누적 분리
+- **버그 2 — done 이벤트 필드 불일치**: 백엔드 `{"model": ..., "cost": ...}` 전송, 프론트 `chunk.model_used/cost_usd` 읽음 → 항상 null. 수정: `chunk.model || chunk.model_used`, `chunk.cost || chunk.cost_usd`
+- **버그 3 — stale closure**: `onDone` 콜백에서 `sseState` 참조 → 리액트 배치 업데이트로 null. 수정: `StreamMeta` 인터페이스 추가, onDone 파라미터로 직접 전달
+- **버그 4 — msgs.reverse() 오류**: 백엔드 `ORDER BY created_at ASC` 반환 → 역순 렌더링. 수정: `.reverse()` 제거
+- **추가 구현**: 30초 AbortController 타임아웃 + 폴링 fallback (SSE 실패 시 3초 후 GET /chat/messages)
+- **파일 수정**: `useChatSSE.ts`, `useChatSession.ts`, `chatApi.ts`, `ceo-chat/page.tsx`
+- **타입 체크**: `npx tsc --noEmit` 오류 없음 ✓
+- **aads-dashboard commit**: f61f793
+
+## AADS-180 Chat API 배포 긴급 수정 — Docker 재빌드 + API 검증 완료 (2026-03-08)
+
+- **문제**: AADS-170에서 구현한 채팅 백엔드(`app/routers/chat.py`, `app/services/chat_service.py`)가 Docker 컨테이너에 미반영 → `/chat` 페이지 동작 불가
+- **라우터 상태 확인**: `main.py` line 153 — `app.include_router(chat_v2_router, prefix="/api/v1")` 이미 등록됨
+- **DB 상태 확인**: 6개 테이블(`chat_workspaces/sessions/messages/artifacts/drive_files/research_archive`) + 7개 워크스페이스 시딩 모두 정상
+- **조치**: `DOCKER_BUILDKIT=0 docker build -t aads-server-aads-server:latest .` 재빌드 → `docker compose up -d aads-server` 재시작
+- **LiteLLM**: `docker-compose.yml`에 정의 없음 — `chat_service.py`가 Anthropic API 직접 호출 (LiteLLM 불필요)
+- **검증 결과**:
+  - `GET /api/v1/chat/workspaces` → 200 + 7개 워크스페이스 ✓
+  - `GET /api/v1/chat/sessions?workspace_id=...` → 200 ✓
+  - `POST /api/v1/chat/messages/send` → SSE delta 스트림 정상 ✓
+  - `https://aads.newtalk.kr/api/v1/chat/workspaces` → 200 외부 검증 ✓
+  - 기존 대시보드 `/api/v1/health` → 200 회귀 없음 ✓
+
 ## AADS-179 infra-check Docker 환경 호환성 수정 + 서버 상태 정확도 최신화 (2026-03-08)
 
 - **health_checker.py** 전면 수정 (`aads-server/app/services/health_checker.py`):
@@ -649,6 +675,8 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v12.3 | 2026-03-08 | AADS-182 | Chat SSE 렌더링 긴급 수정: 버퍼 파싱+done 필드 매핑+StreamMeta stale closure+reverse() 제거+30초 타임아웃+폴링 fallback |
+| v12.2 | 2026-03-08 | AADS-180 | Chat API 배포 긴급 수정: Docker 재빌드+chat_v2_router 활성화+API 검증(workspaces 200/sessions 200/SSE 정상) |
 | v12.1 | 2026-03-08 | AADS-179 | infra-check Docker 호환: /proc 기반 memory/cpu+HTTP fallback(SSH 대체)+PAT warning 하향+consistency auto_fix+DB queued 43건 복구 |
 | v12.0 | 2026-03-08 | AADS-178 | Pre-Flight Check: preflight_checker.py+GET /preflight API+auto_trigger DEPENDS_ON 교차확인+브릿지파일필터링+WORKFLOW-PIPELINE v3.5+D-039 |
 | v11.9 | 2026-03-08 | AADS-172-C | 아티팩트 패널 3단계(Full/Mini/Hidden)+AI Drive: ArtifactPanel+5탭+구문하이라이팅+SVG차트+드라이브파일관리 |
