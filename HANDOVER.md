@@ -1,5 +1,5 @@
-# AADS HANDOVER v11.7
-최종 업데이트: 2026-03-08 | 버전: v11.7 — AADS-172 Chat-First 프론트엔드 UI 완성 (3-Panel + 다크/라이트 + SSE 스트리밍 + 아티팩트 패널)
+# AADS HANDOVER v11.8
+최종 업데이트: 2026-03-08 | 버전: v11.8 — AADS-172-B Chat-First 스트림UI + SSE 연동 + ChatInput + 모델셀렉터5개
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -542,6 +542,21 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - **백엔드**: ClaudeCleanupRequest에 dry_run 필드 추가 — True시 스크립트 실행 없이 최신 보고서만 반환
 - aads-server commit: fbe5b75 | aads-dashboard commit: 4c12a57
 
+## AADS-172-B Chat-First 스트림UI + SSE 연동 (2026-03-08)
+
+- **ChatStream.tsx** 신규: 메시지 스트림 영역 (자동스크롤/새메시지 플로팅버튼/타이핑 인디케이터/DeepResearch 진행바 통합)
+- **ChatInput.tsx** 신규: 멀티라인 textarea(자동높이/max200px), Enter전송/Shift+Enter줄바꿈, 파일첨부📎+드래그&드롭, 음성입력🎤(Web Speech API), 전송버튼▶(활성/비활성)
+- **ChatModelSelector** (ModelSelector.tsx 추가): 5개 모델(Auto/Sonnet4.6/Opus4.6/Flash-Lite/DeepResearch) + 비용표시, isDeepResearch 플래그
+- **ActionChips**: 웰컴5개 고정칩 + 컨텍스트 기반 동적5개 칩 (마지막 AI 메시지 키워드 분석)
+- **DeepResearchProgress**: 3단계 진행바(소스검색/분석/보고서작성), 카운트 애니메이션, 예상소요시간
+- **useChatSSE** (hooks/): fetch ReadableStream SSE, delta/done/error/thought_summary/sources 이벤트, 자동재연결 3회 exponential backoff
+- **useChatSession** (hooks/): 워크스페이스 자동로드+세션CRUD, 낙관적 메시지 추가, 스트리밍 업데이트
+- **chatApi.ts** (services/): /api/v1/chat/* REST+sendMessageStream, AuthHeader 포함
+- **ceo-chat/page.tsx 재작성**: AADS-170 /api/v1/chat/* SSE 연동, 워크스페이스/세션 사이드바, 스트리밍 중지버튼
+- aads-dashboard commit: 3af363b
+
+---
+
 ## AADS-172-A Chat-First 3-Column UI (2026-03-08)
 - **라우트**: `/chat` — (chat) 라우트 그룹, 독립 레이아웃 (메인 대시보드 사이드바 제외)
 - **ThemeContext** (`src/contexts/ThemeContext.tsx`): 다크(기본)/라이트 토글, localStorage 영속화
@@ -580,6 +595,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v11.8 | 2026-03-08 | AADS-172-B | Chat-First 스트림UI: ChatStream+ChatInput+SSE연동+모델셀렉터5개+액션칩+DeepResearch진행바+출처카드+useChatSSE/Session |
 | v11.7 | 2026-03-08 | AADS-172 | Chat-First 프론트엔드 UI 완성: /chat 3-panel 레이아웃, SSE 스트리밍, 다크/라이트 테마, 아티팩트 패널, 반응형 |
 | v11.6 | 2026-03-08 | AADS-172-A | Chat-First 3-Column UI: /chat 독립 라우트, ThemeContext 다크/라이트, Sidebar 7 Hub, 3-column ChatLayout, /chat 새 탭 링크 |
 | v11.3 | 2026-03-08 | AADS-169 | 대시보드 Claude Bot Status 카드: 서버별 프로세스+좀비+bridge, 제어버튼 3개, SSE 연동, Cleanup Actions 테이블 |
