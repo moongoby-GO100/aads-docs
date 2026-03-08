@@ -1,5 +1,5 @@
-# AADS HANDOVER v12.3
-최종 업데이트: 2026-03-08 | 버전: v12.3 — AADS-182 Chat SSE 스트리밍 렌더링 긴급 수정 완료
+# AADS HANDOVER v12.4
+최종 업데이트: 2026-03-08 | 버전: v12.4 — AADS-181 전체 프로젝트 통합 작업 현황 API + /tasks 페이지 실시간 연동 완료
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -542,6 +542,30 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - **백엔드**: ClaudeCleanupRequest에 dry_run 필드 추가 — True시 스크립트 실행 없이 최신 보고서만 반환
 - aads-server commit: fbe5b75 | aads-dashboard commit: 4c12a57
 
+## AADS-181 전체 프로젝트 통합 작업 현황 API + /tasks 페이지 실시간 연동 (2026-03-08)
+
+- **server_registry.py** 신규: 3서버(68/211/114) 접근정보 레지스트리 + 프로젝트 매핑 (AADS→68, KIS/GO100→211, SF/NTV2/NAS→114)
+- **cross_server_checker.py** 신규: 크로스서버 디렉티브 스캐너
+  - 서버 68: 로컬 파일 직접 스캔, 서버 211/114: SSH 일괄 스캔 (실패 시 method=ssh_failed)
+  - 30초 TTL 캐싱 (반복 SSH 방지), asyncio.gather 병렬 3서버 동시 스캔
+  - 파일 내용 파싱: TASK_ID/TITLE/PRIORITY/MODEL/project 필드 추출
+- **GET /api/v1/directives/all** 신규: status/project 필터 + force_refresh 파라미터
+  - 응답: total_count, counts{pending/running/done/archived}, by_server{68/211/114}, directives[]
+- **GET /api/v1/ops/server-summary** 신규: 3서버 pending/running/done 건수 + active_claude_sessions
+- **SSE cross_server_directives 이벤트** 추가: 30초 주기 (6 * 5s tick), 변경 감지 시 발송
+- **기존 GET /api/v1/directives/{status} 하위 호환 유지**
+- **taskApi.ts** 신규: getAllDirectives() + getServerSummary() API 함수
+- **useTaskPolling.ts** 신규: 30초 자동갱신 훅, SSE cross_server_directives 수신 시 즉시갱신, 폴링 fallback
+- **TaskTable.tsx** 신규: 서버/프로젝트/상태/우선순위 뱃지, 서버 컬럼 68(파란)/211(보라)/114(주황)
+- **tasks/page.tsx DirectivesTab 전면 개편**:
+  - 상단 KPI 카드: 3서버 합산 수치 (pending/running/done) + 서버별 총계 뱃지
+  - 전체/KIS/GO100/SF/NTV2/NAS 탭: 크로스서버 데이터 → TaskTable (서버 뱃지 포함)
+  - AADS 탭: 기존 DB 데이터 + 서버 68 뱃지 (하위 호환 유지)
+  - 상태 필터: all/running/pending/done/archived (폴더 기반)
+  - 마지막 갱신 시각 표시, 탭 visibility change 즉시 갱신
+- **검증**: /directives/all 200 (43건, 서버 68), /ops/server-summary 200, npx tsc 오류 없음, npm run build 성공
+- aads-server commit: 102984d | aads-dashboard commit: 49289ac
+
 ## AADS-182 Chat SSE 스트리밍 + 메시지 렌더링 긴급 수정 완료 (2026-03-08)
 
 - **문제**: `/chat` 페이지에서 메시지 전송 후 AI 응답이 화면에 표시되지 않음 (백엔드 API 정상, 프론트엔드 렌더링 버그)
@@ -677,6 +701,8 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
 | v12.3 | 2026-03-08 | AADS-182 | Chat SSE 렌더링 긴급 수정: 버퍼 파싱+done 필드 매핑+StreamMeta stale closure+reverse() 제거+30초 타임아웃+폴링 fallback |
+| v12.4 | 2026-03-08 | AADS-181 | 전체 프로젝트 통합 API: server_registry+cross_server_checker+/directives/all+/ops/server-summary+SSE cross_server_directives+TaskTable+useTaskPolling+/tasks 페이지 3서버 연동 |
+| v12.3 | 2026-03-08 | AADS-182 | Chat SSE 스트리밍 렌더링 긴급 수정: SSE파싱버퍼+done이벤트필드+stale closure+msgs.reverse 4버그 수정 |
 | v12.2 | 2026-03-08 | AADS-180 | Chat API 배포 긴급 수정: Docker 재빌드+chat_v2_router 활성화+API 검증(workspaces 200/sessions 200/SSE 정상) |
 | v12.1 | 2026-03-08 | AADS-179 | infra-check Docker 호환: /proc 기반 memory/cpu+HTTP fallback(SSH 대체)+PAT warning 하향+consistency auto_fix+DB queued 43건 복구 |
 | v12.0 | 2026-03-08 | AADS-178 | Pre-Flight Check: preflight_checker.py+GET /preflight API+auto_trigger DEPENDS_ON 교차확인+브릿지파일필터링+WORKFLOW-PIPELINE v3.5+D-039 |
