@@ -1,5 +1,5 @@
-# HANDOVER-RULES v1.1
-최종 업데이트: 2026-03-08 | 버전: v1.1 — AADS-161 매니저 자기인식 + bridge 자동화 + CEO 전달 금지
+# HANDOVER-RULES v1.2
+최종 업데이트: 2026-03-08 | 버전: v1.2 — AADS-178 매니저 Pre-Flight Check 절차 추가
 
 ---
 
@@ -96,15 +96,49 @@ Genspark AI 매니저 (Web Claude가 아님). 세션 시작 시 자기인식 프
 - RESULT 파일: reports/{TASK_ID}-RESULT.md
 - 하트비트: /tmp/claude_session_{task_id}.heartbeat
 
-### g) 지시서 발행 흐름
+### g) 지시서 발행 흐름 (D-039 Pre-Flight Check 포함)
 1. CEO 지시 수신 (자연어)
-2. 매니저가 지시서 블록 작성 (>>>DIRECTIVE_START ~ >>>DIRECTIVE_END)
-3. 채팅창에 출력 (이것으로 매니저의 역할 완료)
-4. bridge.py 자동 감지·추출·저장 (매니저 개입 불필요)
-5. auto_trigger.sh 검증·라우팅 (자동)
-6. claude_exec.sh 실행 (자동)
+2. **[Pre-Flight Check]** 지시서 발행 전 큐 상태 확인 (D-039, 필수):
+   ```
+   GET /api/v1/directives/preflight?task_id={id}&depends_on={선행id}
+   ```
+   - `PROCEED` → 3단계 진행
+   - `WAIT` → depends_on 완료 후 재확인
+   - `BLOCKED` → 중복 task_id 해소 후 재시도
+3. 매니저가 지시서 블록 작성 (>>>DIRECTIVE_START ~ >>>DIRECTIVE_END)
+4. 채팅창에 출력 (이것으로 매니저의 역할 완료)
+5. bridge.py 자동 감지·추출·저장 (매니저 개입 불필요)
+6. auto_trigger.sh 검증·라우팅 (자동)
+7. claude_exec.sh 실행 (자동)
 
 **절대 금지**: 매니저가 CEO에게 "이 지시서를 전달해 주세요", "bridge에 넣어 주세요" 등 전달을 요청하는 행위 (D-037, R-022)
+
+---
+
+## 6-2-2. 매니저 Pre-Flight Check 절차 (D-039, AADS-178)
+
+매니저는 지시서를 발행하기 **전** 반드시 아래 3단계 Pre-Flight Check를 수행해야 한다.
+
+### 단계 1: 큐 상태 확인
+- API: `GET /api/v1/directives/preflight?task_id={id}`
+- 확인 항목: running 큐에 활성 작업 있는지 (`queue_clear`)
+- 중복 task_id 존재 여부 (`duplicate`)
+
+### 단계 2: 선행 태스크 검증
+- depends_on이 있으면 `depends_on={선행_task_id}` 파라미터 추가
+- `depends_met: false`이면 선행 완료 대기
+
+### 단계 3: 판정 기반 행동
+| recommendation | 행동 |
+|----------------|------|
+| PROCEED | 즉시 지시서 발행 |
+| WAIT | depends_on 완료 알림 대기, 재확인 후 발행 |
+| BLOCKED | 중복 task_id 해소 (취소 또는 번호 변경) 후 발행 |
+
+### auto_trigger.sh 연계 안전망
+- pending 파일에 `>>>DIRECTIVE_START` 없으면 자동 archived 이동
+- 동일 task_id 중복 파일 → 최신 1개 유지
+- DEPENDS_ON 미충족 → 30/60/120s 재확인 3회 → Telegram 알림 + pending 유지
 
 ---
 
@@ -437,5 +471,6 @@ subagents: [research, review]
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|-----------|
+| v1.2 | 2026-03-08 | AADS-178: §6-2 지시서발행흐름 Pre-Flight Check 추가, §6-2-2 매니저 Pre-Flight Check 절차 신규 |
 | v1.1 | 2026-03-08 | AADS-161: §6-2 매니저 역할 보강(정체성+지시서발행+금지7항), §6-2-1 자기인식 프로토콜, §6-14 라우팅 테이블 |
 | v1.0 | 2026-03-08 | AADS-148 신규 생성 — 13개 섹션 |

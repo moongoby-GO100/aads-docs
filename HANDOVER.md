@@ -1,5 +1,5 @@
-# AADS HANDOVER v11.9
-최종 업데이트: 2026-03-08 | 버전: v11.9 — AADS-172-C 아티팩트 패널 3단계 + AI Drive 파일 관리
+# AADS HANDOVER v12.0
+최종 업데이트: 2026-03-08 | 버전: v12.0 — AADS-178 Pre-Flight Check 워크플로우 + DEPENDS_ON 강화
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -542,6 +542,25 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - **백엔드**: ClaudeCleanupRequest에 dry_run 필드 추가 — True시 스크립트 실행 없이 최신 보고서만 반환
 - aads-server commit: fbe5b75 | aads-dashboard commit: 4c12a57
 
+## AADS-178 Pre-Flight Check 워크플로우 + DEPENDS_ON 강화 (2026-03-08)
+
+- **preflight_checker.py** 신규 생성: `aads-server/app/services/preflight_checker.py`
+  - `run_preflight(task_id, depends_on)` → `{queue_clear, depends_met, duplicate, conflicts, recommendation}`
+  - pending+running 큐 스캔, RESULT 파일 제외 중복 task_id 감지
+  - done 폴더 RESULT 파일 존재로 depends_on 충족 확인
+  - recommendation: PROCEED | WAIT | BLOCKED
+- **GET /api/v1/directives/preflight** 신규 엔드포인트: `aads-server/app/api/directives.py`
+  - 쿼리 파라미터: `task_id`, `depends_on` (둘 다 optional)
+  - 200 정상 응답, 500 오류 처리
+- **auto_trigger.sh** 강화:
+  - `_filter_invalid_pending()`: pending 파일 DIRECTIVE_START 블록 없으면 archived 이동, 중복 task_id 최신 1개 유지
+  - `_check_depends_on()`: DEPENDS_ON 필드 있으면 done폴더+API 교차 확인, 3회 재시도(30/60/120s), 실패시 pending 유지+Telegram 알림
+  - `_process_directive()` 내 DEPENDS_ON 체크 삽입 (running 기록 전)
+  - pending → running 이동 전 `_filter_invalid_pending` 호출
+- **WORKFLOW-PIPELINE.md v3.5**: Step 0 Pre-Flight Check 추가, 10단계 파이프라인
+- **CEO-DIRECTIVES.md v3.6**: D-032(DEPENDS_ON 교차 확인), D-039(매니저 Pre-Flight Check 의무) 추가
+- **HANDOVER-RULES.md v1.2**: §6-2 지시서발행흐름 Pre-Flight Check 추가, §6-2-2 신규 절차 문서
+
 ## AADS-172-C 아티팩트 패널 3단계 + AI Drive 파일 관리 (2026-03-08)
 
 - **ArtifactPanel.tsx**: Full(420px)/Mini(48px)/Hidden(0px) 슬라이드 애니메이션 300ms ease-in-out
@@ -613,6 +632,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v12.0 | 2026-03-08 | AADS-178 | Pre-Flight Check: preflight_checker.py+GET /preflight API+auto_trigger DEPENDS_ON 교차확인+브릿지파일필터링+WORKFLOW-PIPELINE v3.5+D-039 |
 | v11.9 | 2026-03-08 | AADS-172-C | 아티팩트 패널 3단계(Full/Mini/Hidden)+AI Drive: ArtifactPanel+5탭+구문하이라이팅+SVG차트+드라이브파일관리 |
 | v11.8 | 2026-03-08 | AADS-172-B | Chat-First 스트림UI: ChatStream+ChatInput+SSE연동+모델셀렉터5개+액션칩+DeepResearch진행바+출처카드+useChatSSE/Session |
 | v11.7 | 2026-03-08 | AADS-172 | Chat-First 프론트엔드 UI 완성: /chat 3-panel 레이아웃, SSE 스트리밍, 다크/라이트 테마, 아티팩트 패널, 반응형 |

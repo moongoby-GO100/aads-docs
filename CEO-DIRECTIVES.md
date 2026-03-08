@@ -217,10 +217,25 @@
 - RESULT_FILE에 `design_status: PASS | PASS_TIMEOUT | REVIEW_NEEDED` 필드 필수 기록
 - **예외 없음** — UI 관련 작업(대시보드, Frontend)은 반드시 디자인 검증
 
+### D-032: DEPENDS_ON 교차 확인 의무 (AADS-178, 2026-03-08)
+- auto_trigger.sh가 DEPENDS_ON 필드를 done 폴더 + AADS API 교차 확인
+- 미충족 시 30/60/120초 exponential backoff 3회 재확인
+- 3회 실패 → pending 유지 + Telegram 알림
+
 ### D-033: Core 문서 운영 원칙 섹션 상시 유지 (AADS-148, 2026-03-08)
 - HANDOVER.md 최상단에 "이 문서의 운영 원칙" 섹션을 상시 유지한다.
 - 이 섹션은 어떤 작업에서도 삭제하거나 축약할 수 없다.
 - 내용: 토큰 상한 없음, 생략 금지, CEO 질문 0회 기준, 업데이트 의무, 비용 비교 경고.
+
+### D-039: 매니저 Pre-Flight Check 의무 (AADS-178, 2026-03-08)
+- 매니저는 지시서를 발행하기 **전** 반드시 Pre-Flight Check를 수행해야 한다.
+- API: `GET /api/v1/directives/preflight?task_id={id}&depends_on={id}`
+- 응답 `recommendation`:
+  - `PROCEED` → 즉시 지시서 발행
+  - `WAIT` → depends_on 완료 대기 후 재발행
+  - `BLOCKED` → 중복 task_id 해소 후 재발행
+- Pre-Flight Check 없이 발행된 지시서로 인한 중복 실행·선행 의존성 오류는 매니저 책임
+- **예외 없음** — 모든 프로젝트, 모든 우선순위에 공통 적용
 
 ---
 
@@ -512,6 +527,7 @@ curl -s -o /dev/null -w "%{http_code}" https://raw.githubusercontent.com/moongob
 
 | 버전 | 날짜 | 변경 |
 |------|------|------|
+| v3.6 | 2026-03-08 | AADS-178: D-032(DEPENDS_ON 교차 확인), D-039(매니저 Pre-Flight Check 의무화) — preflight API + auto_trigger 강화 |
 | v3.5 | 2026-03-08 | AADS-163: D-030(QA 에이전트 의무화), D-031(디자인 검증 의무화) — 개발→QA→디자인 3단계 품질 게이트 통합 |
 | v3.4 | 2026-03-08 | AADS-161: §0 운영 원칙 신규, D-035(bridge 자동 감지), D-036(매니저 자기인식), D-037(CEO 전달 금지), R-022(위반 처리), §4 Genspark 자동화 규칙 신규 |
 | v1.0 | 2026-02-28 | 초판 — D-001~D-008, T-001~T-006, 절대 규칙 |

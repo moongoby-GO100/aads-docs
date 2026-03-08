@@ -1,20 +1,21 @@
-# WORKFLOW-PIPELINE v3.4
-최종 업데이트: 2026-03-08 | 버전: v3.4 — AADS-163 6단계 QA+디자인 검증 추가
+# WORKFLOW-PIPELINE v3.5
+최종 업데이트: 2026-03-08 | 버전: v3.5 — AADS-178 Step 0 Pre-Flight Check + DEPENDS_ON 강화 추가
 
 ## 개요
-AADS 자율 개발 시스템의 8단계 파이프라인 정의.
+AADS 자율 개발 시스템의 파이프라인 정의.
 6개 프로젝트(AADS, GO100, KIS, SF, NTV2, NAS) 공통 적용.
 
 ---
 
-## 8단계 파이프라인
+## 파이프라인 (Step 0 포함 10단계)
 
 | 단계 | 이름 | 주체 | 설명 |
 |------|------|------|------|
+| 0 | Pre-Flight Check | Genspark AI채팅 매니저 | 지시서 발행 전 큐 상태 확인 (D-039). GET /api/v1/directives/preflight 호출. queue_clear·depends_met·duplicate 확인 후 PROCEED면 발행. |
 | 1 | CEO 지시 | CEO (moongoby) | CEO가 Genspark AI채팅 매니저에 지시 |
 | 2 | 지시서 작성 | Genspark AI채팅 매니저 | 매니저가 >>>DIRECTIVE_START ~ >>>DIRECTIVE_END 블록을 채팅창에 출력. CEO에게 전달 요청 금지 (D-037). |
 | 3 | Bridge 감지 | bridge.py (서버 211) | pending 디렉토리 파일 감지 → auto_trigger 라우팅. bridge.py가 자동 감지하여 pending/에 저장. CEO 수동 전달 불필요. |
-| 4 | 사전 검증 | auto_trigger.sh | WORKDIR 권한, 중복 체크, 의존성(DEPENDS_ON) 충족 확인 |
+| 4 | 사전 검증 | auto_trigger.sh | ① DIRECTIVE_START 블록 없는 파일 archived 이동 ② 중복 task_id 필터링 ③ DEPENDS_ON 교차 확인(done폴더+API, 3회 재시도 30/60/120s) |
 | 5 | 우선순위 전송 | auto_trigger.sh | 프로젝트별 서버 라우팅, SCP 전송, SSH claude_exec.sh 실행 |
 | 6 | Claude 실행 + QA + 디자인 검증 | claude_exec.sh | claudebot 계정에서 Claude Code 실행 → QA 에이전트(test-writer, D-030) → 디자인 에이전트(doc-writer, D-031) → RESULT_FILE 생성 |
 | 7 | 결과 보고 | claude_exec.sh | RESULT_FILE 생성, commit SHA 기록, HANDOVER 업데이트 검증(D-034), Telegram 알림 |
@@ -99,6 +100,38 @@ bridge.py (서버 211)
 
 ---
 
+## Step 0 추가: Pre-Flight Check (D-039, AADS-178)
+
+매니저가 지시서를 발행하기 **전** 반드시 Pre-Flight Check를 수행한다.
+
+### API 호출
+```
+GET /api/v1/directives/preflight?task_id={id}&depends_on={id}
+```
+
+### 응답 필드
+| 필드 | 설명 |
+|------|------|
+| queue_clear | running 큐에 활성 작업 없으면 true |
+| depends_met | depends_on task_id가 done에 존재하면 true (없으면 항상 true) |
+| duplicate | 동일 task_id가 pending/running에 이미 존재하면 true |
+| conflicts | 충돌 파일명 목록 |
+| recommendation | **PROCEED** (발행 가능) \| **WAIT** (선행 미완료) \| **BLOCKED** (중복) |
+
+### 판정 기준
+- `recommendation: PROCEED` → 즉시 지시서 발행
+- `recommendation: WAIT` → depends_on 완료 후 재확인
+- `recommendation: BLOCKED` → 중복 task_id 해소 후 재발행
+
+### auto_trigger.sh 연계 (Step 4 강화)
+1. pending 파일 스캔 시 `>>>DIRECTIVE_START` 블록 없는 파일 → `archived/` 이동
+2. 동일 task_id 중복 파일 → 최신 1개 유지, 나머지 `archived/` 이동
+3. `DEPENDS_ON:` 필드 있으면 done 폴더 + API 교차 확인
+4. 미충족 시 30/60/120초 exponential backoff 3회 재확인
+5. 3회 실패 → pending 유지 + Telegram 알림 "DEPENDS_ON 미충족: {task_id}"
+
+---
+
 ## Step 6 추가: HANDOVER 업데이트 검증 (D-034, R-021)
 
 - 검증 방법: git diff --cached 또는 git log -1 --name-only에서 HANDOVER.md 포함 여부 확인
@@ -122,4 +155,4 @@ bridge.py (서버 211)
 - HANDOVER.md: 프로젝트별 최신 상태 (Core)
 - HANDOVER-RULES.md: 파이프라인, 매니저/작업자 규칙, 효율성 전략
 - HANDOVER-HISTORY.md: 최근 완료 태스크 상세
-- CEO-DIRECTIVES.md: D-016~D-037, R-001~R-022
+- CEO-DIRECTIVES.md: D-016~D-039, R-001~R-022
