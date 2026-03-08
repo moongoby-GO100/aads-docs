@@ -1,5 +1,5 @@
-# AADS HANDOVER v12.8
-최종 업데이트: 2026-03-09 | 버전: v12.8 — 채팅 서버검색(SSH)+프론트 웰컴 칩 반영·배포 완료
+# AADS HANDOVER v12.9
+최종 업데이트: 2026-03-09 | 버전: v12.9 — AADS-186C Langfuse Observability + FastAPI-MCP + Telegram 알림 봇
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -601,6 +601,30 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
   - `ActionChips.tsx`: 웰컴 칩 "작업현황", "서버 파일 검색" 추가; 동적 칩(서버 파일 검색·원격 파일 읽기·작업 이력 더)
   - 배포: 2026-03-09 68서버 docker compose build+up 완료. 보고서: reports/chat_server_search_frontend_report_20260306.md
 
+## AADS-186C Langfuse Observability + FastAPI-MCP + Telegram 알림 봇 완료 (2026-03-09)
+
+- **파트 1 — Langfuse 셀프호스팅**:
+  - `docker-compose.langfuse.yml`: Langfuse v3 Docker + 별도 PostgreSQL (langfuse_db), 포트 3001
+  - `scripts/setup_langfuse.sh`: 컨테이너 기동 + 헬스체크 대기 + 초기 계정 안내 출력
+  - `app/core/langfuse_config.py`: SDK 초기화, LiteLLM 콜백 설정, create_trace(), flush_langfuse(); 미설정 시 graceful 비활성화
+  - `app/services/chat_service.py`: send_message_stream에 intent_classification + llm_generation span 자동 추가
+
+- **파트 2 — FastAPI-MCP**:
+  - `app/core/mcp_server.py`: FastApiMCP 마운트 래퍼; MCP_ENABLED=false 또는 미설치 시 graceful skip
+  - `app/main.py`: setup_mcp(app) 호출 — AADS API 엔드포인트 MCP 도구로 자동 노출
+
+- **파트 3 — Telegram 알림 봇**:
+  - `migrations/023_alert_history.sql`: alert_history 테이블 + 3개 인덱스
+  - `app/services/alert_manager.py`: RULES 8개, evaluate_rules(), send_alert(), 1시간 중복방지, get_active_alerts()
+  - `app/services/telegram_bot.py`: TelegramBot (send_alert, send_daily_summary, handle_command: /status /cost /alerts); 미설정 시 graceful 비활성화
+
+- **공통**:
+  - `pyproject.toml`: apscheduler, langfuse, fastapi-mcp, python-telegram-bot 추가
+  - `app/main.py`: APScheduler (2분 주기 evaluate_rules, 09:00 KST daily_summary), Langfuse+Telegram lifespan 초기화
+  - `.env.example` / `docker-compose.yml`: LANGFUSE_*/TELEGRAM_*/MCP_ENABLED 환경변수 추가
+  - `tests/test_observability.py`: 15개 단위 테스트 (Langfuse/AlertManager/TelegramBot/MCP)
+  - aads-server commit: d7504b5
+
 ## AADS-184 채팅 도구 연동 구현 완료 (2026-03-08)
 
 - **문제**: 채팅 AI가 인텐트만 분류하고 실제 도구 호출 없이 추측 기반 응답
@@ -789,6 +813,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v12.9 | 2026-03-09 | AADS-186C | Langfuse v3 셀프호스팅+langfuse_config.py+FastAPI-MCP+AlertManager(8규칙)+TelegramBot(/status /cost /alerts)+APScheduler(2분/09KST)+023_alert_history.sql |
 | v12.8 | 2026-03-09 | AADS-185 확장 | 채팅 서버검색 list_remote_dir·read_remote_file+인텐트 server_file, 웰컴 칩 작업현황/서버 파일 검색, 배포 완료 |
 | v12.7 | 2026-03-08 | AADS-185 | CEO Chat 전면 재설계: 3계층Context+IntentRouter+ModelSelector+ToolUse+GeminiSearch+DeepResearch+프론트엔드3컴포넌트 |
 | v12.6 | 2026-03-08 | AADS-184 | 채팅 도구 연동: chat_tools.py(9도구)+tool_executor.py(24인텐트맵)+chat_service.py 파이프라인+sources컬럼+fallback |
