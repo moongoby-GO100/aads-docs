@@ -1,5 +1,5 @@
-# AADS HANDOVER v12.0
-최종 업데이트: 2026-03-08 | 버전: v12.0 — AADS-178 Pre-Flight Check 워크플로우 + DEPENDS_ON 강화
+# AADS HANDOVER v12.1
+최종 업데이트: 2026-03-08 | 버전: v12.1 — AADS-179 infra-check Docker 환경 호환성 수정
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -542,6 +542,23 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - **백엔드**: ClaudeCleanupRequest에 dry_run 필드 추가 — True시 스크립트 실행 없이 최신 보고서만 반환
 - aads-server commit: fbe5b75 | aads-dashboard commit: 4c12a57
 
+## AADS-179 infra-check Docker 환경 호환성 수정 + 서버 상태 정확도 최신화 (2026-03-08)
+
+- **health_checker.py** 전면 수정 (`aads-server/app/services/health_checker.py`):
+  - `_check_memory()`: `free` 명령 → `/proc/meminfo` 파싱 (`MemTotal/MemAvailable/MemFree`) + `/sys/fs/cgroup/memory.max|current` Docker cgroup v2 추가. 응답: `{ok, total_mb, available_mb, usage_pct}`
+  - `_check_cpu()`: `uptime` 명령 → `/proc/loadavg` 파싱 + `/proc/stat` 2회 샘플링(100ms) CPU 사용률 계산. 응답: `{ok, load_1m, load_5m, load_15m, cpu_usage_pct}`
+  - `_check_http_health(server_key)` 신규 함수: 서버별 HTTP health endpoint 순서 호출 (211: 8200/8100/8080, 114: 7916)
+  - `_check_ssh()`: SSH 실패 시 HTTP fallback → 둘 다 실패 시 `severity: warning` (SSH 키 부재 원인)
+  - `_check_github_pat()`: PAT 미설정 시 `severity: warning` (critical → 하향)
+  - `check_pipeline_status()` 211 원격 체크: SSH → HTTP fallback 순서
+  - `check_consistency(auto_fix=False)`: `auto_fix=True` 시 pending 폴더 없는 queued 건 자동 `archived` 업데이트
+  - `check_infra()`: `severity` 필드 명시된 경우만 해당 등급 적용 (이전: type에 "error" 포함 시 critical → 수정)
+- **ops.py** 수정: `GET /ops/consistency-check?auto_fix=true` 파라미터 추가
+- **docker-compose.yml** 수정: `GITHUB_PAT=${GITHUB_PAT:-}` 환경변수 추가
+- **.env.example** 수정: `GITHUB_PAT=` 항목 추가
+- **DB 정합성 복구**: `directive_lifecycle.status='queued'` 43건 → `archived` 일괄 업데이트 (pending 폴더에 없는 건)
+- aads-server commit: cfd0f2c
+
 ## AADS-178 Pre-Flight Check 워크플로우 + DEPENDS_ON 강화 (2026-03-08)
 
 - **preflight_checker.py** 신규 생성: `aads-server/app/services/preflight_checker.py`
@@ -632,6 +649,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v12.1 | 2026-03-08 | AADS-179 | infra-check Docker 호환: /proc 기반 memory/cpu+HTTP fallback(SSH 대체)+PAT warning 하향+consistency auto_fix+DB queued 43건 복구 |
 | v12.0 | 2026-03-08 | AADS-178 | Pre-Flight Check: preflight_checker.py+GET /preflight API+auto_trigger DEPENDS_ON 교차확인+브릿지파일필터링+WORKFLOW-PIPELINE v3.5+D-039 |
 | v11.9 | 2026-03-08 | AADS-172-C | 아티팩트 패널 3단계(Full/Mini/Hidden)+AI Drive: ArtifactPanel+5탭+구문하이라이팅+SVG차트+드라이브파일관리 |
 | v11.8 | 2026-03-08 | AADS-172-B | Chat-First 스트림UI: ChatStream+ChatInput+SSE연동+모델셀렉터5개+액션칩+DeepResearch진행바+출처카드+useChatSSE/Session |
