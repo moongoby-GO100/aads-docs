@@ -589,7 +589,8 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
   - `CitationCard.tsx` 신규: 검색 출처 카드 (favicon + 제목 + URL), 최대 5개
   - `ResearchProgress.tsx` 신규: Deep Research 진행 바 + "보고서 보기" 버튼
   - `chatApi.ts` SSEChunk 타입 확장 (11개 이벤트 타입)
-  - `docker-compose.yml`: GEMINI_API_KEY/BRAVE_API_KEY/LITELLM 환경변수 추가
+  - `docker-compose.prod.yml`: `aads-server` 서비스에 GEMINI_API_KEY/BRAVE_API_KEY 환경변수 추가 (이번 세션)
+  - `pyproject.toml`: `google-genai>=1.0.0` 의존성 추가 (이번 세션)
 - **TypeScript 빌드**: tsc --noEmit 오류 없음 (0 errors)
 - **비용 목표**: 일반 80% Gemini ~$0.004/건, 시스템 15% Sonnet ~$0.03/건, 분석 5% Opus ~$0.15/건
 
