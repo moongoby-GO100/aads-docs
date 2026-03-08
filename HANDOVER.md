@@ -573,7 +573,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - **신규 파일 1**: `aads-server/app/services/chat_tools.py`
   - 9개 도구 함수: health_check / dashboard_query / search_web / read_github_file /
     query_database / read_remote_file / fetch_url / generate_directive / list_workspaces_sessions
-  - health_check: quick_health + _check_db + _check_disk + SSH 병렬 조회 (경량 8초 이내)
+  - health_check: quick_health + _check_db + _check_disk 병렬 조회 (0.23s, SSH/외부HTTP 제외)
   - dashboard_query: directives 폴더 스캔 + DB 최근 완료 10건
   - search_web: Brave Search API (BRAVE_API_KEY 환경변수 필요)
   - read_github_file: raw.githubusercontent.com + GITHUB_PAT, HANDOVER 등 키워드 자동 매핑
@@ -597,7 +597,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
   - "안녕" → casual 인텐트 → 도구 없음 → 빠른 응답 ✓
   - "서버 상태 확인해" → dashboard 인텐트 → dashboard_query → has_sources=true ✓
   - sources 컬럼 JSON 저장 확인 ✓
-- aads-server commit: 81647df
+- aads-server commits: 81647df (파이프라인) | 1a45893 (health_check 경량화)
 
 ## AADS-183 채팅 시스템 프롬프트 풍부화 완료 (2026-03-08)
 
