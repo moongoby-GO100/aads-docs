@@ -1,5 +1,5 @@
-# AADS HANDOVER v11.8
-최종 업데이트: 2026-03-08 | 버전: v11.8 — AADS-172-B Chat-First 스트림UI + SSE 연동 + ChatInput + 모델셀렉터5개
+# AADS HANDOVER v11.9
+최종 업데이트: 2026-03-08 | 버전: v11.9 — AADS-172-C 아티팩트 패널 3단계 + AI Drive 파일 관리
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -542,6 +542,24 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - **백엔드**: ClaudeCleanupRequest에 dry_run 필드 추가 — True시 스크립트 실행 없이 최신 보고서만 반환
 - aads-server commit: fbe5b75 | aads-dashboard commit: 4c12a57
 
+## AADS-172-C 아티팩트 패널 3단계 + AI Drive 파일 관리 (2026-03-08)
+
+- **ArtifactPanel.tsx**: Full(420px)/Mini(48px)/Hidden(0px) 슬라이드 애니메이션 300ms ease-in-out
+- **useArtifactPanel.ts**: ◀ 버튼 Full↔Mini 토글 / Ctrl+] 3단계 순환 / AI 응답 자동 감지(detectArtifactType) / openTab(tab) Mini→Full 확장
+- **ArtifactTabs.tsx**: 5탭 (📄보고서/💻코드/📊차트/🖥️대시보드/📁AI Drive), Full 수평 / Mini 수직 아이콘
+- **ArtifactReport.tsx**: 마크다운 렌더링(헤더/표/코드블록/인용/목록) + 목차 네비게이션 + 복사/PDF/편집/지시서생성/Drive저장
+- **ArtifactCode.tsx**: 토큰 기반 구문 하이라이팅(JS/TS/Python/SQL/Shell) + 라인 넘버 + 복사 + 지시서 생성 + Drive저장
+- **ArtifactChart.tsx**: SVG 인라인 라인차트(비용추이) + 수평 바차트(프로젝트 완료율), API 실패시 샘플데이터 폴백
+- **ArtifactDashboard.tsx**: 서버 68/211/114 상태 + 서킷 브레이커 + 최근 파이프라인 (30초 자동 갱신)
+- **AIDrive.tsx**: 파일 목록+폴더 트리+저장 용량 바+업로드 토글 패널 통합
+- **AIDriveFileList.tsx**: 파일타입 아이콘, AI생성 뱃지, 폴더별 필터, 다운로드/삭제/이름변경(인라인 편집)
+- **AIDriveUpload.tsx**: 드래그&드롭+클릭 업로드, 폴더 선택(AADS/SF/KIS/GO100/NTV2/NAS/Reports/Code), 진행 표시
+- **driveApi.ts**: /api/v1/chat/drive/* 연결 (getFiles/getStats/getFolders/uploadFile/saveText/renameFile/deleteFile)
+- **ChatBubble.tsx 수정**: onViewInPanel prop 추가 → 호버 시 🗂 "패널에서 보기" 버튼
+- **ChatStream.tsx 수정**: onViewInPanel prop passthrough (assistant 메시지만 활성화)
+- **ceo-chat/page.tsx 재작성**: ArtifactPanel 우측 통합 + useArtifactPanel + detectAndShowArtifact() + handleViewInPanel() + 🗂 패널 토글 버튼
+- aads-dashboard commit: 7dfdb7d
+
 ## AADS-172-B Chat-First 스트림UI + SSE 연동 (2026-03-08)
 
 - **ChatStream.tsx** 신규: 메시지 스트림 영역 (자동스크롤/새메시지 플로팅버튼/타이핑 인디케이터/DeepResearch 진행바 통합)
@@ -595,6 +613,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v11.9 | 2026-03-08 | AADS-172-C | 아티팩트 패널 3단계(Full/Mini/Hidden)+AI Drive: ArtifactPanel+5탭+구문하이라이팅+SVG차트+드라이브파일관리 |
 | v11.8 | 2026-03-08 | AADS-172-B | Chat-First 스트림UI: ChatStream+ChatInput+SSE연동+모델셀렉터5개+액션칩+DeepResearch진행바+출처카드+useChatSSE/Session |
 | v11.7 | 2026-03-08 | AADS-172 | Chat-First 프론트엔드 UI 완성: /chat 3-panel 레이아웃, SSE 스트리밍, 다크/라이트 테마, 아티팩트 패널, 반응형 |
 | v11.6 | 2026-03-08 | AADS-172-A | Chat-First 3-Column UI: /chat 독립 라우트, ThemeContext 다크/라이트, Sidebar 7 Hub, 3-column ChatLayout, /chat 새 탭 링크 |
