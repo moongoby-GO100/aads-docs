@@ -1,5 +1,5 @@
-# AADS HANDOVER v12.4
-최종 업데이트: 2026-03-08 | 버전: v12.4 — AADS-181 전체 프로젝트 통합 작업 현황 API + /tasks 페이지 실시간 연동 완료
+# AADS HANDOVER v12.5
+최종 업데이트: 2026-03-08 | 버전: v12.5 — AADS-183 채팅 시스템 프롬프트 풍부화 완료
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -566,6 +566,27 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - **검증**: /directives/all 200 (43건, 서버 68), /ops/server-summary 200, npx tsc 오류 없음, npm run build 성공
 - aads-server commit: 102984d | aads-dashboard commit: 49289ac
 
+## AADS-183 채팅 시스템 프롬프트 풍부화 완료 (2026-03-08)
+
+- **문제**: 채팅 AI가 AADS 시스템, 프로젝트, 서버 정보를 전혀 모르는 상태에서 응답
+- **원인**: 시스템 프롬프트가 한 줄짜리이며 HANDOVER/프로젝트 컨텍스트 미주입
+- **신규 파일**: `aads-server/app/services/context_builder.py`
+  - `build_system_context(workspace_name: str) → str` 함수
+  - 공통 컨텍스트: 날짜(KST), AADS 정의, 서버 3대, 프로젝트 6개, 도구 안내
+  - 워크스페이스별 컨텍스트 분기: CEO/AADS/SF/KIS/GO100/NTV2/NAS
+  - `[CEO] 통합지시` 형식 이름 처리 (괄호 추출 → 키 매칭)
+  - 크기 제한: 14000자 (~4000 토큰) 이내
+- **수정 파일**: `aads-server/app/services/chat_service.py`
+  - `send_message_stream()`: workspace_name 조회 추가
+  - `build_system_context(workspace_name)` + `"---"` + `base_prompt` 결합
+- **신규 마이그레이션**: `aads-server/migrations/update_workspace_prompts.sql`
+  - 7개 워크스페이스 system_prompt 풍부화 (ILIKE 패턴 매칭)
+  - CEO: 지시서 포맷 + 보고 규칙 + 최근 완료 이력
+  - AADS: 기술 스택 + API 목록 + 파이프라인 구조
+  - SF/KIS/GO100/NTV2/NAS: 각 프로젝트 역할 + 인프라
+- **DB 적용**: 7개 워크스페이스 UPDATE 1 × 7 확인 완료
+- **검증 기준**: "AADS란?" → 정확한 정의, "오늘 날짜" → KST 정확 응답, 프로젝트별 컨텍스트 분기
+
 ## AADS-182 Chat SSE 스트리밍 + 메시지 렌더링 긴급 수정 완료 (2026-03-08)
 
 - **문제**: `/chat` 페이지에서 메시지 전송 후 AI 응답이 화면에 표시되지 않음 (백엔드 API 정상, 프론트엔드 렌더링 버그)
@@ -700,6 +721,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v12.5 | 2026-03-08 | AADS-183 | 채팅 프롬프트 풍부화: context_builder.py 신규+chat_service.py workspace 컨텍스트 주입+7개 워크스페이스 system_prompt 업데이트+DB 적용 |
 | v12.3 | 2026-03-08 | AADS-182 | Chat SSE 렌더링 긴급 수정: 버퍼 파싱+done 필드 매핑+StreamMeta stale closure+reverse() 제거+30초 타임아웃+폴링 fallback |
 | v12.4 | 2026-03-08 | AADS-181 | 전체 프로젝트 통합 API: server_registry+cross_server_checker+/directives/all+/ops/server-summary+SSE cross_server_directives+TaskTable+useTaskPolling+/tasks 페이지 3서버 연동 |
 | v12.3 | 2026-03-08 | AADS-182 | Chat SSE 스트리밍 렌더링 긴급 수정: SSE파싱버퍼+done이벤트필드+stale closure+msgs.reverse 4버그 수정 |
