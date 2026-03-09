@@ -3,6 +3,33 @@
 
 ---
 
+## AADS-186E-2 완료 (2026-03-09)
+
+- **제목**: Extended Thinking 활성화 + Programmatic Tool Calling + 4계층 영속 메모리
+- **내용**: CTO 인텐트 4개(cto_strategy/cto_code_analysis/cto_verify/cto_impact) → claude-opus + thinking(budget_tokens=10000, max_tokens=16000). ptc_executor.py 신규(PTC 병렬 실행, code_execution 도구). memory_manager.py + 024_memory_tables.sql(session_notes, ai_meta_memory). save_note/recall_notes/learn_pattern 도구, context_builder에 \<recent_sessions\>/\<learned_patterns\> 주입. chat_service 자동 노트 저장.
+- **커밋**: aads-server 004508e, aads-docs a39365f
+- **테스트**: 41/41 통과
+
+---
+
+## AADS-186D 완료 (2026-03-09)
+
+- **제목**: 전체 통합 + 나머지 프로젝트 CKP + Tool Search Tool + Prompt Caching 최적화
+- **내용**: KIS/GO100/SF/NTV2/NAS .claude/projects/{project}/ CKP 5종(25개 파일) 생성. ckp_manager.scan_remote_project() 개선(.claude/projects 우선, HANDOVER 폴백). Tool Search Tool 도구 카테고리 안내. cache_config.py Prompt Caching. 주간 CEO 브리핑 매주 월요일 09:00 KST. 통합 테스트 31/31.
+- **커밋**: aads-server 4587714
+- **문서**: HANDOVER v12.13, STATUS.md 갱신
+
+---
+
+## AADS-186E-1 완료 (2026-03-09)
+
+- **제목**: 검색·크롤링 완전 해방 — Jina Reader + Crawl4AI + deep_crawl 도구
+- **내용**: jina_reader_service.py, crawl4ai_service.py, deep_crawl_service.py(research_crawl 파이프라인). tool_registry crawl 그룹: jina_read, crawl4ai_fetch, deep_crawl. intent_router url_read/deep_crawl. docker-compose.crawl4ai.yml(선택). tests/test_crawl_tools.py 8/8.
+- **커밋**: aads-server dde8147
+- **문서**: HANDOVER v12.12, STATUS.md 갱신
+
+---
+
 ## 채팅 서버검색+프론트 반영 (2026-03-09)
 
 - **목적**: 채팅창에서 클로드봇에게 서버(SSH) 파일 검색 지시 가능 + 작업현황 확인용 웰컴 칩 추가

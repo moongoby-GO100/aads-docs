@@ -4,23 +4,7 @@ result: SUCCESS
 commit_sha: 004508e
 report_url: https://github.com/moongoby-GO100/aads-server/commit/004508e
 chat_delivered: false
-next_pending: ~
-
-last_completed: AADS-186E-1
-completed_at: "2026-03-09T09:30:00+09:00"
-result: SUCCESS
-commit_sha: dde8147
-report_url: https://github.com/moongoby-GO100/aads-server/commit/dde8147
-chat_delivered: false
-next_pending: ~
-
-last_completed: AADS-186B
-completed_at: "2026-03-09T08:45:00+09:00"
-result: SUCCESS
-commit_sha: 50f6f5c
-report_url: https://github.com/moongoby-GO100/aads-server/commit/50f6f5c
-chat_delivered: false
-next_pending: ~
+next_pending: AADS-186E-3
 
 history:
   - task_id: AADS-186E-2
