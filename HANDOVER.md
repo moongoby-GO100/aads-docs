@@ -1,5 +1,5 @@
-# AADS HANDOVER v12.13
-최종 업데이트: 2026-03-09 | 버전: v12.13 — AADS-186D 전체 통합 + 원격 CKP + Tool Search Tool + Prompt Caching
+# AADS HANDOVER v12.14
+최종 업데이트: 2026-03-09 | 버전: v12.14 — AADS-186E-2 Extended Thinking + PTC + 4계층 영속 메모리
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -847,6 +847,8 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 | 버전 | 날짜 | Task ID | 변경 요약 |
 |------|------|---------|-----------|
+| v12.14 | 2026-03-09 | AADS-186E-2 | Extended Thinking(Opus전용 budget_tokens=10000)+PTC ptc_executor.py+메모리4계층(memory_manager.py+024_memory_tables.sql)+context_builder <recent_sessions>/<learned_patterns>+system_prompt 기억규칙+chat_service 자동노트저장+tests 41/41 |
+| v12.13 | 2026-03-09 | AADS-186D | Tool Search Tool+원격 CKP 5개+Prompt Caching 최적화+주간 브리핑 |
 | v12.12 | 2026-03-09 | AADS-186E-1 | 크롤링 도구: jina_reader_service.py+crawl4ai_service.py+deep_crawl_service.py+tool_registry crawl그룹+tool_executor실행기3개+intent_router url_read/deep_crawl+docker-compose.crawl4ai.yml+tests 8/8 |
 | v12.11 | 2026-03-09 | AADS-186B | CKP 시스템: ckp_manager.py+ast_analyzer.py+cto_mode.py+models/ckp.py+022_ckp_tables.sql+.claude/5종+intent_router CTO인텐트6개+context_builder CKP연동+tests 27개 |
 | v12.10 | 2026-03-09 | AADS-186A | 시스템 프롬프트 재설계: system_prompt_v2.py XML섹션+Tool Examples+워크플로우 도구 3개 |
