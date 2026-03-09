@@ -1,10 +1,11 @@
-last_completed: AADS-188E
-completed_at: "2026-03-09T10:28:00+09:00"
+last_completed: AADS-188E (통합 E2E 테스트)
+completed_at: "2026-03-09T11:00:00+09:00"
 result: SUCCESS
-commit_sha: b6dc996
-report_url: https://github.com/moongoby-GO100/aads-docs/blob/main/reports/AADS-188D-188E-monaco-approve-diff-report_20260307.md
+commit_sha: pending
+report_url: https://github.com/moongoby-GO100/aads-docs/blob/main/reports/AADS-188E-INTEGRATION-REPORT.md
 chat_delivered: false
 next_pending: null
+qa_status: PASS (66 E2E + 178 회귀 = 244 PASS)
 
 history:
   - task_id: AADS-188E
