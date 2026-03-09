@@ -1,7 +1,7 @@
 last_completed: AADS-188E (통합 E2E 테스트)
 completed_at: "2026-03-09T11:00:00+09:00"
 result: SUCCESS
-commit_sha: pending
+commit_sha: bc2aede (aads-server) | 6718353 (aads-docs)
 report_url: https://github.com/moongoby-GO100/aads-docs/blob/main/reports/AADS-188E-INTEGRATION-REPORT.md
 chat_delivered: false
 next_pending: null
