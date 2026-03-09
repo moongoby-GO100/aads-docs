@@ -39,7 +39,7 @@
 ## 4. 적용·배포 상태
 
 - **적용**: ✅ 소스 반영 완료
-- **배포**: ✅ aads-server·aads-dashboard 커밋 푸시 완료. 프로덕션 배포는 68서버에서 `docker compose -f docker-compose.prod.yml build aads-server aads-dashboard && docker compose -f docker-compose.prod.yml up -d aads-server aads-dashboard` 실행 필요.
+- **배포**: ✅ 완료. aads-server·aads-dashboard 이미지 빌드 후 `up -d` 실행(재기동 완료). package-lock.json 동기화 커밋(9fb4620) 반영하여 빌드 성공.
 
 ## 5. 진행/체크사항
 
