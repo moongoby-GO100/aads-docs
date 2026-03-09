@@ -1,12 +1,16 @@
-last_completed: AADS-186E2-BRIDGE
-completed_at: "2026-03-09T14:30:00+09:00"
+last_completed: AADS-186E-3
+completed_at: "2026-03-09T16:00:00+09:00"
 result: SUCCESS
-commit_sha: ff97268
-report_url: https://github.com/moongoby-GO100/aads-server/commit/ff97268
+commit_sha: dcd16b2
+report_url: https://github.com/moongoby-GO100/aads-server/commit/dcd16b2
 chat_delivered: false
-next_pending: AADS-186E-3
+next_pending: null
 
 history:
+  - task_id: AADS-186E-3
+    completed_at: "2026-03-09T16:00:00+09:00"
+    result: SUCCESS
+    commit_sha: dcd16b2
   - task_id: AADS-186E2-BRIDGE
     completed_at: "2026-03-09T14:30:00+09:00"
     result: SUCCESS
@@ -59,10 +63,6 @@ history:
     completed_at: "2026-03-08T12:30:00+09:00"
     result: SUCCESS
     commit_sha: 9f4076b
-  - task_id: AADS-171
-    completed_at: "2026-03-08T10:35:00+09:00"
-    result: SUCCESS
-    commit_sha: pending
   - task_id: AADS-170
     completed_at: "2026-03-08T10:44:16+09:00"
     result: SUCCESS
@@ -71,54 +71,10 @@ history:
     completed_at: "2026-03-08T09:22:00+09:00"
     result: SUCCESS
     commit_sha: 4c12a57
-  - task_id: AADS-168
-    completed_at: "2026-03-08T09:20:00+09:00"
-    result: SUCCESS
-    commit_sha: afed71b
-  - task_id: AADS-167
-    completed_at: "2026-03-08T09:15:00+09:00"
-    result: SUCCESS
-    commit_sha: 337b50d
-  - task_id: AADS-166
-    completed_at: "2026-03-08T08:58:38+09:00"
-    result: SUCCESS
-    commit_sha: pending
-  - task_id: AADS-165
-    completed_at: "2026-03-08T09:25:00+09:00"
-    result: SUCCESS
-    commit_sha: pending
   - task_id: AADS-163
     completed_at: "2026-03-08T17:30:00+09:00"
     result: SUCCESS
     commit_sha: 74d2401
-  - task_id: AADS-164
-    completed_at: "2026-03-08T16:06:00+09:00"
-    result: SUCCESS
-    commit_sha: 59d6491
-  - task_id: AADS-161
-    completed_at: "2026-03-08T14:00:00+09:00"
-    result: SUCCESS
-    commit_sha: 85c6100
-  - task_id: AADS-148
-    completed_at: "2026-03-08T12:00:00+09:00"
-    result: SUCCESS
-    commit_sha: 3edeeca
-  - task_id: AADS-160
-    completed_at: "2026-03-07T19:45:00+09:00"
-    result: SUCCESS
-    commit_sha: fd51915
-  - task_id: AADS-159
-    completed_at: "2026-03-07T18:30:00+09:00"
-    result: SUCCESS
-    commit_sha: 1fbb76d
-  - task_id: AADS-158
-    completed_at: "2026-03-07T18:00:00+09:00"
-    result: SUCCESS
-    commit_sha: ""
-  - task_id: AADS-157
-    completed_at: "2026-03-07T17:00:00+09:00"
-    result: SUCCESS
-    commit_sha: 65edfde
   - task_id: AADS-146
     completed_at: "2026-03-07T13:20:30+09:00"
     result: SUCCESS
