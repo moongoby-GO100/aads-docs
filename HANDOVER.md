@@ -296,6 +296,7 @@ Claude 코드 수정 → QA 에이전트(test-writer) → 디자인 에이전트
 - **절대 금지**: .env 커밋 금지, DB DROP 금지, 미승인 서비스 재시작 금지
 - **OAuth 토큰**: 전체 만료 상태 — 재인증 필요 시 브라우저 통해 수행
 - **Cloudflare**: OAuth 후 proxied DNS 유지
+- **PostgreSQL 백업**: 메모리 레이어·세션 노트·관찰 데이터가 전부 DB에 있으므로 **일 1회 pg_dump 필수**. 스크립트: `aads-server/scripts/backup_postgres.sh` (docker exec 방식). cron: `0 3 * * * .../backup_postgres.sh >> .../logs/backup.log`. 상세: [AADS-BACKUP-STRATEGY-20260309.md](https://github.com/moongoby-GO100/aads-docs/blob/main/reports/AADS-BACKUP-STRATEGY-20260309.md)
 
 ---
 
@@ -516,6 +517,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 | AADS_ARCHITECTURE_v1.0 | https://github.com/moongoby-GO100/aads-docs/blob/main/architecture/AADS_ARCHITECTURE_v1.0.md | 시스템 아키텍처 (인프라, API 50+, DB 13테이블) |
 | LANGGRAPH_PIPELINE_AUDIT | https://github.com/moongoby-GO100/aads-docs/blob/main/architecture/LANGGRAPH_PIPELINE_AUDIT_v1.0.md | 8-에이전트 파이프라인 기술 감사 |
 | project-docs.json | https://github.com/moongoby-GO100/aads-docs/blob/main/shared/project-docs.json | 대시보드 문서 링크 설정 (자동 push) |
+| AADS-BACKUP-STRATEGY | https://github.com/moongoby-GO100/aads-docs/blob/main/reports/AADS-BACKUP-STRATEGY-20260309.md | 백업·복원 정책 (PostgreSQL 일일 pg_dump, .env, Nginx/systemd, Docker 볼륨) |
 
 ---
 
