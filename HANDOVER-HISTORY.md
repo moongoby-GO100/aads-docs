@@ -1,5 +1,16 @@
 # AADS HANDOVER HISTORY
-최종 업데이트: 2026-03-09 | D-023 4계층 분리 — 최근 완료 태스크 상세 기록
+최종 업데이트: 2026-03-09 | AADS-188D/188E 배포 완료 기록
+
+---
+
+## AADS-188D/188E 완료 (2026-03-09)
+
+- **제목**: Monaco DiffEditor + approve-diff API + E2E 테스트 배포
+- **188D**: 에이전트 코드 수정 시 diff 미리보기(Monaco DiffEditor) 및 승인/거절/편집 후 반영 API·UI 구현. 백엔드: ApproveDiffRequest/Out, agent_hooks diff_preview(original_content/modified_content), POST /api/v1/chat/approve-diff, _diff_approval_store. 프론트: CodeDiffViewer, CodePanel, useDiffApproval, code-editor.css, chat/page.tsx 연동.
+- **188E**: Agent SDK 자율 실행 E2E 테스트 추가 (execute_stream, 3턴 이상, approve-diff approve/reject/400) — tests/test_e2e_agent_sdk.py.
+- **커밋**: aads-server main b6dc996, aads-dashboard feature/188d-monaco-diff 9fb4620(lockfile), aads-docs 511cd1e.
+- **배포**: docker compose -f docker-compose.prod.yml build aads-server aads-dashboard && up -d 완료 (2026-03-09).
+- **보고서**: https://github.com/moongoby-GO100/aads-docs/blob/main/reports/AADS-188D-188E-monaco-approve-diff-report_20260307.md
 
 ---
 
