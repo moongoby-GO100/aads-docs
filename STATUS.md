@@ -1,7 +1,7 @@
 last_completed: AADS-186D
 completed_at: "2026-03-09T10:30:00+09:00"
 result: SUCCESS
-commit_sha: pending
+commit_sha: 4587714
 report_url: ~
 chat_delivered: false
 next_pending: ~
@@ -26,7 +26,7 @@ history:
   - task_id: AADS-186D
     completed_at: "2026-03-09T10:30:00+09:00"
     result: SUCCESS
-    commit_sha: pending
+    commit_sha: 4587714
   - task_id: AADS-186E-1
     completed_at: "2026-03-09T09:30:00+09:00"
     result: SUCCESS
