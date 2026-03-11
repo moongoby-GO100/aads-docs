@@ -1,6 +1,6 @@
 # AADS 채팅 시스템 — 기능 분석 및 기술 명세서
 
-> **버전**: v1.0 | **작성일**: 2026-03-11 | **최종 수정**: 2026-03-11
+> **버전**: v1.1 | **작성일**: 2026-03-11 | **최종 수정**: 2026-03-11
 > **시스템**: aads.newtalk.kr/chat
 
 ---
@@ -117,12 +117,15 @@
 | **자동 브리핑** | 접속 시 미완료 지시서/알림/에러/서버상태 자동 표시 |
 | **Extended Thinking** | AI 사고 과정 접기/펼치기 표시 |
 | **다크/라이트 테마** | 원클릭 전환, localStorage 저장 |
+| **메시지 수정 재전송** | ✏️ 인라인 편집 → 기존 메시지+AI응답 삭제 → 수정 내용 재전송 (방식A) |
+| **메시지 재지시** | 🔄 입력창에 복사 → 수정 후 새 메시지로 전송, 기존 이력 유지 (방식B) |
+| **파일 임시 컨텍스트** | 첨부파일 전문을 현재 턴에만 주입(Layer D), 다음 턴 자동 제거 |
 
 ---
 
 ## 3. 백엔드 API 엔드포인트
 
-### 3.1 REST API (24개)
+### 3.1 REST API (26개)
 
 **라우터**: `/root/aads/aads-server/app/routers/chat.py`
 
@@ -147,6 +150,8 @@
 |--------|------|------|
 | GET | `/chat/messages?session_id=` | 메시지 조회 (limit, offset) |
 | **POST** | **`/chat/messages/send`** | **메시지 전송 (SSE 스트리밍 응답)** |
+| PUT | `/chat/messages/{id}` | 사용자 메시지 내용 수정 (방식A: 수정재전송) |
+| DELETE | `/chat/messages/{id}` | 메시지 + 다음 AI 응답 삭제 (방식A: 수정재전송) |
 | PUT | `/chat/messages/{id}/bookmark` | 북마크 토글 |
 | GET | `/chat/messages/search?q=` | 메시지 검색 |
 
@@ -207,34 +212,42 @@ data: {"type": "diff_preview", ...}                  ← 코드 변경 미리보
   ↓
 1. 세션 검증 + 사용자 메시지 DB 저장
   ↓
-2. 첨부파일 처리 (텍스트 100KB 읽기 → content 추가)
+2. 첨부파일 처리 (Ephemeral Document Context)
+   ├─ 파일 추출: PDF(pdfplumber), Excel(openpyxl), 텍스트(200KB)
+   ├─ 30K 토큰 이하 → 전문 삽입, 초과 → 앞뒤 분할(6K+6K)
+   ├─ Layer D 생성 (현재 턴에만 주입, 다음 턴 자동 제거)
+   └─ 참조 요약 1줄을 DB content에 추가 (히스토리 오염 방지)
   ↓
-3. 대화 히스토리 로드 (최근 200건, ASC)
+3. 재참조 감지 ("아까 그 파일", "위 문서" 등 7패턴)
+   └─ 이전 첨부파일 DB 조회 → Layer D 재구성
   ↓
-4. 3-레이어 컨텍스트 빌드 (context_builder)
+4. 대화 히스토리 로드 (최근 200건, ASC)
+  ↓
+5. 4-레이어 컨텍스트 빌드 (context_builder)
    ├─ Layer 1: 시스템 프롬프트 (정적, ~1400 토큰)
    ├─ Layer 2: 동적 상태 (시간, 세션 비용, 도구 가이드, ~300 토큰)
-   └─ Layer 2+: 메모리 주입 (memory_recall, 5섹션, ~2000 토큰)
+   ├─ Layer 2+: 메모리 주입 (memory_recall, 5섹션, ~2000 토큰)
+   └─ Layer D: 임시 문서 컨텍스트 (첨부파일 전문, 현재 턴 only)
   ↓
-5. 시맨틱 코드 검색 컨텍스트 주입 (옵션)
+6. 시맨틱 코드 검색 컨텍스트 주입 (옵션)
   ↓
-6. 자동 압축 (80K 토큰 초과 시 compaction_service)
+7. 자동 압축 (80K 토큰 초과 시 compaction_service)
   ↓
-7. 인텐트 분류 (intent_router → Gemini Flash-Lite, ~200ms)
+8. 인텐트 분류 (intent_router → Gemini Flash-Lite, ~200ms)
   ↓
-8. 모델/도구 라우팅
+9. 모델/도구 라우팅
    ├─ Gemini Direct → grounding / deep_research
    ├─ Agent SDK → execute / code_modify
    ├─ AutonomousExecutor → cto_*, pipeline_c (max 25 iterations)
    └─ Standard → model_selector.call_stream()
   ↓
-9. LLM 스트리밍 (도구 루프 포함)
+10. LLM 스트리밍 (도구 루프 포함)
   ↓
-10. Output Validator (빈 약속 응답 재시도)
+11. Output Validator (빈 약속 응답 재시도)
   ↓
-11. 응답 DB 저장 + 비용 누적
+12. 응답 DB 저장 + 비용 누적
   ↓
-12. 20턴마다 세션 노트/관찰 자동 저장
+13. 20턴마다 세션 노트/관찰 자동 저장
 ```
 
 ### 4.2 인텐트 분류
@@ -318,7 +331,7 @@ data: {"type": "diff_preview", ...}                  ← 코드 변경 미리보
 |------|------|
 | `directive_create` | 지시서 생성 |
 | `generate_directive` | 지시서 자동 생성 |
-| `delegate_to_agent` | 복잡 작업 위임 |
+| `delegate_to_agent` | 복잡 작업 위임 → AutonomousExecutor 실제 실행 + directive_lifecycle DB 등록 + 채팅방 결과 보고 |
 | `delegate_to_research` | 심층 리서치 위임 |
 | `spawn_subagent` | 서브에이전트 생성 |
 | `spawn_parallel_subagents` | 병렬 서브에이전트 |
@@ -388,7 +401,16 @@ Layer 2+: 메모리 주입 (memory_recall 5섹션, ~2,000 토큰)
 Layer 3: 대화 히스토리 (Observation Masking 적용)
   ├─ 최근 20턴: 도구 결과 유지
   └─ 이전 턴: 도구 결과 플레이스홀더 교체
+Layer D: 임시 문서 컨텍스트 (현재 턴에만 주입, 다음 턴 자동 제거)
+  ├─ 파일 첨부 시: <ephemeral_document_context> XML로 전문 삽입
+  ├─ 30K 토큰 이하: 전문 삽입, 초과: 앞뒤 분할 (CHUNK_MAX=6K)
+  ├─ 재참조 감지: "아까 그 파일" 등 → 이전 첨부 DB 조회 → 재주입
+  └─ DB에는 1줄 참조 요약만 저장 (히스토리 오염 방지)
 ```
+
+**환경변수**:
+- `DOCUMENT_FULL_INSERT_MAX_TOKENS=30000` — 전문 삽입 최대 토큰
+- `DOCUMENT_CHUNK_MAX_TOKENS=6000` — 분할 시 청크 크기
 
 ### 4.6 압축 (Compaction)
 
@@ -415,22 +437,30 @@ Layer 3: 대화 히스토리 (Observation Masking 적용)
 **파일**: `/root/aads/aads-server/app/services/pipeline_c.py`
 
 ```
-Phase 1: Claude Code SSH 자율 작업 (10분 타임아웃)
-  ↓
+Phase 1: Claude Code SSH 자율 작업 (30분 타임아웃)
+  ↓  → 채팅방: 🔧 시작 보고
 Phase 2: AI 자동 검수 (Claude Sonnet)
-  ↓  ← 검수 불합격 시 재지시 (최대 3회)
-Phase 3: 수정 반복 루프
-  ↓
+  ↓  → 채팅방: ✅ 통과 / 🔄 실패+재지시
+Phase 3: 수정 반복 루프 (최대 3회)
+  ↓  → 채팅방: 매 사이클 기록
 Phase 4: CEO 승인 대기 (awaiting_approval)
-  ↓  ← CEO 승인 / 거부
+  ↓  → 채팅방: 🔔 승인 요청 (diff 포함)
 Phase 5: 배포 (git commit + push + 서비스 재시작)
-  ↓
+  ↓  → 채팅방: 🚀 배포 진행
 Phase 6: Health 검증
   ↓
-Phase 7: 완료 (done)
+Phase 7: 완료 (done) → 채팅방: ✅ 최종 보고
 ```
 
-**지원 프로젝트**: KIS, GO100, SF, NTV2, AADS
+**지원 프로젝트**: KIS, GO100, SF, NTV2, AADS (크로스 프로젝트: 어느 세션에서든 모든 프로젝트 작업 가능)
+
+**채팅방 연동**: `_post_to_chat()` 헬퍼로 매 Phase 전환 시 `chat_messages`에 직접 삽입. `contextvars`로 session_id 전달.
+
+**Watchdog**: 2분 주기 스톨 감지 (10분 이상 같은 phase 유지 시 ⚠️ 채팅방 경고)
+
+**AADS 자기수정 안전장치**: 재시작 전 `phase='restarting'` DB 선저장 → 서버 재시작 후 `recover_interrupted_jobs()`가 자동 복구 → 채팅방 기록
+
+**AADS 실행 경로**: Docker 컨테이너에서 `host.docker.internal`로 SSH → 호스트의 Claude CLI 사용 (컨테이너 내 미설치 해결)
 
 ### 4.8 Agent SDK 서비스
 
@@ -464,7 +494,8 @@ Phase 7: 완료 (done)
 | `SessionCreate` | workspace_id, title |
 | `SessionOut` | id, workspace_id, title, summary, message_count, cost_total, pinned |
 | `MessageSendRequest` | session_id, content, attachments, model_override |
-| `MessageOut` | id, session_id, role, content, model_used, intent, cost, tokens_in/out, bookmarked, attachments, sources, tools_called, thinking_summary |
+| `MessageUpdateRequest` | content (수정 내용) |
+| `MessageOut` | id, session_id, role, content, model_used, intent, cost, tokens_in/out, bookmarked, attachments, sources, tools_called, thinking_summary, **edited_at** |
 | `ArtifactOut` | id, session_id, type, title, content, metadata |
 | `DriveFileOut` | id, workspace_id, filename, file_path, file_type, file_size |
 
@@ -514,6 +545,7 @@ Phase 7: 완료 (done)
 | tools_called | JSONB | 호출된 도구 목록 |
 | thinking_summary | TEXT | Extended Thinking 요약 |
 | is_compacted | BOOLEAN | 압축 여부 |
+| edited_at | TIMESTAMPTZ | 수정 시간 (NULL=미수정) |
 | created_at | TIMESTAMPTZ | 생성 시간 |
 
 #### `chat_artifacts`
@@ -609,6 +641,13 @@ Phase 7: 완료 (done)
 | `CHAT_UPLOAD_DIR` | /root/aads/uploads/chat | 첨부파일 저장 경로 |
 | `DATABASE_URL` | — | PostgreSQL 연결 URL |
 | `MCP_ENABLED` | true | MCP 서버 활성화 |
+| `DOCUMENT_FULL_INSERT_MAX_TOKENS` | 30000 | Layer D 전문 삽입 최대 토큰 |
+| `DOCUMENT_CHUNK_MAX_TOKENS` | 6000 | Layer D 분할 시 청크 크기 |
+| `MAX_THINKING_TOKENS` | 8000 | Extended Thinking 최대 토큰 |
+| `CONFIDENCE_CEO_PREF` | 0.2 | CEO 선호 관찰 신뢰도 임계값 |
+| `CONFIDENCE_TOOL_STRATEGY` | 0.3 | 도구 전략 관찰 신뢰도 임계값 |
+| `CONFIDENCE_DISCOVERY` | 0.4 | 발견사항 관찰 신뢰도 임계값 |
+| `LANGFUSE_ENABLED` | true | Langfuse 트레이싱 활성화 |
 
 ---
 
@@ -634,7 +673,7 @@ Phase 7: 완료 (done)
 ### 백엔드
 ```
 /root/aads/aads-server/
-├── app/routers/chat.py                ← 24개 REST 엔드포인트
+├── app/routers/chat.py                ← 26개 REST 엔드포인트
 ├── app/models/chat.py                 ← Pydantic 데이터 모델
 ├── app/services/
 │   ├── chat_service.py                ← 핵심 비즈니스 로직 (~1,290줄)
@@ -649,7 +688,9 @@ Phase 7: 완료 (done)
 │   ├── output_validator.py            ← 출력 검증
 │   └── pipeline_c.py                  ← Pipeline C 워크플로우
 ├── app/core/
-│   └── memory_recall.py               ← 5-섹션 메모리 시스템
+│   ├── memory_recall.py               ← 5-섹션 메모리 시스템
+│   ├── document_context.py            ← Ephemeral Document Context (Layer D)
+│   └── project_config.py              ← 프로젝트별 서버/경로 매핑
 └── app/api/
     ├── ceo_chat_tools.py              ← 도구 구현 (브라우저, Pipeline C)
     ├── ceo_chat_tools_db.py           ← 프로젝트 DB 쿼리
@@ -692,8 +733,20 @@ Phase 7: 완료 (done)
 | 6 | ai_observations upsert race condition | MEDIUM |
 | 7 | session_notes 중복 방지 없음 | MEDIUM |
 | 8 | 이미지/PDF vision 블록 미지원 (텍스트만 주입) | MEDIUM |
+| 9 | ~~Pipeline B delegate_to_agent 미실행~~ → AutonomousExecutor 통합 완료 (DB 등록 + 채팅방 보고) | DONE |
+| 10 | ~~Pipeline C AADS localhost claude 미설치~~ → host.docker.internal SSH 경유 해결 | DONE |
+| 11 | ~~Pipeline C 원격 600초 타임아웃~~ → 1800초(30분) 확장 | DONE |
 
 ---
 
-*이 문서는 AADS 채팅 시스템 v2.0 기준으로 작성되었습니다.*
+## 11. 변경 이력
+
+| 버전 | 날짜 | 주요 변경 |
+|------|------|----------|
+| v1.0 | 2026-03-11 | 최초 작성 — 전체 시스템 기술 명세 |
+| v1.1 | 2026-03-11 | 메시지 수정/재지시(방식A+B), Ephemeral Document Context(Layer D), Pipeline B 실제실행 통합, Pipeline C 채팅방연동+크로스프로젝트+Watchdog+AADS자기수정안전장치+타임아웃확장, 환경변수 7개 추가 |
+
+---
+
+*이 문서는 AADS 채팅 시스템 v2.1 기준으로 작성되었습니다.*
 *문의: aads.newtalk.kr*
