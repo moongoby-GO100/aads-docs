@@ -165,6 +165,42 @@ CEO 채팅 → intent_router(pipeline_runner) → chat_service(AutonomousExecuto
 - `app/services/pipeline_runner_service.py`: 비즈니스 로직
 - `app/api/ceo_chat_tools.py`: pipeline_runner_submit/status/approve 도구
 
+
+---
+
+## Pipeline Runner 시스템 (AADS-190+, 2026-03-10~)
+
+### Pipeline C → Pipeline Runner 전환
+- **Pipeline C** (pipeline_c.py, 104KB): 레거시 보존. 컨테이너 내 asyncio 실행. 도구명(pipeline_c_start 등) 폐기, 시스템 프롬프트에 "사용 금지" 명시.
+- **Pipeline Runner** (pipeline-runner.sh): 활성 실행 시스템. 호스트 systemd 독립 프로세스.
+
+### Pipeline Runner 실행 흐름
+```
+CEO 채팅 → intent_router(pipeline_runner) → chat_service(AutonomousExecutor)
+    → tool_executor → POST /api/v1/pipeline/jobs (submit)
+    → pipeline-runner.sh (호스트 systemd, 5초 폴링)
+    → Claude Code CLI 실행 (6단계 모델+계정 폴백)
+    → AI Reviewer 자동 검수 → awaiting_approval
+    → CEO approve → git push → 프로젝트별 배포 → done
+```
+
+### Pipeline C vs Runner 비교
+
+| 항목 | Pipeline C (보존) | Pipeline Runner (활성) |
+|------|------------------|----------------------|
+| 실행 위치 | 컨테이너 내 asyncio | 호스트 systemd 독립 프로세스 |
+| 서버 재시작 영향 | 작업 소멸 | 무영향 |
+| 계정 폴백 | 없음 | 6단계 (Sonnet/Opus/Haiku × 2계정) |
+| AI 검수 | 없음 | AI Reviewer 자동 실행 |
+| CEO 승인 | 없음 | approve/reject 필수 |
+| 프로젝트 | AADS만 | AADS/KIS/GO100/SF/NTV2 전체 |
+
+### 관련 파일
+- `scripts/pipeline-runner.sh`: 메인 실행 스크립트 (systemd)
+- `app/api/pipeline_runner_api.py`: REST API (submit/status/approve/reject)
+- `app/services/pipeline_runner_service.py`: 비즈니스 로직
+- `app/api/ceo_chat_tools.py`: pipeline_runner_submit/status/approve 도구
+
 ---
 
 ## 서버 현황 (3대 전체)
@@ -567,6 +603,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 | project-docs.json | https://github.com/moongoby-GO100/aads-docs/blob/main/shared/project-docs.json | 대시보드 문서 링크 설정 (자동 push) |
 | AADS-BACKUP-STRATEGY | https://github.com/moongoby-GO100/aads-docs/blob/main/reports/AADS-BACKUP-STRATEGY-20260309.md | 백업·복원 정책 (PostgreSQL 일일 pg_dump, .env, Nginx/systemd, Docker 볼륨) |
 | CTO-SYSTEM-MAP.md | /root/aads/aads-server/docs/knowledge/CTO-SYSTEM-MAP.md | CTO 세션 컨텍스트 복원 (8.6KB, 전체 아키텍처 지도) |
+| CTO-SYSTEM-MAP.md | /root/aads/aads-server/docs/knowledge/CTO-SYSTEM-MAP.md | CTO 세션 컨텍스트 복원 (8.6KB, 전체 아키텍처 지도) |
 
 ---
 
@@ -958,6 +995,15 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 | v7.8 | 2026-03-07 | AADS-149 | 파이프라인 전수조사 버그 5건 수정 |
 | v7.7 | 2026-03-07 | AADS-148 | /proc grep 블로킹 3일 장애 수정 |
 | v7.6 | 2026-03-07 | AADS-146 | Worktree 병렬, 서브에이전트, Writer/Reviewer |
+
+---
+
+## 버전 이력 (v12.22 이후)
+
+| 버전 | 날짜 | 주요 변경 |
+|------|------|----------|
+| v12.22 | 2026-03-09 | AADS-188E: approve-diff API + E2E 66건 PASS |
+| v14.0 | 2026-03-30 | 3월 갭 12건 갱신: Pipeline Runner, OAuth, Blue-Green, PC Agent, 메모리 진화, LiteLLM 확장, CTO 온보딩 |
 
 ---
 
