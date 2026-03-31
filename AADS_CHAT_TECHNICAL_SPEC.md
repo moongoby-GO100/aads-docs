@@ -238,7 +238,7 @@ data: {"type": "diff_preview", ...}                  ← 코드 변경 미리보
 9. 모델/도구 라우팅
    ├─ Gemini Direct → grounding / deep_research
    ├─ Agent SDK → execute / code_modify
-   ├─ AutonomousExecutor → cto_*, pipeline_c (max 25 iterations)
+   ├─ AutonomousExecutor → cto_*, pipeline_runner (max 25 iterations)
    └─ Standard → model_selector.call_stream()
   ↓
 10. LLM 스트리밍 (도구 루프 포함)
@@ -279,7 +279,7 @@ data: {"type": "diff_preview", ...}                  ← 코드 변경 미리보
 | directive / directive_gen | claude-opus (thinking) | 지시서 |
 | execute | claude-opus | 실행/배포 |
 | code_modify | claude-opus | 코드 수정 |
-| **pipeline_c** | **claude-sonnet** | **자율 작업 파이프라인** |
+| **pipeline_runner** | **claude-sonnet** | **자율 작업 파이프라인** |
 | cto_code_analysis | claude-opus (thinking) | 코드 분석 |
 | cto_verify | claude-opus (thinking) | 작업 검증 |
 | cto_impact | claude-opus (thinking) | 영향 분석 |
@@ -314,9 +314,9 @@ data: {"type": "diff_preview", ...}                  ← 코드 변경 미리보
 | `dashboard_query` | 파이프라인 현황 |
 | `server_status` | Docker 컨테이너 상태 |
 | `read_github_file` | GitHub 문서 읽기 |
-| `pipeline_c_start` | Pipeline C 시작 |
-| `pipeline_c_status` | Pipeline C 상태 확인 |
-| `pipeline_c_approve` | Pipeline C 승인/거부 |
+| `pipeline_runner_submit` | Pipeline Runner 시작 |
+| `pipeline_runner_status` | Pipeline Runner 상태 확인 |
+| `pipeline_runner_approve` | Pipeline Runner 승인/거부 |
 
 **Tier 2 — 분석 (온디맨드, 3~15초)**
 | 도구 | 설명 |
@@ -432,9 +432,9 @@ Layer D: 임시 문서 컨텍스트 (현재 턴에만 주입, 다음 턴 자동 
 6. 중요한 기술적 결정
 7. 다음 단계 및 미완료 항목
 
-### 4.7 Pipeline C (자율 작업 파이프라인)
+### 4.7 Pipeline Runner (자율 작업 파이프라인)
 
-**파일**: `/root/aads/aads-server/app/services/pipeline_c.py`
+**파일**: `/root/aads/aads-server/scripts/pipeline-runner.sh`
 
 ```
 Phase 1: Claude Code SSH 자율 작업 (30분 타임아웃)
@@ -686,13 +686,13 @@ Phase 7: 완료 (done) → 채팅방: ✅ 최종 보고
 │   ├── autonomous_executor.py         ← 자율 실행 엔진
 │   ├── agent_sdk_service.py           ← Agent SDK 통합
 │   ├── output_validator.py            ← 출력 검증
-│   └── pipeline_c.py                  ← Pipeline C 워크플로우
+│   └── pipeline-runner.sh              ← Pipeline Runner 워크플로우
 ├── app/core/
 │   ├── memory_recall.py               ← 5-섹션 메모리 시스템
 │   ├── document_context.py            ← Ephemeral Document Context (Layer D)
 │   └── project_config.py              ← 프로젝트별 서버/경로 매핑
 └── app/api/
-    ├── ceo_chat_tools.py              ← 도구 구현 (브라우저, Pipeline C)
+    ├── ceo_chat_tools.py              ← 도구 구현 (브라우저, Pipeline Runner)
     ├── ceo_chat_tools_db.py           ← 프로젝트 DB 쿼리
     ├── ceo_chat_tools_export.py       ← 데이터 내보내기
     └── ceo_chat_tools_scheduler.py    ← 동적 스케줄러
@@ -734,8 +734,8 @@ Phase 7: 완료 (done) → 채팅방: ✅ 최종 보고
 | 7 | session_notes 중복 방지 없음 | MEDIUM |
 | 8 | 이미지/PDF vision 블록 미지원 (텍스트만 주입) | MEDIUM |
 | 9 | ~~Pipeline B delegate_to_agent 미실행~~ → AutonomousExecutor 통합 완료 (DB 등록 + 채팅방 보고) | DONE |
-| 10 | ~~Pipeline C AADS localhost claude 미설치~~ → host.docker.internal SSH 경유 해결 | DONE |
-| 11 | ~~Pipeline C 원격 600초 타임아웃~~ → 1800초(30분) 확장 | DONE |
+| 10 | ~~Pipeline Runner AADS localhost claude 미설치~~ → host.docker.internal SSH 경유 해결 | DONE |
+| 11 | ~~Pipeline Runner 원격 600초 타임아웃~~ → 1800초(30분) 확장 | DONE |
 
 ---
 
@@ -744,7 +744,7 @@ Phase 7: 완료 (done) → 채팅방: ✅ 최종 보고
 | 버전 | 날짜 | 주요 변경 |
 |------|------|----------|
 | v1.0 | 2026-03-11 | 최초 작성 — 전체 시스템 기술 명세 |
-| v1.1 | 2026-03-11 | 메시지 수정/재지시(방식A+B), Ephemeral Document Context(Layer D), Pipeline B 실제실행 통합, Pipeline C 채팅방연동+크로스프로젝트+Watchdog+AADS자기수정안전장치+타임아웃확장, 환경변수 7개 추가 |
+| v1.1 | 2026-03-11 | 메시지 수정/재지시(방식A+B), Ephemeral Document Context(Layer D), Pipeline B 실제실행 통합, Pipeline Runner 채팅방연동+크로스프로젝트+Watchdog+AADS자기수정안전장치+타임아웃확장, 환경변수 7개 추가 |
 
 ---
 

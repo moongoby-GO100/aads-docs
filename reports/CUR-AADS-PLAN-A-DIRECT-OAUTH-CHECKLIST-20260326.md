@@ -1,7 +1,7 @@
 # A안(Claude → Anthropic 직접 OAuth) 적용 — 정밀 체크리스트 (채팅 무영향 우선)
 
-**문서**: `CUR-AADS-PLAN-A-DIRECT-OAUTH-CHECKLIST-20260326.md`  
-**전제**: LiteLLM을 Claude 경로에서 제외(또는 최후 폴백만)하고, `CLAUDE_CODE_OAUTH_TOKEN`(OAuth)로 Anthropic 직접 호출.  
+**문서**: `CUR-AADS-PLAN-A-DIRECT-OAUTH-CHECKLIST-20260326.md`
+**전제**: LiteLLM을 Claude 경로에서 제외(또는 최후 폴백만)하고, `CLAUDE_CODE_OAUTH_TOKEN`(OAuth)로 Anthropic 직접 호출.
 **최우선 제약**: **현재 CEO 채팅창 동작·가용성에 영향이 없어야 함** — 단일 점검 창구, 단계적 전환, 즉시 롤백 가능.
 
 ---
@@ -34,10 +34,10 @@
 ## 2. 설계 결정 (채팅 무영향을 위한 분기)
 
 - [ ] **직접 OAuth 활성 조건**: 플래그 ON **且** (선택) 특정 헤더/내부 사용자만 Canary — **전 사용자 일괄 전환 금지**直到 smoke 통과.
-- [ ] **Relay subprocess env (권장 패턴)**  
-  - 직접 OAuth 시: `unset` 또는 덮어쓰기 — `ANTHROPIC_API_KEY`(또는 helper가 넣는 proxy 키), **proxy `ANTHROPIC_BASE_URL`**  
-  - 설정: `ANTHROPIC_BASE_URL=https://api.anthropic.com` (또는 공식 문서 기준)  
-  - `CLAUDE_CODE_OAUTH_TOKEN=<CURRENT_OAUTH에 따른 sk-ant-oat01>`  
+- [ ] **Relay subprocess env (권장 패턴)**
+  - 직접 OAuth 시: `unset` 또는 덮어쓰기 — `ANTHROPIC_API_KEY`(또는 helper가 넣는 proxy 키), **proxy `ANTHROPIC_BASE_URL`**
+  - 설정: `ANTHROPIC_BASE_URL=https://api.anthropic.com` (또는 공식 문서 기준)
+  - `CLAUDE_CODE_OAUTH_TOKEN=<CURRENT_OAUTH에 따른 sk-ant-oat01>`
   - **API 키 `sk-ant-api03` 경로 금지** (프로젝트 규칙).
 - [ ] **`get_api_key.sh`**: 직접 OAuth 모드에서는 **호출되지 않거나**, 호출돼도 **빈 값/false가 아닌** CLI 기대 동작과 충돌 없음을 확인 (settings.json과 CLI 버전별 동작 점검).
 - [ ] **스위치 UI ↔ Relay**: UI가 바꾸는 값(`CURRENT_OAUTH` 등)이 **Relay 기동 시점이 아닌 요청 시점**에 읽히도록 할지(파일 매 read vs env 주입) 결정 — **채티 중 스위치 반영 지연** 허용 범위 문서화.

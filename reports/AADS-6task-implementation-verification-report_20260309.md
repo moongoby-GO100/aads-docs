@@ -53,14 +53,14 @@
 
 ## 3. 조치한 미구현 항목
 
-- **app/services/__init__.py**: `memory_manager` 모듈을 패키지에서 노출하지 않아, `app.services.memory_manager`를 패치하는 E2E/agent_sdk 테스트가 실패함.  
-  → **조치**: `from . import memory_manager` 및 `__all__`에 `"memory_manager"` 추가.  
+- **app/services/__init__.py**: `memory_manager` 모듈을 패키지에서 노출하지 않아, `app.services.memory_manager`를 패치하는 E2E/agent_sdk 테스트가 실패함.
+  → **조치**: `from . import memory_manager` 및 `__all__`에 `"memory_manager"` 추가.
   → **결과**: `getattr(app.services, "memory_manager")` 사용 테스트 및 stop_hook 패치 경로 정상 동작.
 
 ## 4. E2E·통합 검증 결과
 
 - **실행 환경**: Python 3.11, pytest 9.0.2, **asyncpg 설치 필수** (pyproject.toml에 이미 포함).
-- **실행 명령**:  
+- **실행 명령**:
   `pytest tests/test_autonomous.py tests/test_code_explorer.py tests/test_ptc.py tests/test_deep_research.py tests/test_agent_sdk.py tests/test_code_indexer.py tests/test_memory.py tests/test_e2e_deep_research.py tests/test_e2e_code_modify.py tests/test_e2e_agent_sdk.py`
 - **결과**: **227 passed** (4.72s).
 

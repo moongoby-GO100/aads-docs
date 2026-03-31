@@ -25,7 +25,15 @@
 - [ ] git push (성공 확인)
 - [ ] push 결과 출력에서 에러 없음 확인
 
+### API 키 보안 절대 규칙 (R-KEY)
+- **절대 API 키를 소스코드/docker-compose/yaml/config/보고서에 하드코딩하지 않는다**
+- 보고서에 키 값 기재 시 마스킹 필수 (예: `AIzaSy...ghQ`, `sk-ant-...QAA`)
+- 모든 시크릿은 `.env` 파일에만 저장, `.env`는 git에 절대 커밋 금지
+- 커밋 전 pre-commit hook이 API 키 패턴 자동 감지 → 차단
+- 위반 시: 제공사가 키를 leaked 처리하여 영구 비활성화됨
+
 ## 금지 사항 (MUST NOT)
 - git push 없이 "완료" 보고 금지
 - 보고서 결과란 비우기 금지
 - phase-reports를 이전 상태로 방치 금지
+- API 키/비밀번호를 보고서·코드에 평문 기재 금지
