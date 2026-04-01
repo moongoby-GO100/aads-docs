@@ -1,5 +1,5 @@
-# AADS HANDOVER v14.0
-최종 업데이트: 2026-03-30 | 버전: v14.0 — 3월 9~30일 갭 12건 갱신: Pipeline Runner 체계, OAuth 전환, Blue-Green 배포, PC Agent, 메모리 진화, LiteLLM 확장
+# AADS HANDOVER v15.0
+최종 업데이트: 2026-04-01 | 버전: v15.0 — hot-reload 자동 트리거 완료, 인증 일일 체크 스케줄러(AUTH-001), AUTH_GUARD.md 작성
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -288,7 +288,14 @@ CEO 채팅 → intent_router(pipeline_runner) → chat_service(AutonomousExecuto
 
 ## 진행 중 작업 상세
 
-없음
+### 2026-04-01 완료 작업
+
+| 항목 | 커밋 | 내용 |
+|------|------|------|
+| hot-reload 자동 트리거 연결 | c758af6 | hot_reload 라우터 등록 + API 파일 추가 |
+| hot-reload 라우터 등록 + API 파일 추가 | 8237470 | app/api/hot_reload.py 신규 + main.py 라우터 포함 커밋 |
+| 인증 일일 체크 스케줄러 (AUTH-001) | main.py 패치 | 매일 09:05 KST _auth_daily_check() — TOKEN_1/TOKEN_2/LiteLLM 상태 텔레그램 보고 |
+| AUTH_GUARD.md 작성 | docs/AUTH_GUARD.md | 인증 핵심 파일 목록, 수정 전후 체크리스트, 오류 조치 절차 |
 
 ---
 
