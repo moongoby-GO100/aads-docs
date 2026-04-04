@@ -1,5 +1,5 @@
-# AADS HANDOVER v15.0
-최종 업데이트: 2026-04-01 | 버전: v15.0 — hot-reload 자동 트리거 완료, 인증 일일 체크 스케줄러(AUTH-001), AUTH_GUARD.md 작성
+# AADS HANDOVER v15.1
+최종 업데이트: 2026-04-04 | 버전: v15.1 — P0 401 인증 장애 복구, Gemini 폴백 수정, Background 10종 qwen-turbo 100% 전환 (AADS-204)
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -287,6 +287,16 @@ CEO 채팅 → intent_router(pipeline_runner) → chat_service(AutonomousExecuto
 ---
 
 ## 진행 중 작업 상세
+
+### 2026-04-04 완료 작업 (AADS-204)
+
+| 항목 | 커밋 | 내용 |
+|------|------|------|
+| P0 401 인증 장애 복구 | — | credentials.json 제거(3서버) + TOKEN_1↔TOKEN_2 교환 + 컨테이너 재생성 |
+| Gemini 폴백 모델 교체 | a713a55 | gemini-3.1-flash-lite-preview → gemini-2.5-flash (content=null 버그 수정) |
+| QA 결과 파싱 버그 수정 | cd5edc4 | pipeline-runner.sh grep -qi 부분매칭으로 교체 (AUTO PASS/FAIL 인식) |
+| Background 10종 qwen-turbo 전환 | 81a9129 | smart_search/kakaobot_ai/code_reviewer/self_evaluator/response_critic → qwen-turbo |
+| Alibaba DashScope LiteLLM 연동 | 48d40f5 | ALIBABA_API_KEY docker-compose 주입, qwen-turbo/plus LiteLLM 등록 완료 |
 
 ### 2026-04-01 완료 작업
 
