@@ -23,6 +23,19 @@
 - **기술 스택**: LangGraph >= 1.0.10, FastAPI, Next.js, PostgreSQL, Docker
 - **E2E 검증 완료**: 3시나리오, 건당 $3.72~$4.03
 
+## 최근 운영 변경사항 (2026-04-23)
+
+- Claude 계정 우선순위 기준을 `.env.oauth`가 아니라 DB `llm_api_keys(provider=anthropic)` priority로 통일했다.
+- 채팅 API, Claude relay, 채팅창 계정 표시가 모두 같은 DB priority를 사용한다.
+- Claude 폴백은 사용자가 지정한 slot 우선순위를 먼저 따르고, DB에 `rate_limited_until`이 기록된 계정만 자동으로 뒤로 미룬다.
+- 현재 검증된 live 상태:
+  - relay current slot: `2`
+  - relay label: `moongoby@gmail`
+  - DB priority 1: `moongoby@gmail / slot2`
+  - DB priority 2: `moong76@gmail / slot1`
+- `/docs` 통합 페이지는 전 프로젝트 문서를 더 많이 스캔하도록 확장되었고, 문서 전체 경로 표시, 좌우 폭 리사이즈, 세분화된 문서 유형 필터를 지원한다.
+- 상세 보고서: `reports/AADS_claude_db_priority_fallback_and_docs_hub_20260423.md`
+
 ---
 
 ## 매니저 자기인식 프로토콜
