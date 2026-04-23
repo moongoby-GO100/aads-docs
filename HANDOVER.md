@@ -41,6 +41,34 @@
   - 2026-04-23 12:51 KST 현재 활성 슬롯은 `green`
 - `/docs` 통합 페이지는 전 프로젝트 문서를 더 많이 스캔하도록 확장되었고, 문서 전체 경로 표시, 좌우 폭 리사이즈, 세분화된 문서 유형 필터를 지원한다.
 - 상세 보고서: `reports/AADS_claude_db_priority_fallback_and_docs_hub_20260423.md`
+- 채팅창 권한/터미널 동등권한 구조 개선 검토 보고서: `reports/AADS_chat_terminal_parity_and_privileged_execution_plan_20260423.md`
+- 채팅창 터미널 P0 백엔드가 추가되었다.
+  - 신규 API: `/api/v1/terminal/sessions`, `/input`, `/execute`, `/resize`, `/close`, `/stream`
+  - 신규 파일: `app/models/terminal.py`, `app/services/terminal_runner.py`, `app/api/terminal.py`
+  - 현재 런타임 검증 결과: PTY는 `devpts` 제약으로 `pipe fallback` 사용
+  - 일반 쉘 명령은 동작 확인, fullscreen interactive TTY는 배포 컨테이너에서 추가 확인 필요
+- direct edit 반영 경로가 `즉시 commit/push`에서 `ledger + finalize/preflight` 구조로 일부 전환되었다.
+  - 신규 파일: `app/services/workspace_change_tracker.py`
+  - 신규 API: `GET /api/v1/ops/workspace-changes`, `POST /api/v1/ops/workspace-changes/finalize`
+  - `tool_executor.py`의 `_post_file_modify_hook()`은 이제 ledger 기록, hot-reload, changelog, AI diff review만 수행한다
+  - `run_remote_command`는 deploy/restart 성격 명령 전에 현재 채팅 세션의 pending 변경을 finalize한다
+  - deploy/restart 성공 후 pushed 변경은 `deployed` 상태로 승격되며 `deployed_at`이 기록된다
+  - 실코드 제약상 `auto add`는 넣지 않았고, finalize 시점에만 `git add/commit/push`를 수행한다
+  - DB ledger smoke test는 `dirty -> pushed -> deployed` 상태 전이와 `deployed_at` 기록까지 확인했다
+- 채팅창 프론트에 운영 도크 UI가 추가되었다.
+  - 신규 파일: `aads-dashboard/src/components/chat/ChatOpsDock.tsx`
+  - `작업 상태` 패널: 현재 세션의 `dirty/committed/pushed/deployed` ledger 조회 + 수동 finalize
+  - `Terminal` 패널: 세션 생성/선택/종료, SSE 출력, 명령 실행, Ctrl+C, 최근 명령 재사용
+  - 현재 타입 검증(`npx tsc --noEmit --incremental false`) 통과
+- 2026-04-23 17:38~17:42 KST 배포 완료
+  - `aads-server` 커밋: `68a5468`
+  - `aads-dashboard` 커밋: `52af866`
+  - 서버 배포: `bash /root/aads/aads-server/deploy.sh code` 성공
+  - 대시보드 배포: blue-green 성공, 활성 슬롯 `blue`
+  - 라이브 검증:
+    - `GET /api/v1/health` → `status=ok`
+    - OpenAPI에 `/api/v1/terminal/sessions`, `/api/v1/ops/workspace-changes`, `/api/v1/ops/workspace-changes/finalize` 노출 확인
+    - `GET /api/v1/ops/workspace-changes?...` 응답 확인
 
 ---
 
