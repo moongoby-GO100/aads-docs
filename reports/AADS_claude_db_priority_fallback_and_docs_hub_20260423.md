@@ -85,10 +85,77 @@
 
 - `aads-api` supervisor restart 완료
 - `claude-relay` systemd restart 완료
-- `aads-dashboard` 이미지 재빌드 및 컨테이너 재기동 완료
+- `aads-dashboard` blue-green 배포 완료 (`3100 -> 3101`)
 
 ## 운영 메모
 
 - 현재 Claude current slot은 DB priority와 DB rate-limit 상태를 함께 따른다.
 - 우선순위는 사용자가 DB에서 지정한 순서를 먼저 따르며, 한도 초과 계정만 자동으로 뒤로 보낸다.
-- relay는 여전히 DB를 `docker exec`로 읽는다. 다음 단계로는 relay가 내부 서명 API 또는 직접 DB 조회를 사용하도록 바꾸는 것이 더 단순하다.
+- relay는 더 이상 DB를 `docker exec`로 읽지 않는다.
+- relay는 `GET /api/v1/health/claude-relay/oauth-state` 내부 엔드포인트를 shared secret으로 호출해 OAuth 상태를 받는다.
+- shared secret 파일은 `aads-server/scripts/claude_relay_secret.txt` 로컬 파일을 사용하며 Git에는 포함하지 않는다.
+
+## 2026-04-23 추가 조치 (2차)
+
+### 1. 권한 제약 검토 결과
+
+- 현재 채팅창에서 막히는 권한 문제는 실제로 존재한다.
+- 원인:
+  - Docker daemon 접근
+  - `systemctl`/`nginx reload` 같은 호스트 운영 명령
+  - `.git/logs/*` 쓰기 및 pre-commit hook의 Docker smoke test
+- 결론:
+  - 채팅창이 직접 호스트 권한 상승을 요청할 수 없는 구조라면, 위 종류 작업은 서버 내부 privileged path로 우회하지 않는 한 실패 가능성이 높다.
+  - 특히 배포, 운영 복구, 일부 검증 작업은 여전히 권한 경계 밖에 있다.
+
+### 2. Claude relay의 Docker 기반 DB 조회 제거
+
+- 이전:
+  - relay가 `docker exec aads-server ... python` 으로 DB-backed OAuth 상태를 읽었다.
+  - Docker 권한/출력 로그 혼입에 취약했다.
+- 현재:
+  - `app/api/health.py`에 `GET /api/v1/health/claude-relay/oauth-state` 추가
+  - relay는 local HTTP + shared secret 헤더로 OAuth 상태를 읽는다.
+- 장점:
+  - Docker socket 의존 제거
+  - JSON 파싱 단순화
+  - 권한 이슈 감소
+- 남은 고려사항:
+  - shared secret 파일 유실 시 relay는 env fallback으로 떨어질 수 있다.
+  - 이 파일은 서버 로컬 자산으로 운영 관리가 필요하다.
+
+### 3. Dashboard blue-green 실배포
+
+- 이전:
+  - nginx는 `/` 를 `127.0.0.1:3100` 단일 포트로만 보았다.
+  - `aads-dashboard`는 컨테이너 교체형이라 엄밀한 무중단이 아니었다.
+- 현재:
+  - `docker-compose.prod.yml`에 `aads-dashboard-green` 추가 (`3101`)
+  - `nginx-aads-upstream.conf`에 `upstream aads_dashboard` 추가
+  - nginx `/` 라우팅을 `aads_dashboard` upstream으로 전환
+  - `aads-dashboard/deploy.sh`를 실제 blue-green 스위치 스크립트로 교체
+- 실배포 결과:
+  - `2026-04-23 12:51 KST`
+  - active slot: `green`
+  - active container: `aads-dashboard-green`
+  - external health: `/login` 정상
+
+### 4. Claude 계정 상태판
+
+- `health/api-keys` 응답에 다음 필드를 추가했다.
+  - `cli.status`
+  - `cli.auth_mode`
+  - `cli.token_available`
+  - `db_keys[].key_name`
+  - `db_keys[].is_current`
+  - `db_keys[].last_used_at`
+  - `db_keys[].last_verified_at`
+  - `db_keys[].notes`
+- 채팅창에는 Claude 상태판 팝오버를 추가했다.
+- 표시 항목:
+  - 현재 relay slot
+  - 현재 active 계정
+  - priority/slot
+  - rate limit 시각
+  - 마지막 검증 시각
+  - 마지막 사용 시각
