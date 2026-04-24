@@ -69,6 +69,11 @@
     - `GET /api/v1/health` → `status=ok`
     - OpenAPI에 `/api/v1/terminal/sessions`, `/api/v1/ops/workspace-changes`, `/api/v1/ops/workspace-changes/finalize` 노출 확인
     - `GET /api/v1/ops/workspace-changes?...` 응답 확인
+- 2026-04-24 host terminal mode 반영 완료
+  - 채팅창 터미널에 `Host / Container` 모드 추가
+  - `host` 모드 시 `ssh -tt root@host.docker.internal`로 호스트 root bash PTY 세션 생성
+  - 브라우저 E2E 기준 `session_mode=host`, `backend_mode=pty`, `codex --version -> codex-cli 0.123.0` 확인
+  - 관련 보고서: `reports/AADS_chat_terminal_host_mode_20260424.md`
 
 ---
 
