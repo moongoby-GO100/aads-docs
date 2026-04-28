@@ -1,5 +1,5 @@
-# AADS HANDOVER v15.1
-최종 업데이트: 2026-04-04 | 버전: v15.1 — P0 401 인증 장애 복구, Gemini 폴백 수정, Background 10종 qwen-turbo 100% 전환 (AADS-204)
+# AADS HANDOVER v15.2
+최종 업데이트: 2026-04-28 | 버전: v15.2 — Chat 서버 재시작 후 이어쓰기 실패 방지, Redis done 오인 방어, 복구 보고서 저장
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -22,6 +22,34 @@
 - **GitHub PAT**: repo+workflow 권한, 만료 2026-05-27
 - **기술 스택**: LangGraph >= 1.0.10, FastAPI, Next.js, PostgreSQL, Docker
 - **E2E 검증 완료**: 3시나리오, 건당 $3.72~$4.03
+
+## 최근 운영 변경사항 (2026-04-28)
+
+- GO100/KIS/SF/NTV2 원격 프로젝트 채팅 세션의 프롬프트·도구 라우팅을 보강했다.
+  - `prompt_assets`에 원격 프로젝트 접근 계약, GO100 실행 기준, 원격 코드·DB 사전 확인 지침을 추가했다.
+  - GO100 워크스페이스는 `project_key=GO100`, `workdir=/root/kis-autotrade-v4`, `db_profile=GO100`을 가진다.
+  - 기존 세션도 새 대화턴마다 PromptCompiler가 최신 `prompt_assets`를 다시 조립한다.
+  - `read_remote_file`은 `file_path`와 `path`를 모두 허용하고, 프로젝트형 도구에서 `project`가 빠지면 세션/워크스페이스 기준으로 자동 보정한다.
+  - Agent SDK 직접 실행 경로도 실행 직전에 PromptCompiler 결과를 `system_prompt`로 전달한다.
+  - Codex relay는 세션 프로젝트를 전달받아 GO100/KIS/SF/NTV2를 AADS 기본 프로젝트로 오인하지 않게 했다.
+  - 채팅 UI에 세션 역할 선택값을 추가해 Layer 3 role asset이 다음 턴부터 매칭되게 했다.
+  - 상세 보고서: `reports/AADS-WRAP-021_remote-project-prompt-routing_20260428.md`
+- 채팅 스트리밍 중 `aads-api` SIGTERM/서버 재시작이 발생했을 때 중간 응답을 최종 응답으로 오인하는 장애를 분석하고 방어 패치를 적용했다.
+- 원인: producer `finally`가 실제 SSE `type="done"` 수신 없이 Redis Stream에 `done=true`를 기록했고, 재시작 복구 로직이 이 Redis 완료 마커를 신뢰해 LLM 이어쓰기를 생략했다.
+- `app/services/chat_service.py`에 다음 방어를 추가했다.
+  - `saw_done_event` 상태를 도입해 실제 `done` 이벤트를 본 경우에만 Redis `done=true`를 기록한다.
+  - `CancelledError`, `GeneratorExit`, SIGTERM, auto-cancel 등 미완료 종료 시 placeholder를 보존한다.
+  - 재시작 복구 시 Redis `done=true`가 있어도 DB `chat_turn_executions.status`가 `completed`가 아니면 Redis 완료를 무시하고 이어쓰기 경로로 전환한다.
+- 보고서 저장:
+  - `aads-server/docs/reports/20260428_CHAT_RESTART_RESUME_FAILURE_REPORT.md`
+  - `aads-server/docs/reports/20260428_CHAT_FEATURE_FULL_AUDIT.md`
+- 검증:
+  - `docker exec aads-server python3 -m py_compile /app/app/services/chat_service.py` 통과
+  - `git diff --check` 통과
+  - 2026-04-28 12:33 KST 기준 `aads-server` 컨테이너 healthy, `/api/v1/health` 응답 `status=ok`
+- 주의: 같은 시점 `aads-server` 워크트리에는 PromptCompiler/role routing 등 이전 변경이 함께 미커밋 상태로 남아 있으므로, 이번 재시작 복구 패치는 커밋 시 `chat_service.py` 내 해당 hunk만 분리해야 한다.
+
+---
 
 ## 최근 운영 변경사항 (2026-04-23)
 
