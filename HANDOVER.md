@@ -1,5 +1,5 @@
-# AADS HANDOVER v15.2
-최종 업데이트: 2026-04-28 | 버전: v15.2 — Chat 서버 재시작 후 이어쓰기 실패 방지, Redis done 오인 방어, 복구 보고서 저장
+# AADS HANDOVER v15.3
+최종 업데이트: 2026-04-28 | 버전: v15.3 — 진행 중 채팅 버블 미표시 방지: streaming_placeholder 복구 API 옵션 + 세션 ID 기준 스트리밍 유지
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -25,6 +25,13 @@
 
 ## 최근 운영 변경사항 (2026-04-28)
 
+- 진행 중 채팅 버블이 화면에서 사라지는 구조적 문제를 패치했다.
+  - 원인: `/chat/messages`가 활성 실행 중 `streaming_placeholder`를 항상 제외해, SSE 재부착이 늦거나 실패하면 DB/Redis에는 진행 내용이 있어도 화면에는 버블이 없었다.
+  - `GET /api/v1/chat/messages`에 `include_streaming=true` 옵션을 추가했고, 이 옵션일 때만 활성 실행 중 placeholder를 응답에 포함한다.
+  - 대시보드 `/chat` 재진입 로드는 스트리밍 중 `include_streaming=true`로 메시지를 가져와 DB placeholder를 안전망으로 사용한다.
+  - `/chat` 세션 effect는 `activeSession` 객체 필드 갱신이 아니라 실제 세션 ID 변경 때만 진행 스트림을 abort/clear하도록 방어했다.
+  - 변경 파일: `aads-server/app/routers/chat.py`, `aads-server/app/services/chat_service.py`, `aads-dashboard/src/app/chat/page.tsx`
+  - 검증: `python3.11 -m py_compile app/routers/chat.py app/services/chat_service.py` 통과. 대시보드 `npx tsc --noEmit`/`npx eslint src/app/chat/page.tsx`는 기존 admin/chat 누적 오류로 실패했으며, 이번 변경 라인 신규 TS 오류는 확인되지 않았다.
 - GO100/KIS/SF/NTV2 원격 프로젝트 채팅 세션의 프롬프트·도구 라우팅을 보강했다.
   - `prompt_assets`에 원격 프로젝트 접근 계약, GO100 실행 기준, 원격 코드·DB 사전 확인 지침을 추가했다.
   - GO100 워크스페이스는 `project_key=GO100`, `workdir=/root/kis-autotrade-v4`, `db_profile=GO100`을 가진다.
