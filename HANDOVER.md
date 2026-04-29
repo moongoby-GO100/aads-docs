@@ -1090,6 +1090,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 - APK 공개 다운로드 확인: `https://aads.newtalk.kr/api/v1/devices/android/download` 응답 1.4MB.
 - manifest 확인: `apk_available=true`, `server_ws_base_url=wss://aads.newtalk.kr/api/v1/devices/ws`.
+- AADS 대시보드 헤더에 `Android 설치` 바로가기 추가 및 blue 슬롯(3100) 배포 완료. 버튼 경로: `/ops/mobile-agent`.
 - Nginx에 `/api/v1/devices/ws/` WebSocket upgrade location 추가 및 reload 완료.
 - 공개 WSS 등록 검증: `{"type":"registered","payload":{"agent_id":"ceo-phone-5a25c7"}}` 응답 확인.
 - CEO 폰 설치용 임시 pairing token 생성: `ceo-phone-5a25c7`, 만료 `2026-04-30 01:56 KST`.
@@ -1102,7 +1103,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - `POST /api/v1/devices/android/pairing` 관리자 API로 디바이스별 페어링 토큰 생성. 토큰은 1회 응답만 평문 반환, DB에는 SHA-256 해시 저장.
 - WebSocket 인증을 기존 `PC_AGENT_TOKEN` fallback + `device_pairing_tokens` 기반 검증으로 확장.
 - `device_sdk`/`device_manager` 시간 필드를 timezone-aware UTC로 보정.
-- APK 빌드 스크립트: `android_agent/build_debug_apk.sh`. 서버에 Gradle/JDK/Android SDK가 없어 현재 환경에서는 APK 산출물 미생성.
+- APK 빌드 스크립트: `android_agent/build_debug_apk.sh`. 현재 서버 산출물: `android_agent/dist/aads-agent-debug.apk` 생성 완료.
 
 ---
 
