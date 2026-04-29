@@ -1075,6 +1075,16 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 ---
 
+## 2026-04-29 AADS-231 직접 구현 메모
+
+- `android_agent/` 네이티브 Android 에이전트 프로젝트 위에 설치 UX 보강: install/manifest/download/source.zip API 추가.
+- `POST /api/v1/devices/android/pairing` 관리자 API로 디바이스별 페어링 토큰 생성. 토큰은 1회 응답만 평문 반환, DB에는 SHA-256 해시 저장.
+- WebSocket 인증을 기존 `PC_AGENT_TOKEN` fallback + `device_pairing_tokens` 기반 검증으로 확장.
+- `device_sdk`/`device_manager` 시간 필드를 timezone-aware UTC로 보정.
+- APK 빌드 스크립트: `android_agent/build_debug_apk.sh`. 서버에 Gradle/JDK/Android SDK가 없어 현재 환경에서는 APK 산출물 미생성.
+
+---
+
 ## 버전 이력 (v12.22 이후)
 
 | 버전 | 날짜 | 주요 변경 |
