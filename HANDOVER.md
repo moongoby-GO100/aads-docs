@@ -1073,6 +1073,14 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 | v12.22 | 2026-03-09 | AADS-188E: approve-diff API + E2E 66건 PASS |
 | v14.0 | 2026-03-30 | 3월 갭 12건 갱신: Pipeline Runner, OAuth, Blue-Green, PC Agent, 메모리 진화, LiteLLM 확장, CTO 온보딩 |
 
+## 2026-04-29 AADS-231 Android Agent 설치 검증 메모
+
+- APK 공개 다운로드 확인: `https://aads.newtalk.kr/api/v1/devices/android/download` 응답 1.4MB.
+- manifest 확인: `apk_available=true`, `server_ws_base_url=wss://aads.newtalk.kr/api/v1/devices/ws`.
+- Nginx에 `/api/v1/devices/ws/` WebSocket upgrade location 추가 및 reload 완료.
+- 공개 WSS 등록 검증: `{"type":"registered","payload":{"agent_id":"ceo-phone-5a25c7"}}` 응답 확인.
+- CEO 폰 설치용 임시 pairing token 생성: `ceo-phone-5a25c7`, 만료 `2026-04-30 01:56 KST`.
+
 ---
 
 ## 2026-04-29 AADS-231 직접 구현 메모
