@@ -1,5 +1,5 @@
-# AADS HANDOVER v15.3
-최종 업데이트: 2026-04-28 | 버전: v15.3 — 진행 중 채팅 버블 미표시 방지: streaming_placeholder 복구 API 옵션 + 세션 ID 기준 스트리밍 유지
+# AADS HANDOVER v15.4
+최종 업데이트: 2026-04-29 | 버전: v15.4 — Android Agent 설치 버튼/페어링 대시보드 반영
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -22,6 +22,19 @@
 - **GitHub PAT**: repo+workflow 권한, 만료 2026-05-27
 - **기술 스택**: LangGraph >= 1.0.10, FastAPI, Next.js, PostgreSQL, Docker
 - **E2E 검증 완료**: 3시나리오, 건당 $3.72~$4.03
+
+## 최근 운영 변경사항 (2026-04-29)
+
+- AADS 대시보드에 Android 스마트폰 에이전트 설치 진입점을 반영했다.
+  - 신규 페이지: `aads-dashboard/src/app/ops/mobile-agent/page.tsx`
+  - 사이드바 메뉴: `/ops/mobile-agent` Mobile Agent 추가
+  - 운영 현황 대시보드: Mobile Agent 설치/페어링 카드 추가
+  - API 클라이언트: `/devices/android/manifest`, `/devices/android/pairing`, `/devices`, `/devices/android/pairing/{agent_id}/revoke` 연결 추가
+  - 기능: APK 다운로드, 설치 페이지 열기, 관리자 페어링 토큰 생성, JSON/URL 복사, Android 단말 연결 목록 5초 갱신
+  - 커밋/푸시: `aads-dashboard` `b19dd78` (`Add Android agent install dashboard`)
+  - 배포: 깨끗한 worktree(`/tmp/aads-dashboard-deploy-b19dd78-*`) 기준으로 `aads-dashboard-green` blue-green 배포, nginx upstream green 전환
+  - 검증: `npm run build` 통과, `/ops/mobile-agent` 라우트 생성 확인, `https://aads.newtalk.kr/api/v1/devices/android/manifest` 200, APK 다운로드 200(`1,375,655 bytes`), `aads-dashboard-green` healthy
+  - 주의: 배포 당시 대시보드 로컬 작업트리에 기존 미커밋 변경(`src/app/chat/page.tsx`, `src/app/settings/page.tsx`, `src/components/settings/LlmRegistryWorkspacePanel.tsx`, `tsconfig.tsbuildinfo`)이 있었으므로, 배포는 해당 변경이 섞이지 않게 별도 clean worktree에서 수행했다.
 
 ## 최근 운영 변경사항 (2026-04-28)
 
