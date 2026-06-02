@@ -1,5 +1,5 @@
-# AADS HANDOVER v15.4
-최종 업데이트: 2026-04-29 | 버전: v15.4 — Android Agent 설치 버튼/페어링 대시보드 반영
+# AADS HANDOVER v15.8
+최종 업데이트: 2026-06-02 | 버전: v15.8 — NTV2 V1 상품저장 타임아웃 복구 + E2E 자격증명 체계
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -23,8 +23,63 @@
 - **기술 스택**: LangGraph >= 1.0.10, FastAPI, Next.js, PostgreSQL, Docker
 - **E2E 검증 완료**: 3시나리오, 건당 $3.72~$4.03
 
+
+## 최근 운영 변경사항 (2026-06-02)
+
+- **NTV2 V1 상품저장 타임아웃 장애 복구** (서버 114, PHP 7.4 FPM)
+  - 증상: 상품수정 저장 시 "처리중" 모달이 무한 대기, 5분+ 소요 후 실패
+  - 근본 원인: PHP-FPM `pm.max_children=5` → 워커 고갈, `request_terminate_timeout=60s` → 이미지 처리(ImageSplitter) 중 강제 종료
+  - 조치: `pm.max_children=200`, `pm.start_servers=12`, `pm.min_spare_servers=6`, `pm.max_spare_servers=30`, `request_terminate_timeout=300s`
+  - FPM 설정 파일: `/etc/php/7.4/fpm/pool.d/www.conf`
+  - 15:55 KST FPM 재시작 이후 타임아웃 에러 0건, CEO 저장 요청 전부 200 응답 (0.23~0.34초)
+  - 영향 상품: 685086, 685085, 685091(pt15945k65), 685257, 685131, 685147, 685108, 685110, 685111
+  - 주의: 간헐적 busy 경고 발생(idle=0 시 자동 spawning) — 정상 동작이며 max_children 200으로 충분한 여유
+- **NTV2 E2E 자격증명 체계 수립**
+  - `.env.e2e.local` (git-ignored): 관리자/도매/소매 3역할 계정 저장
+  - `.env.e2e.example`: 키 이름만 공개 (비밀번호 없음)
+  - Credential Vault: 암호화 저장 + login_steps (input[name=login], input[name=password])
+  - E2E 검증: Playwright 로그인 성공, 편집 페이지 200, API POST 저장 200 확인
+  - 제한: Playwright에서 JS confirm() 다이얼로그 자동 dismiss → 브라우저 저장 버튼 E2E 불가, API fallback으로 대체
+- **CDN URL 표준화**: `newtalk.kr/data/files/...` 기준 통일, `img.newtalk.kr`는 301 리다이렉트로 폐기
+
+## 최근 운영 변경사항 (2026-05-29)
+
+- AADS 채팅 세션 복귀/새로고침 시 저장된 부분 응답이 화면에서 숨거나 진행 버블이 중단 버블로 잘못 변환되는 경로를 패치했다.
+  - 변경 파일: `aads-dashboard/src/app/chat/page.tsx`
+  - 원인: visibilitychange 재조회 경로가 진행 중 `streaming_placeholder`를 `keepEmpty=false`로 처리해 active streaming 중에도 부분 응답을 `interrupted_partial`로 변환하거나 병합을 건너뛰는 레이스가 있었다.
+  - 조치: `streamingRef`, `waitingBgRef`, `bgPartialContentRef` 기준으로 진행 중 placeholder를 보존하고, raw DB 메시지와 변환 결과 양쪽에서 서버 draft 존재 여부를 판정한다.
+  - 조치: 세션 로드 시 stale state 대신 `bgPartialContentRef.current`를 fallback으로 사용해 DB 저장 partial과 화면 버블 병합 기준을 일치시켰다.
+  - 조치: `gotFinal` 런타임 참조 혼선을 제거하기 위해 전송/재생성 완료 플래그를 각각 `streamGotFinal`, `regenGotFinal`로 분리했다.
+  - 검증: `npx eslint src/app/chat/page.tsx` 에러 0건, 기존 경고 21건. `npx tsc --noEmit --pretty false`는 기존 타입 오류 5건으로 실패했으며 이번 패치 라인 신규 오류는 확인되지 않았다.
+
+## 최근 운영 변경사항 (2026-05-08)
+
+- AADS 채팅 SSE 끊김 P0 조치를 운영 반영했다.
+  - nginx `/api/v1/` HTTP/HTTPS location에서 `proxy_next_upstream`을 `off`로 변경해 Chat SSE 스트림이 blue/green upstream 재시도 중 `done` 이벤트 없이 끊기는 경로를 차단했다.
+  - 실제 운영 파일 `/etc/nginx/conf.d/aads.conf`에 반영 후 `nginx -t`와 `systemctl reload nginx`를 완료했다.
+  - 대시보드 `src/hooks/useChatSSE.ts`의 `stream-resume` 경로에서 `resume_done/done` 없이 스트림이 닫히면 `isStreaming=true`가 남던 문제를 막고 기존 retry/pollFallback 경로로 넘어가게 했다.
+  - `bash /root/aads/aads-dashboard/deploy.sh` blue-green 배포 완료. 활성 슬롯은 `green`, `aads-dashboard-green` healthy.
+  - 검증: `npm run build` 통과, `https://aads.newtalk.kr/api/v1/health` 정상, `https://aads.newtalk.kr/login` 200 OK, nginx active.
+
 ## 최근 운영 변경사항 (2026-04-29)
 
+## 최근 운영 변경사항 (2026-05-03)
+
+- AADS Pipeline Runner의 프로젝트당 동시 실행 상한을 `3 -> 6`으로 상향했다.
+  - 활성 유닛: `/etc/systemd/system/aads-pipeline-runner.service`
+  - 리포 템플릿: `scripts/aads-pipeline-runner.service`
+  - 러너 기본값: `scripts/pipeline-runner.sh`
+  - 문서 반영: `docs/knowledge/CTO-SYSTEM-MAP.md`, `docs/pipeline-runner/PIPELINE-RUNNER-ARCHITECTURE.md`, `docs/pipeline-runner/PIPELINE-RUNNER-API-REFERENCE.md`
+  - 적용 기준: `MAX_CONCURRENT_GLOBAL=10`, `MAX_CONCURRENT_PER_PROJECT=6`, `RUNNER_PROJECTS=AADS`
+  - 후속 조치: `systemctl daemon-reload && systemctl restart aads-pipeline-runner.service` 후 `systemctl show ... Environment`로 실측 검증
+
+- 채팅창 버블 깜빡임/임시 사용자 메시지 일시 소실 원인을 프론트 상태 병합 레이스로 확인하고 P0 패치를 적용했다.
+  - 변경 파일: `aads-dashboard/src/app/chat/page.tsx`, `aads-dashboard/src/app/chat/types.ts`
+  - 핵심: `/chat/messages` 폴링 또는 `streaming-status.just_completed` 후 DB 메시지가 도착해도 `tmp-*`, `ai-*`, `stopped-*` 임시 메시지를 일괄 삭제하지 않는다.
+  - 같은 role/content 또는 최신 assistant placeholder 매칭이 확인된 경우에만 서버 메시지로 교체한다.
+  - 서버 메시지의 실제 `id`는 유지하고, React DOM 안정화용 `render_id`를 별도 보관해 placeholder→최종 응답 전환 시 key 깜빡임을 줄인다.
+  - 검증: `npm run build` 통과. `npm run lint`와 `npx tsc --noEmit`은 기존 admin/chat/lib 누적 오류로 실패했으며, 이번 변경 지점의 `git diff --check`는 통과했다.
+  - 주의: 대시보드 워크트리에는 이 패치 외 기존 미커밋 변경(`src/app/settings/page.tsx`, `src/components/settings/LlmRegistryWorkspacePanel.tsx`, `tsconfig.tsbuildinfo` 등)이 남아 있다.
 - AADS 대시보드에 Android 스마트폰 에이전트 설치 진입점을 반영했다.
   - 신규 페이지: `aads-dashboard/src/app/ops/mobile-agent/page.tsx`
   - 사이드바 메뉴: `/ops/mobile-agent` Mobile Agent 추가
@@ -1104,6 +1159,63 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - WebSocket 인증을 기존 `PC_AGENT_TOKEN` fallback + `device_pairing_tokens` 기반 검증으로 확장.
 - `device_sdk`/`device_manager` 시간 필드를 timezone-aware UTC로 보정.
 - APK 빌드 스크립트: `android_agent/build_debug_apk.sh`. 현재 서버 산출물: `android_agent/dist/aads-agent-debug.apk` 생성 완료.
+
+## 2026-04-30 채팅 버블 깜빡임 개선 대시보드 배포
+
+- `/root/aads/aads-dashboard/src/app/chat/page.tsx`, `src/app/chat/types.ts`의 메시지 병합 안정화 패치를 대시보드 blue-green 배포로 반영.
+- `bash /root/aads/aads-dashboard/deploy.sh` 실행: green 슬롯 빌드, 내부 `/login` 헬스, nginx upstream 3101 전환, 외부 `/login` 헬스 통과.
+- 배포 후 `https://aads.newtalk.kr/chat`는 307 로그인 리다이렉트 정상, `/api/v1/health`는 `status=ok`, `graph_ready=true` 확인.
+- Next.js production build는 성공. 전체 `npm run lint`는 저장소 기존 누적 ESLint 위반 315건으로 실패했으며, 이번 배포 차단 요인은 아님.
+
+## 2026-04-30 서버114 Cross-Monitor 디스크 100%/HTTP-health 실패 조치
+
+- 증상: Telegram `[CROSS-MONITOR Core(68)] Exec(114) 심각` 알림. 실측 시 서버114 `/dev/sda3`가 `875G/875G, Use% 100%`, Docker buildkit도 `no space left on device` 발생.
+- 원인: `/usr/local/bin/newtalk_backup.sh`가 02:05 KST부터 `rsync -azx --delete /home/danharoo/www/data/ /backup/images/20260430/`를 루트 파티션 `/backup`에 수행해 불완전 이미지 백업 181G를 생성.
+- 즉시 조치: 실행 중인 `newtalk_backup.sh`/`rsync` 프로세스 종료, `/backup/images/20260430` 불완전 백업 제거, `/backup/autoda_db_bak_20260124.sql` 8.6G를 11T 마운트의 `_server_backups/newtalk/mysql/`로 이동.
+- 재발 방지: `newtalk_backup.sh`의 `BACKUP_BASE_DIR`를 `/home/danharoo/www/data/files/goods/goodscode/_server_backups/newtalk`로 변경, `flock` 중복 실행 잠금 추가, 이미지 백업 대상이 루트 파티션이면 건너뛰는 가드 추가. 원본 백업: `/usr/local/bin/newtalk_backup.sh.bak_20260430_0735`.
+- HTTP-health 원인: AADS 컨테이너에서 `https://newtalk.kr/` 기본 curl 요청은 Cloudflare 403으로 실패. `monitored_services`의 `newtalk-v2` check_target을 `https://v2.newtalk.kr/`로 교정하고 실패 카운트 0으로 초기화.
+- 검증: 07:45 KST 기준 서버114 monitored_services `mysql/newtalk-v2/nginx` 모두 `ok`, `/dev/sda3`는 `686G/875G, Use% 80%`, `https://v2.newtalk.kr/`는 AADS 컨테이너 기준 HTTP 307 정상.
+
+## 2026-04-30 aads-redis 자동복구 성공 오알림 차단
+
+- 증상: Telegram에 `자동복구 성공 / 서비스: 68:aads-redis / 명령: docker restart aads-redis / 결과: Restart blocked for aads-redis (use external watchdog)` 알림이 반복됨.
+- 원인: AADS 내부 `unified_healer.py`가 보호 컨테이너 restart 차단을 `success=True`로 반환해 실제 재시작 없이 성공 알림을 보낼 수 있었음.
+- 즉시 조치: 운영 DB `monitored_services`의 `68:aads-redis` `auto_recovery_command`를 `NULL`로 변경해 현재 실행 중인 Healer가 Redis 내부 재시작을 더 이상 시도하지 않도록 차단.
+- 코드 조치: `/root/aads/aads-server/app/services/unified_healer.py`에서 보호 컨테이너 차단 결과를 `success=False, blocked=True`로 반환하고, `blocked` 결과는 텔레그램 성공/실패 알림 없이 warning 로그만 남기도록 패치.
+- 검증: Redis `PONG`, Docker health `healthy`, `monitored_services.consecutive_failures=0`, `python3 -m py_compile app/services/unified_healer.py` 통과, `bash scripts/reload-api.sh` hot-reload 성공(53개 모듈 재로드), 30초 이상 모니터링 후 `Restart blocked` 재발 없음. API health blue/green 모두 `status=ok`.
+- 주의: 반복 알림 차단은 DB 변경으로 즉시 반영됐고, 코드 패치도 hot-reload로 런타임 반영 완료. Redis 실제 장애 복구는 호스트 cron `/root/aads/aads-server/watchdog-host.sh` Layer 0가 담당.
+
+## 2026-04-30 Telegram 반복 알림 추가 소음 차단
+
+- 재확인: Redis 컨테이너는 `Up 9 days (healthy)`, DB `monitored_services` 기준 `68:aads-redis`는 `ok`, `consecutive_failures=0`, `auto_recovery_command=NULL`.
+- 확인: `alert_history`, `error_log`, `recovery_log`에는 최근 Redis 관련 신규 이력 0건. Docker `aads-server`/`aads-server-green` 런타임 모두 `unified_healer` 보호 컨테이너 차단 패치와 `redis_connection_error` 매핑 제거가 반영됨.
+- 추가 조치: 2026-03-01부터 떠 있던 고아 `uvicorn app.main:app --port 18080` 프로세스(PID 22500)를 종료. 해당 프로세스는 nginx upstream에 연결되지 않은 관리 밖 API로, 오래된 APScheduler 루프를 돌릴 가능성이 있었음.
+- 소음 저감: `/root/aads/aads-server/watchdog-host.sh`의 `stale placeholder N건 자동 정리`는 CEO 조치가 필요 없는 루틴 정리라 Telegram `notify` 대신 syslog `logger`만 남기도록 낮춤.
+- 추가 소음 차단: `/usr/local/bin/newtalk_claude_monitor.py`의 디스크 경고 기준을 `>85%`에서 `>=90%`로 조정해 현재 `/` 87% 상태가 30분마다 Telegram 경고 후보가 되지 않도록 cross-monitor 기준과 맞춤.
+- 검증: `bash -n watchdog-host.sh` 통과, `python3 -m py_compile /usr/local/bin/newtalk_claude_monitor.py` 통과, `ss -ltnp` 기준 `:18080` 리스너 제거, 운영 API는 `:8100/:8102` Docker 슬롯만 리스닝.
+
+## 2026-05-03 runner_response 채팅 미표시 직접 조치
+
+- 증상: 최근 AI 검수/상태 보고 응답이 `chat_messages`에는 저장되지만 채팅 본문에서 보이지 않음.
+- 원인: 백엔드 `list_messages`/`list_messages_cursor`가 `intent='runner_response'`를 자동 메시지로 제외했고, 대시보드 `src/app/chat/page.tsx`도 같은 intent를 로그 탭 전용 시스템 메시지로 분류해 본문 렌더링에서 숨김.
+- 조치: `app/services/chat_service.py`, `app/routers/chat.py`, `/root/aads/aads-dashboard/src/app/chat/page.tsx`에서 `runner_response`를 일반 assistant 보고로 표시하도록 필터를 조정. `pipeline_c`, `system_trigger`, `auto_reaction`, Pipeline Runner 자동 알림 패턴은 계속 숨김.
+- 반영: `aads-api` supervisor 재시작 완료. 대시보드 `bash /root/aads/aads-dashboard/deploy.sh` blue-green 배포 완료, 활성 슬롯 green.
+- 검증: `py_compile` 통과, `npm run build` 통과, 배포 스크립트 내부/외부 `/login` 헬스 통과, QA `UNKNOWN` 응답(실패 아님). DB 기준 최신 `runner_response`는 2026-05-03 20:51:50 KST, 서비스 함수 기준 `list_messages`/cursor 각각 최근 20건 중 11건 반환 확인. 헬스체크가 있는 AADS 핵심 컨테이너는 healthy.
+
+## 2026-05-11 AADS 바이브코딩 디자인 서비스 자료조사
+
+- CEO 지시로 GitHub/공식문서/논문 기반 AI 바이브코딩 디자인 서비스 자료를 조사하고 상세 보고서 저장 완료.
+- 저장 문서: `design/AADS-VIBE-CODING-DESIGN-SERVICE-RESEARCH-20260511.md`
+- 핵심 결론: AADS 디자인 서비스는 `Artifact-first + Figma-optional` 구조로 시작하고, `DESIGN.md`, skill-driven design workflow, component registry, visual QA, provenance 저장을 MVP 핵심으로 둔다.
+- 추천 실행안: A안 즉시 MVP 구현. `/design` 또는 `/studio/design`에서 brief → direction → sandbox preview → visual QA → Runner 지시 변환까지 구현한다.
+
+## 2026-05-19 채팅 스트리밍 신뢰성 P0/P1 조치
+
+- CEO 지시로 P0-3/P0-4, P1-5~9, P2/P3 개선 작업을 Pipeline Runner에 투입하고 결과를 확인.
+- 확인 결과 `runner-13e6b015`의 stale placeholder DB 재시도 패치는 deploy timeout 이후 현재 작업트리에 유지되지 않아 직접 복구.
+- 직접 조치: `app/services/chat_service.py`에 producer finally DB 최종화 재시도(`0.5s/1.0s/2.0s`), completed/interrupted 상태 보정 재시도, placeholder 삭제 재시도, disconnect 후 content 길이 변화 없을 때 중간 저장 스킵을 반영.
+- 검증: 컨테이너 내부 `python -m py_compile /app/app/services/chat_service.py` 통과, 호스트 `python3 -m py_compile app/services/chat_service.py` 통과, `git diff --check` 통과.
+- 배포 상태: `aads-server`는 `/app/app` 바인드 마운트 구조라 파일 변경은 컨테이너에서 즉시 확인됨. `aads-dashboard`는 최신 프론트 커밋 컨테이너가 healthy이나 러너 기록에는 nginx upstream 검증 실패/timeout이 남아 후속 배포 정리가 필요.
 
 ---
 
