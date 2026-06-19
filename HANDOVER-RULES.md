@@ -447,8 +447,8 @@ subagents: [research, review]
 |----------|------|------|---------|-----------|
 | AADS | 68 | Claude | /root/aads | LLM 15회/작업 이하, langgraph-supervisor 금지, Supabase 직접연결(5432) |
 | SF | 114 | Cursor/Claude | /data/shortflow | gemini-2.0-flash 금지(404), OAuth 비공개, 업로드 private 유지 |
-| GO100 | 211 | Cursor | /root/kis-autotrade-v4 | V4.1 immutable, strategy-cards CEO 승인 |
-| KIS | 211 | Cursor | /root/kis-autotrade-v4 | GO100 동일 서버/제약 |
+| GO100 | contabo14 / 5.104.86.14 | Cursor | /root/kis-autotrade-v4 | V4.1 immutable, strategy-cards CEO 승인, legacy 211 폐지 예정 |
+| KIS | 211 | Cursor | /root/kis-autotrade-v4 | GO100과 더 이상 동일 운영 서버로 단정 금지 |
 | NTV2 | 114 | Claude | /srv/newtalk-v2 | Laravel 12, Docker 재시작 제한, rfree-009(114.207.244.86) |
 | NAS | Cafe24 | Claude | /root | claudebot만 허용, Flask/FastAPI |
 
@@ -460,7 +460,7 @@ subagents: [research, review]
 |----------|----------------|----------------|------|
 | AADS | https://www.genspark.ai/agents?id=3d86d6f3-09a7-41b2-b91b-762a55512458 | AADS-xxx | 68 |
 | KIS | https://www.genspark.ai/agents?id=77de652f-ca8c-4edb-b841-4ca3726b7bb4 | KIS-xxx | 211 |
-| GO100 | https://www.genspark.ai/agents?id=167071cf-c8b5-476a-8953-6168dd6c910c | GO100-xxx | 211 |
+| GO100 | https://www.genspark.ai/agents?id=167071cf-c8b5-476a-8953-6168dd6c910c | GO100-xxx | contabo14 |
 | SF | (CEO 확인 필요) | SF-xxx | 114 |
 | NTV2 | (CEO 확인 필요) | NT-xxx | 114 |
 | NAS | (CEO 확인 필요) | NAS-xxx | Cafe24 |
