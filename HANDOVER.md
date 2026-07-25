@@ -1,5 +1,5 @@
 # AADS HANDOVER v15.8
-최종 업데이트: 2026-06-02 | 버전: v15.8 — NTV2 V1 상품저장 타임아웃 복구 + E2E 자격증명 체계
+최종 업데이트: 2026-07-20 | 버전: v15.8 — 냉면 식품 유형 및 제조방법 설명서 제출문서 추가
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -25,6 +25,35 @@
 
 
 ## 최근 운영 변경사항 (2026-06-02)
+
+- **Claude Opus 5 전체 반영 완료** (2026-07-25 18:55 KST)
+  - 출시된 Claude Opus 5 (model_id: claude-opus-5)를 AADS 전 계층에 반영했다.
+  - 백엔드: model_selector.py alias, model_registry.py 런타임 매핑, chat_service.py 기본모델, pipeline_runner.py XL 라우팅 (커밋 c57a2bbf, 122bcffb → origin/main 푸시 완료)
+  - 대시보드: ModelSelector.tsx MODEL_OPTIONS + CHAT_MODEL_OPTIONS에 Opus 5 추가 (커밋 f22ac7b → origin/main 푸시 완료, 컨테이너 리빌드 완료)
+  - DB: llm_models 테이블에 claude-opus-5 INSERT (is_active=true)
+  - 러너: XL 사이즈 작업 시 claude-opus-5 자동 배정
+  - 배포: aads-server-green Hot-Reload 적용, aads-dashboard 컨테이너 리빌드 (3100 활성)
+  - 비용: Opus 4.8과 동일 ($15/MTok 입력, $75/MTok 출력) — 비용 변동 없음
+- **냉면 식품의 유형 및 제조방법 설명서 제출문서 생성** (2026-07-20 09:28 KST)
+  - CEO 요청으로 식품 영업신고 첨부용 냉면 제조방법설명서를 A4 1장 HTML/PDF 문서로 생성했다.
+  - 저장 파일: `aads-server/app/static/reports/20260720_naengmyeon_manufacturing_method_statement.html`, `aads-server/app/static/reports/20260720_naengmyeon_manufacturing_method_statement.pdf`.
+  - 공개 복사본: `aads-dashboard/public/static/reports/20260720_naengmyeon_manufacturing_method_statement.html`, `aads-dashboard/public/static/reports/20260720_naengmyeon_manufacturing_method_statement.pdf`.
+  - 검증: 로컬 `http://127.0.0.1:8102/static/reports/...` HTML/PDF 200 OK, 외부 `https://fb.newtalk.kr/static/reports/...` HTML/PDF 200 OK.
+  - PDF 검증: `pypdf` 기준 1 page, MediaBox 210.0mm x 297.0mm, 본문에 `냉면`, `식품의 유형`, `제조방법`, `작성자` 포함.
+  - 커밋: `aads-server` HEAD `625a8e24 docs: add naengmyeon manufacturing statement`. 현재 `main...origin/main [ahead 30]`라 원격 push는 미완료.
+  - 주의: `aads.newtalk.kr/static/reports/...`는 현재 404이며 검증된 다운로드 경로는 `fb.newtalk.kr/static/reports/...`이다.
+
+- **AADS Kling 유료 API 실사용 테스트 완료** (2026-06-08 09:57 KST)
+  - CEO가 Kling 유료 결제 완료 후 실제 과금 테스트를 요청했다.
+  - DB 활성 Kling 키 2개를 사용해 이미지/영상 생성 경로를 검증했다.
+  - 이미지 job `media-943520858efe43d3`: `provider=kling`, `model_id=kling-v2-1`, `provider_task_id=892762005612924976`, `provider_status=succeed`, `provider_final_unit_deduction=4`, `result_uri` 저장 완료.
+  - 영상 job `media-f15088f6f0324860`: 최초 `kling-v2`는 현재 계정에서 `code=1201, model is not supported`로 실패했으며, `kling-v1` route를 추가한 뒤 `provider_task_id=892762631793152018`, `provider_status=succeed`, `provider_final_unit_deduction=1`, `result_uri` 저장 완료.
+  - 영상 결과 다운로드: AADS 서버 컨테이너 내부 `/tmp/aads-media/videos/media-f15088f6f0324860.mp4`, `video/mp4`, `4,317,207 bytes`.
+  - DB route 상태: `model_routing_preferences(route_key='video', provider='kling', model_id='kling-v1')` 활성화 완료, `llm_models(provider='kling', model_id='kling-v1')` verified/selectable 상태.
+  - 코드 보강: `app/services/media_generation_service.py`에서 Kling HTTP 4xx/5xx 응답 본문을 `ValueError`에 보존하도록 패치했다.
+  - 신규 migration: `aads-server/migrations/104_kling_v1_video_route.sql`로 Kling v1 video route를 멱등 등록한다.
+  - 검증: `docker exec aads-server pytest -q tests/unit/test_media_generation_service.py tests/unit/test_media_generation_tools.py` 결과 `20 passed, 16 warnings`.
+  - 주의: 2026-06-08 09:57 KST 기준 위 코드/migration은 로컬 워크트리에 미커밋 상태이며, 배포/푸시는 별도 승인 후 수행해야 한다. DB route는 이미 운영 DB에 적용되어 실사용 테스트가 성공했다.
 
 - **NTV2 V1 상품저장 타임아웃 장애 복구** (서버 114, PHP 7.4 FPM)
   - 증상: 상품수정 저장 시 "처리중" 모달이 무한 대기, 5분+ 소요 후 실패
@@ -324,11 +353,21 @@ CEO 채팅 → intent_router(pipeline_runner) → chat_service(AutonomousExecuto
 
 ## 서버 현황 (3대 전체)
 
+### contabo14 (5.104.86.14)
+- 역할: GO100 백억이 운영 서버
+- 위치/OS: Contabo Tokyo / Ubuntu 24.04
+- IPv6: 2400:d320:2338:1565::1
+- 주요 서비스: go100, go100-frontend, PostgreSQL 16, Redis, Nginx
+- 담당 프로젝트: GO100
+- WORKDIR: /root/kis-autotrade-v4
+- 운영 상태: 2026-06-19 KST 이전 완료. go100.newtalk.kr Cloudflare origin은 5.104.86.14 기준.
+- 주의: GO100 기준 legacy 서버211은 폐지 예정이므로 신규 GO100 작업/배포/점검은 contabo14를 우선한다.
+
 ### 서버 211 (211.188.51.113)
-- 역할: Hub 서버 (Bridge, auto_trigger, pipeline_monitor)
+- 역할: legacy 서버
 - OS: Ubuntu
 - 주요 서비스: bridge.py, auto_trigger.sh, pipeline_monitor, session_watchdog, meta_watchdog
-- 담당 프로젝트: KIS, GO100
+- 담당 프로젝트: KIS 중심. GO100은 contabo14로 이전 완료 및 폐지 예정.
 - WORKDIR: /root/kis-autotrade-v4
 
 ### 서버 68 (68.183.183.11)
@@ -663,7 +702,7 @@ Claude 코드 수정 → QA 에이전트(test-writer) → 디자인 에이전트
 ## AADS-165 CEO Chat 크로스 프로젝트 코드 접근 + 실행 검증 (2026-03-08)
 - **C+ 하이브리드 3단계**: 1단계 SSH 즉시 정적 분석 → 2단계 claudebot 지시서 위임 → 3단계 서브에이전트 프로파일
 - **SSH 원격 도구 2개** (ceo_chat_tools.py): `list_remote_dir`, `read_remote_file`
-  - 프로젝트-서버 매핑: KIS→211, GO100→211, SF→114, NTV2→114
+  - 프로젝트-서버 매핑: KIS→211, GO100→contabo14(5.104.86.14), SF→114, NTV2→114
   - 보안: 명령 인젝션 차단, 민감 파일 차단, WORKDIR 탈출 차단, 10초 타임아웃, 50KB 제한
 - **Intent Classifier 확장** (10→12분류): `execution_verify` 인텐트 추가
   - 프로젝트명 + QA 키워드 조합 → qa 인텐트 (예: "KIS 백테스트 검수" → qa)
@@ -783,7 +822,7 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 
 ## AADS-181 전체 프로젝트 통합 작업 현황 API + /tasks 페이지 실시간 연동 (2026-03-08)
 
-- **server_registry.py** 신규: 3서버(68/211/114) 접근정보 레지스트리 + 프로젝트 매핑 (AADS→68, KIS/GO100→211, SF/NTV2/NAS→114)
+- **server_registry.py** 신규: 서버 접근정보 레지스트리 + 프로젝트 매핑 (AADS→68, KIS→211, GO100→contabo14, SF/NTV2/NAS→114)
 - **cross_server_checker.py** 신규: 크로스서버 디렉티브 스캐너
   - 서버 68: 로컬 파일 직접 스캔, 서버 211/114: SSH 일괄 스캔 (실패 시 method=ssh_failed)
   - 30초 TTL 캐싱 (반복 SSH 방지), asyncio.gather 병렬 3서버 동시 스캔
