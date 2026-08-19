@@ -26,6 +26,15 @@
 
 ## 최근 운영 변경사항 (2026-06-02)
 
+- **매장비서 중화점 배민 PC Agent 수집 성공 및 로그인 화면 보정** (2026-08-19 12:23 KST)
+  - CEO 요청으로 중화점 판매채널 즉시 수집을 운영 DB/API 기준으로 실행했다.
+  - 중화점 판매채널 계정은 `biz-junghwa`/`중화점`, 사용자 `yunhee1` 기준으로 배민·쿠팡이츠·요기요·땡겨요 4개가 저장되어 있음을 확인했다. 비밀번호 원문은 출력/보고하지 않았다.
+  - 서버 직접 수집 결과: 배민/쿠팡이츠는 포털 보안 정책상 서버 자동접속 차단, 요기요는 로그인 후 조회 row 0건, 땡겨요는 추가 인증 요구로 분리됐다.
+  - PC Agent 브라우저 세션 `bb-ff7296b1654a`로 배민 수집을 재실행해 `sales=1`, `settlements=1`, `reviews=288` 응답 성공을 확인했다. DB dedupe 후 중화점 리뷰 원장 row는 172건으로 확인됐다.
+  - 코드 보강: `aads-server/app/services/yeoljeong_finance_service.py`에서 배민 PC Agent 세션이 로그인 화면이면 저장된 계정 비밀번호를 로그/응답에 노출하지 않고 브라우저 컨텍스트 안에서만 입력한 뒤 기존 대시보드 파싱 경로를 계속 타도록 보정했다.
+  - 검증: `docker exec aads-server pytest tests/unit/test_yeoljeong_finance_service.py::test_sync_delivery_uses_baemin_pc_agent_session_without_password tests/unit/test_yeoljeong_finance_service.py::test_baemin_dashboard_records_extracts_home_summary tests/unit/test_yeoljeong_finance_service.py::test_sync_delivery_uses_service_label_for_upload_required_message tests/unit/test_yeoljeong_finance_service.py::test_sync_delivery_uses_service_label_for_credential_required_message` 결과 4 passed.
+  - 주의: 쿠팡이츠·요기요·땡겨요의 PC Agent 브라우저 파싱 커넥터는 아직 미구현이다. 세 포털의 정상 자동수집은 로그인된 PC 세션 기반 커넥터 추가 또는 CSV/엑셀 업로드 경로가 필요하다.
+
 - **Claude Opus 5 전체 반영 완료** (2026-07-25 18:55 KST)
   - 출시된 Claude Opus 5 (model_id: claude-opus-5)를 AADS 전 계층에 반영했다.
   - 백엔드: model_selector.py alias, model_registry.py 런타임 매핑, chat_service.py 기본모델, pipeline_runner.py XL 라우팅 (커밋 c57a2bbf, 122bcffb → origin/main 푸시 완료)
