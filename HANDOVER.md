@@ -1,5 +1,5 @@
 # AADS HANDOVER v15.8
-최종 업데이트: 2026-07-20 | 버전: v15.8 — 냉면 식품 유형 및 제조방법 설명서 제출문서 추가
+최종 업데이트: 2026-08-31 | 버전: v15.8 — 서버 성능 카드 및 PowerShell SSH 접속 보강
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -25,6 +25,25 @@
 
 
 ## 최근 운영 변경사항 (2026-06-02)
+
+- **AADS 서버 성능 카드 및 CEO PC PowerShell SSH 접속 보강** (2026-08-31 13:23 KST)
+  - CEO 요청으로 `https://aads.newtalk.kr/ops/servers`의 3서버 카드에 실제 성능값을 표시하도록 보강했다.
+  - 백엔드 `aads-server/app/api/ops.py`: 원격 9090 헬스 서버가 없거나 응답하지 않을 때 `free -m`, `/proc/meminfo`, `df -h /`, `uptime`, `/proc/loadavg` 기반 SSH/로컬 폴백으로 메모리, 디스크, load 값을 반환한다.
+  - PC Agent `aads-server/app/services/pc_agent_manager.py`: Windows PowerShell 명령을 UTF-16LE `-EncodedCommand`로 전달해 파이프, 세미콜론, 한글 메시지가 깨지지 않도록 보정했다.
+  - 대시보드 `aads-dashboard/src/app/ops/servers/page.tsx`: 카드 fetch에 Bearer 토큰을 붙이고, SSH 폴백 응답 필드를 파싱하며, 서버별 `ssh -p {port} root@{host}` PowerShell 실행 버튼을 추가했다.
+  - 추가 보정: SSH 폴백 응답이 5초를 넘길 때 카드가 false critical로 떨어지지 않도록 서버 카드 fetch timeout을 20초로 늘리고, fetch 실패 상태는 `unknown`으로 표시한다. 카드에서 여는 PowerShell 창 내부 명령도 `-EncodedCommand`로 실행한다.
+  - 운영 실측: `contabo116` disk 85%, memory 24.5%, load 9.98, status warning; `contabo14` disk 52%, memory 41.6%, load 12.15, status ok; `cafe24_114` disk 89%, memory 18.1%, load 2.91, status warning.
+  - 검증: `npx eslint src/app/ops/servers/page.tsx` 통과, `npm run build` 통과, 운영 API `/api/v1/ops/server-health/{contabo116,contabo14,cafe24_114}` 인증 호출 성공, `oby-ceo` PC Agent PowerShell 파이프 명령 exit 0.
+  - 커밋: 서버 `5d639e84 fix(ops): add server performance fallback and powershell routing`, 대시보드 `53e804b fix(ops): show server performance and powershell access`, 후속 대시보드 timeout/encoded command 보정 커밋은 별도 기록한다.
+
+- **AADS 채팅 resume 실패 이벤트 화면 보존 패치** (2026-08-30 20:09 KST)
+  - CEO 지시 “권장조치 즉시 구현하고 E2E 검증 후 결과 보고” 이어받기 작업으로, 응답 생성이 완료되지 못한 상태에서 `stream-resume`이 `resume_unavailable`/`resume_timeout`/`resume_error`를 반환할 때 화면이 계속 “응답 작성 중”으로 남거나 버블이 사라질 수 있는 경로를 보강했다.
+  - 대시보드 실제 사용 경로 `aads-dashboard/src/app/chat/page.tsx`: attach replay 경로와 일반 send SSE 경로 모두에서 recoverable resume 실패 이벤트를 terminal 상태로 처리하도록 변경. 보존된 `full`/`streamBuf`/`bgPartialContent`를 `interrupted_partial` 버블로 남기고, `requestServerFinalization()` 폴링을 즉시 예약한다.
+  - 보조 훅 `aads-dashboard/src/hooks/useChatSSE.ts`: 미사용 경로지만 동일 이벤트를 처리하도록 맞춰 추후 훅 전환 시 같은 결함이 재발하지 않게 했다.
+  - 타입 계약 `aads-dashboard/src/services/chatApi.ts`: 서버가 이미 보내는 resume 실패 이벤트와 `reason` 필드를 `SSEChunk`에 추가했다.
+  - 검증: `npx eslint src/hooks/useChatSSE.ts src/services/chatApi.ts src/app/chat/page.tsx` 오류 0건(기존 경고 20건), `npx tsc --noEmit` 통과. 전체 `npm run lint`는 기존 전역 부채 249 errors/63 warnings로 실패.
+  - E2E/폴백: 로컬 Next dev `http://localhost:3000` 기동 확인, `/chat`는 비로그인 기준 `/login?redirect=%2Fchat` 307, `/login?redirect=%2Fchat` 200 및 OHVIS 로그인 HTML 렌더 확인. Browser Bridge `browser_navigate`, `capture_screenshot`는 timeout되어 브라우저 캡처는 미검증, API/HTTP/헬스 검증으로 대체했다. AADS contabo116 헬스는 `HEALTHY`, DB latency 113~131ms, pipeline stalled 0.
+  - 배포/커밋 상태: 2026-08-30 20:09 KST 기준 로컬 패치만 완료. CEO 명시 승인 전이라 커밋/푸시/운영 배포는 미실행.
 
 - **매장비서 중화점 배민 PC Agent 수집 성공 및 로그인 화면 보정** (2026-08-19 12:23 KST)
   - CEO 요청으로 중화점 판매채널 즉시 수집을 운영 DB/API 기준으로 실행했다.
@@ -1264,6 +1283,43 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - 직접 조치: `app/services/chat_service.py`에 producer finally DB 최종화 재시도(`0.5s/1.0s/2.0s`), completed/interrupted 상태 보정 재시도, placeholder 삭제 재시도, disconnect 후 content 길이 변화 없을 때 중간 저장 스킵을 반영.
 - 검증: 컨테이너 내부 `python -m py_compile /app/app/services/chat_service.py` 통과, 호스트 `python3 -m py_compile app/services/chat_service.py` 통과, `git diff --check` 통과.
 - 배포 상태: `aads-server`는 `/app/app` 바인드 마운트 구조라 파일 변경은 컨테이너에서 즉시 확인됨. `aads-dashboard`는 최신 프론트 커밋 컨테이너가 healthy이나 러너 기록에는 nginx upstream 검증 실패/timeout이 남아 후속 배포 정리가 필요.
+
+## 2026-08-20 C안 프로젝트 별칭 레이어 직접 조치
+
+- CEO 지시로 권장 C안(내부 프로젝트 키 유지 + 표시명/별칭 레이어)을 중단 지점부터 직접 복구.
+- 서버 반영: `app/core/project_config.py` 별칭 레이어는 커밋 `eb4762d6`으로 원격 반영 확인. 후속으로 `app/services/chat_service.py`, `migrations/124_chat_workspaces_project_key.sql`, `migrations/125_project_label_normalization.sql`을 커밋 `7507d817`로 `aads-server/main`에 푸시.
+- DB 반영: `chat_workspaces.project_key` 컬럼/인덱스 존재 확인, 57/57 워크스페이스 백필 확인. `memory_facts` 대괄호 표시명 2,895건과 `project_tasks` legacy display name 194건을 백업 테이블 `project_label_normalization_backup_20260820`에 기록 후 정규화.
+- 대시보드 반영: `src/app/chat/page.tsx`, `src/app/chat/types.ts`, `src/services/chatApi.ts`에서 top-level `workspace.project_key`를 우선 사용하도록 커밋 `49e4b15`을 `aads-dashboard/main`에 푸시.
+- 검증: AADS 컨테이너 기준 `tests/unit/test_project_config_alias.py tests/unit/test_tools_and_pipeline.py` 94 passed, 대시보드 `npx tsc --noEmit` 통과, 변경 파일 eslint 오류 0건. 전체 dashboard lint는 기존 누적 오류로 실패.
+- 배포 상태: 코드/DB/원격 푸시는 완료. 런타임 blue-green 배포는 main worktree의 다른 작업 dirty 및 FOOD 러너 승인 대기 때문에 보류.
+
+## 2026-08-20 AADS 직접 docker compose 재발방지 가드 보강
+
+- CEO 지시로 P0~P2 후속 중 직접 구현 잔여분을 재개. 러너 6건은 `cancelled` 상태였고, 서버68 헬스는 정상으로 확인.
+- 확인 결과 `deploy.sh`의 `deploy_history.downtime_seconds` 기록, `scripts/container_watchdog.sh`, `scripts/container_watchdog_cron.sh`는 이미 파일/실행권한 기준 반영돼 있었음.
+- 추가 조치: `app/api/ceo_chat_tools.py`의 AADS `run_remote_command`가 `docker compose -f ... up -d`처럼 옵션이 subcommand 앞에 오는 명령도 파싱하도록 보강. 서비스명 없는 compose up, `--force-recreate`, compose down은 즉시 차단하고, 조회성 compose 명령은 `scripts/docker-compose-guard.sh`를 경유하도록 배선.
+- 추가 조치: `scripts/docker-compose-guard.sh` 자체도 옵션 위치와 무관하게 subcommand/service를 파싱하도록 보강. `up`은 `--no-deps <service>`가 없으면 차단하고, `AADS_COMPOSE_GUARD_DRY_RUN=true` 검증 모드를 추가.
+- 회귀 테스트: `tests/unit/test_tools_and_pipeline.py`에 compose 파서/차단/가드 스크립트 테스트를 추가.
+- 검증: `python3 -m py_compile app/api/ceo_chat_tools.py`, `bash -n scripts/docker-compose-guard.sh`, 가드 스크립트 직접 dry-run/차단 케이스 통과. 로컬 `pytest`는 패키지 부재로 미실행, 배포 후 컨테이너에서 재검증 필요.
+
+## 2026-08-21 AADS 채팅 이어쓰기 실패 P0 조치
+
+- CEO 지시로 세션 `45249276-83a1-42ca-b58d-d5f1737a388b`의 이어쓰기 실패/응답 버블 미노출 원인을 DB, 컨테이너 로그, 코드 기준으로 재조사.
+- 원인 1: active API 컨테이너가 부팅 직후 stale `/tmp/aads_execution_resume_owner` 값 때문에 `execution_resume_owner_resolved owner=false`로 판정되어 M-9 execution resume scanner가 비활성화될 수 있었음.
+- 조치 1: `app/main.py`의 startup self-heal을 "마커 없을 때만 생성"에서 "매 부팅 시 `/app/.active_container` 기준으로 `/tmp/aads_execution_resume_owner` 재동기화"로 변경.
+- 원인 2: 수동 `/chat/sessions/{session_id}/resume` 경로가 DB 업데이트는 `retry_count < 8`까지 허용하면서, 사전 검사는 `retry_count >= 5`를 대부분 거부해 과거 중단 응답의 수동 이어쓰기가 막힘.
+- 조치 2: `app/routers/chat.py`의 수동 resume 사전 검사를 8회 한도로 정렬하여 `retry_count=5~7`도 CEO 명시 수동 이어쓰기에서는 복구 가능하게 변경.
+- 운영 반영: `deploy_safe(mode=reload)`로 API hot reload 완료, post health OK. 해당 세션 최신 실행 8건은 completed, 최신 assistant 메시지는 `is_hidden=false` 확인. 최근 2분 `execution_resume_scan_skipped_inactive` 재발 없음.
+- 검증: `python3 -m py_compile app/main.py app/routers/chat.py` 및 컨테이너 `python -m py_compile app/main.py app/routers/chat.py` 통과. 컨테이너 pytest 82건 중 80 passed, 기존 tenant/messaging assertion 2건 실패는 이번 변경 범위 외.
+
+## 2026-08-26 AADS 대시보드 GO100 문서 딥링크 복구 배포
+
+- 증상: 채팅/문서 링크에서 `project=AADS&base_path=/app/docs&file_path=reports/GO100-...md`처럼 구형 AADS 문서 URL로 진입하면 실제 GO100 원격 문서를 열지 못할 수 있었음.
+- 조치: `aads-dashboard` 커밋 `5b323a4`에서 문서 링크 정규화와 `/docs` 딥링크 복원 로직을 보강. GO100/KIS/SF/NTV2 문서 힌트가 있는 구형 AADS 링크는 화면 진입 시 프로젝트와 base_path를 교정하도록 반영.
+- 배포: 2026-08-26 07:43~07:49 KST `bash /root/aads/aads-dashboard/deploy.sh` blue-green 배포 완료. 활성 슬롯은 `aads-dashboard-green:3101`, standby `aads-dashboard:3100`이며 두 슬롯 모두 `AADS_RELEASE_SHA=5b323a4badef`, Docker health `healthy`.
+- 검증: `npx tsc --noEmit`, 변경 파일 eslint, `npm run build`, 컴파일된 `documentLinks.selftest.js` 통과. 전체 `npm run lint`는 기존 전역 부채 249 errors/63 warnings로 실패했으나 이번 변경 파일 3개는 오류 0건.
+- 운영 확인: 외부 `/login` HTTP 200, 구형 `/docs?...` 비로그인 요청은 `/login?redirect=...` 307 후 200. E2E 토큰 기반 API 폴백에서 `GO100 + /root/kis-autotrade-v4/docs + reports/GO100-303-STRATEGY-CARD-FULL-SYNC-20260825.md` 문서 본문 1,272자 반환 확인.
+- 제한: Browser Bridge `browser_navigate`, `browser_connect`, `capture_screenshot`가 timeout되어 실제 로그인 화면 렌더 캡처는 미검증. API/HTTP/컨테이너 검증으로 대체함.
 
 ---
 
