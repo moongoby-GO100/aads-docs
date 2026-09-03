@@ -1,5 +1,5 @@
-# AADS HANDOVER v15.8
-최종 업데이트: 2026-08-31 | 버전: v15.8 — 서버 성능 카드 및 PowerShell SSH 접속 보강
+# AADS HANDOVER v15.9
+최종 업데이트: 2026-09-04 | 버전: v15.9 — FOOD 신한 자동수집 배포 및 재시도 결과
 
 ## 이 문서의 운영 원칙
 - 이 문서는 토큰 상한이 없다. 비용을 아끼지 말고 최신화하라.
@@ -25,6 +25,15 @@
 
 
 ## 최근 운영 변경사항 (2026-06-02)
+
+- **FOOD 신한 자동수집 배포 및 재시도 결과** (2026-09-04 06:13 KST)
+  - CEO 지시로 AADS API를 `deploy.sh bluegreen` 경로로 배포했다. 릴리스 커밋은 `16ba911adc1d88a41208dadcd308cf677ee0d678`이며 active `aads-server:8100`과 standby `aads-server-green:8102`가 모두 `aads-server:16ba911adc1d` 이미지와 동일 digest `sha256:1593c06df6e12ad88d14b25cc7c542e682e9fd9dd223c6c2e73c9b84ae4886b2`로 healthy 상태임을 확인했다.
+  - 배포 중 active stream 대기 구간은 CEO 승인에 따라 `AADS_DEPLOY_ALLOW_BUSY_TARGET=true`로 진행했다. 외부 `/health`는 로그인 보호로 `307 /login?redirect=%2Fhealth`를 반환하므로 내부 슬롯 `/health`로 배포 정상성을 검증했다.
+  - 신한 미아점 계좌 `9aa33cb9-5597-4f0d-ab0d-43146c35f318` 대상 재수집을 PC Agent `7f99c528-24d`, Browser Bridge `bb-d455e289af8f`, work key `yeoljeong-bank-shinhan-individual-00e6447fd39dad84`로 2회 실행했다.
+  - 수집 결과: PC Agent 연결, 신한 사이트 접속, 보안 프로그램 감지, 간편조회 페이지 진입, ID/PW 입력/제출 단계는 통과했으나 로그인 성공 마커가 관측되지 않아 `BANK_BROWSER_PC_AGENT_TIMEOUT`으로 종료됐다. `transactions.json` 원장 row는 0건, `imported_rows=0`, `collected_rows=0`이다.
+  - 화면 근거: Browser snapshot 기준 신한 페이지는 `https://bank.shinhan.com/rib/easy/index.jsp`의 `간편조회서비스` 안내 상태로 확인됐고, 거래내역 조회 화면은 아니었다.
+  - 운영 조치: 선행 쿠팡이츠 수집 프로세스가 로그인 pending 이후 정체되어 신한 재시도를 막고 있어 해당 child 프로세스만 종료하고 queue item을 `COLLECTOR_TERMINATED_FOR_BANK_RETRY` 실패 상태로 마감했다.
+  - 검증: active/standby `/health` 모두 `{"status":"ok","graph_ready":true,"version":"0.2.1"}`, 최근 10분 active API error/critical/Traceback 로그 매칭 0건, 자동수집 잔여 프로세스 0건.
 
 - **AADS 서버 성능 카드 및 CEO PC PowerShell SSH 접속 보강** (2026-08-31 13:23 KST)
   - CEO 요청으로 `https://aads.newtalk.kr/ops/servers`의 3서버 카드에 실제 성능값을 표시하도록 보강했다.
