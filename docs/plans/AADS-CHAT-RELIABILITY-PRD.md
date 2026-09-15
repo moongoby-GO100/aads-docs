@@ -284,3 +284,43 @@ CEO가 UI로 등록한 자격증명은 전부 앞쪽에 저장되는데, 실제�
   `errorReporter` 연결이 필요하나 `page.tsx` 를 다른 세션이 작업 중이다.
 - **`review_infra_failed`** — 자동 재실행된 러너 작업이 다시 실패하는 최대
   원인(12건 중 6건). 미조사.
+
+## 8. 승인 게이트 자동화 — "다음 단계" 를 카드로 (2026-09-15)
+
+**배경.** 보고서 끝의 "→ 다음 단계 1·2·3" 은 글자일 뿐이었다. 어디에도
+올라가지 않아 CEO가 매번 "진행해" 를 쳐야 다음이 돌았다. 2026-09-15 하루에만
+"다음단계 진행해" 계열 지시가 반복됐다(코드 주석 `next_step_proposals.py:4-8`).
+CEO 지시: "대안 다음진행사항을 승인게이트에 올려 내가 승인한 권한 범위면
+자동으로 다음단계를 실행될수 있게".
+
+**설계 — 막힌 카드와 분리한다.** `live_trading_guard` 카드는 "하려다 막혔다"
+(gate_source 기존값), 이 카드는 "이걸 할까요"(`gate_source='next_step'`)로
+나눈다. 화면에서 섞이면 회장님이 둘을 같은 것으로 보고 습관적으로 누르게 되고,
+그때 진짜 막아야 할 하나가 같이 통과한다. 이미 받아 둔 미션·골 승인이 그
+도구를 덮으면 카드를 만들지 않고 `auto` 로 돌려 같은 것을 두 번 묻지 않는다.
+
+**work_key 고정.** 같은 날 승인 재사용 불가 버그(파이썬 `hash()` 가 프로세스마다
+값이 달라짐, `c65319ee` 에서 실행 가드는 이미 수정)와 같은 원인을 반복하지
+않기 위해 `hashlib.sha1(title)` 로 키를 고정했다(`next_step_proposals.py:44-51`).
+
+**구현.**
+| 대상 | 내용 |
+|---|---|
+| `app/services/next_step_proposals.py` (신규, 222줄) | 제안을 `agent_permission_requests` 에 `gate_source='next_step'` 로 등록. 최대 5건(`MAX_STEPS`), 넘기면 안 읽고 누른다 |
+| `app/services/tool_registry.py` | `propose_next_steps` 스키마 등록 |
+| `app/services/tool_executor.py` | 디스패치 + 승인 커버 여부 판정(읽기 전용, 실행 시점 판정은 `live_trading_guard.is_approved()`) |
+
+**검증.**
+- 단위 테스트 64 passed (EXIT=0), 도구 정합성 게이트 통과(registry=135 / executor=142 / ceo_tools=83)
+- 배포 `#521`(release_sha `1496e89a17f5`), blue-green 정상 진행(`active_slot_drain` → `syncing_standby`, active_streams 드레이닝 후 컷오버)
+- 실제 호출 시연 2026-09-15 11:29 KST경 `propose_next_steps` 로 카드 2건 생성 확인: `6ef1b784-3816-4792-82a0-f25d85ac9c4b`, `90ecbbcc-582e-4ec7-b362-268b9b4fe2f8` [실측]
+
+**남은 것.**
+- `/approvals` 화면에는 아직 체크박스가 없다. 지금은 채팅 팝업에만 있다.
+- "실행 바인딩" — 카드 승인 시 제안된 조치를 실제로 자동 수행하는 경로는 별도
+  과제다. 지금은 카드가 올라가는 것까지이고, 수행은 다음 턴에서 사람이 다시
+  지시하거나 세션이 이어서 처리해야 한다.
+- 이 절은 09-15 오전 턴이 "PRD 10절 개정 완료"로 잘못 보고한 뒤 실제로는
+  aads-docs 원본에 반영되지 않았던 것을 뒤 턴에서 발견해 채운 것이다. 문서
+  갱신을 "완료"로 보고하기 전에는 정본 저장소(`aads-docs`) 파일과 git log 를
+  직접 확인해야 한다.
