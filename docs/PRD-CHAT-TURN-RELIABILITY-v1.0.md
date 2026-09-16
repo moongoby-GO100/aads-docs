@@ -6,7 +6,7 @@
 | 작성일 | 2026-09-16 (KST) |
 | 지시 | 대표님 — "채팅창 응답이 너무 느린데 원인 파악이 가능한가?" → "원인 규명우선 진행해" → "신규 생성한 채팅창도 응답을 못하는데" → "진행하고 오류기록하고 설계 PRD파일 작성저장하고 구현 배포진행해" |
 | 대상 | `aads-server` (`scripts/claude-docker-wrapper.sh`, `app/main.py`, `app/services/chat_service.py`, `app/routers/chat.py`) |
-| 오류 사전 | `chat.slot_credential_lock_starvation`, `chat.resume_scanner_epoch_loop`, `codex.refresh_token_reused` |
+| 오류 사전 | `chat.execution_never_reaped`, `chat.slot_credential_lock_starvation`, `chat.resume_scanner_epoch_loop`, `codex.refresh_token_reused` |
 
 ---
 
@@ -229,6 +229,124 @@ AND COALESCE(intent,'') NOT IN (
 | C1 | 추가지시 판정을 intent 기준으로 | `app/services/chat_service.py` | 배포 완료 |
 | C2 | 수거 SQL·정규식 접두 확장 | 〃, `app/routers/chat.py` | 배포 완료 |
 | C3 | 중복 차단 창·정규화 | `app/routers/chat.py` | 배포 완료 |
+
+---
+
+## 4-1. D — 버려진 실행이 수거되지 않음 (2026-09-17 추가)
+
+### 실측
+
+```
+세션 #310 전파동 사이클 — 답변 버블이 아예 안 나옴
+  06:37 사용자 메시지 → 실행 3e650f17
+        status=interrupted · assistant_message_id = NULL
+        → 그릴 것이 없어 버블 자체가 없었다
+
+같은 세션에 남아 있던 실행들의 나이
+  13.7h · 42.9h · 48.4h · 58.2h · 65.7h
+```
+
+한 실행의 재개 간격을 보면 성격이 드러난다.
+
+```
+attempt 1   09-16 17:19:36
+attempt 2   09-17 07:01:54   ← 13시간 42분 휴면
+attempt 3~13  6초 간격으로 폭주
+```
+
+### 원인 — 그물은 있었고, 이들만 그물을 빠져나갔다
+
+처음에는 "종결을 찍는 주체가 없다" 고 적었다. **틀렸다.** 검증 중에
+`stale_execution_watchdog` 이 90초마다 돌며 running/retrying 을 `interrupted`
+로 내리고 있는 것이 확인됐다 — 합성 행을 넣었더니 6분 만에 처리했다.
+
+빠져나간 이유는 워치독 후보 조회에 있다.
+
+```python
+_claimable = [r for r in candidates
+              if str(r["session_id"]) not in _active_sids]   # ← 여기
+```
+
+`_active_sids` 는 `_active_bg_tasks` — **프로세스 로컬 표**다. 재개 스캐너가
+5초마다 그 세션의 백그라운드 태스크를 새로 띄우면 세션은 영원히 "진행 중"
+으로 보이고, 워치독은 영원히 건너뛴다. 게다가 이 표는 슬롯이 바뀌면 비므로
+블루/그린 전환 뒤에는 근거 자체가 사라진다.
+
+실측이 이를 뒷받침한다.
+
+| 항목 | 값 |
+|---|---|
+| 살아남은 12건의 `watchdog_settled_without_retry` | **0건** (워치독이 손댄 적 없음) |
+| `owner_epoch` | 2 → 17 (반복 claim) |
+| `retry_count` | 0 ~ 2 (스캐너 경로는 이 값을 올리지 않는다 — B 참고) |
+
+재개 스캐너의 `updated_at > NOW()-2h` 창은 이들을 **조회에서 뺄 뿐** 종결
+시키지 않는다. 행은 `retrying` 인 채 살아 있다가 무언가 건드리면 되살아났다.
+
+### 설계 — 세 겹
+
+하나만으로는 또 샌다. 어제 스캐너 조회만 막았다가 다른 호출자가 2초 만에
+되살린 전례가 있다(B 참고).
+
+| # | 지점 | 내용 |
+|---|---|---|
+| 1 | 스캐너 조회 | `started_at` 기준 나이 상한. `updated_at` 은 재개 때마다 갱신돼 무력하다 |
+| 2 | `_claim_execution_lease` | 같은 상한. 조회를 막아도 소유권을 주면 되살아난다 |
+| 3 | 수거기 (5분 주기) | 오래되고 **멈춰 있는** `running`/`retrying` 을 **`cancelled`** 로 종결 |
+
+**`cancelled` 여야 한다.** `interrupted` 는 `_claim_execution_lease` 의 WHERE 에
+그대로 들어 있어 다시 집어간다.
+
+**`_active_bg_tasks` 로 거르지 않는다.** 그 표가 바로 이 사고의 사각지대다.
+대신 DB 에 남는 하트비트로 "정말 멈췄나" 를 본다.
+
+**수거 대상에 `interrupted` 를 넣지 않는다.** 전수로 잡으면 과거 기록
+5,580건(최고 145일)을 다시 쓰게 된다. 오래된 `interrupted` 의 부활은 2번이 막는다.
+
+**자리표시자는 지우지 않는다.** 내용이 있으면 `interrupted_partial` 로 살리고,
+없으면 안내 문구로 바꾼다. 지우면 대표님이 보시는 것이 정확히 이 절의 증상
+— "버블이 아예 안 나온다" — 이 된다.
+
+### 나이만으로 자르면 정상 턴을 죽인다
+
+처음 잡은 2시간은 **위험한 값이었다.** 검증 중 실측.
+
+```
+최근 30일 완료된 턴 4,284건
+  p99   77.4분
+  최대  289.5분 (4시간 50분)
+  2시간 초과 정상 완료  8건
+```
+
+2시간이면 이 8건을 잘랐다. 그런데 같은 8건을 다시 보면 답이 나온다.
+
+```
+실행시간 289.5분 → 하트비트 289.5분까지 갱신
+        218.2분 →         218.2분까지
+        213.8분 →         213.8분까지     (8건 전부 동일)
+```
+
+**살아 있는 하트비트가 곧 "진짜 일하는 중" 이다.** 그래서 수거 조건을 셋으로
+한다 — 셋 다 만족해야 자른다.
+
+```sql
+WHERE status IN ('running', 'retrying')
+  AND started_at < NOW() - ($1 * INTERVAL '1 hour')          -- 기본 6시간
+  AND (lease_expires_at IS NULL OR lease_expires_at < NOW())
+  AND COALESCE(heartbeat_at, updated_at, started_at)
+        < NOW() - ($2 * INTERVAL '1 minute')                 -- 기본 30분
+```
+
+운영 데이터로 확인: 나이 문턱을 **0시간**으로 낮춰 돌려도 현재 실행 중인 턴은
+하나도 걸리지 않는다(리스·하트비트가 살아 있으므로).
+
+두 곳이 `AADS_EXECUTION_MAX_AGE_HOURS`(기본 6) 하나를 같이 읽는다. 한쪽만
+바꾸면 수거되기 전에 되살아나는 창이 생긴다.
+
+### 회귀 방지
+
+`tests/unit/test_execution_lease_contract.py` 가 세 겹과 실측 기본값을 검사한다.
+기본값을 낮추려면 위 지속시간 실측부터 다시 해야 테스트가 통과한다.
 
 ---
 
