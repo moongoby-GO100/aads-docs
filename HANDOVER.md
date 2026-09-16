@@ -60,10 +60,18 @@
   - **배포 완료** (2026-09-16 KST): 릴레이 재기동, aads-server `86bde7dc` bluegreen
     (deploy_run_id=2534, P0/P1 모니터링 통과), 대시보드 배포.
     신규 라우트 5종 OpenAPI 등재 확인.
-  - **남은 것 — 대표님 조치 필요.** 이제 대시보드 설정>LLM 관리에서 버튼으로 진행하실 수 있다.
-    1. 코덱스 진아 계정 로그인: DB 의 refresh_token 이 `refresh_token_reused` 로 무효
-       (1회용·회전). 244 서버에서 현재 `auth.json` 재추출도 대안이다
-    2. 클로드 slot3 로그인: 저장값이 access token 단독이라 자동 구성 불가 (골격은 생성됨)
+  - **코덱스 진아 계정 이관 완료** (2026-09-16 KST, 대표님 지시 "코덱스 진아 계정은 옮겨")
+    - 244(`jinah244`, 5.104.85.244) `/root/.codex/auth.json` → 116
+      `/root/.codex-accounts/CODEX_OAUTH_JINAH/auth.json`
+    - 이관 전 244 에서 살아 있는지 먼저 확인했다(plan=pro, used=22%, 한도 여유).
+      116 에서 `codex exec` 실측 호출 성공 — 계정 홈 구조가 실제로 동작함을 확인.
+    - **244 쪽은 `auth.json.moved-to-116-20260916` 으로 치웠다.** 같은 자격증명을 두
+      서버가 들고 있으면 먼저 갱신한 쪽이 다른 쪽을 무효화한다(refresh_token_reused).
+      `/root/.codex/MOVED-README.txt` 에 경위와 되돌리는 법을 남겼다.
+    - 결과: 가용 계정 1/2. MAIN 이 한도 정지인 동안 신규 세션은 JINAH 로 자동 배정된다.
+      MAIN 은 p1 이라 09-19 17:13 KST 복귀 후 다시 우선 선택된다.
+  - **남은 것 — 대표님 조치 필요.** 대시보드 설정>LLM 관리에서 버튼으로 진행하실 수 있다.
+    - 클로드 slot3 로그인: 저장값이 access token 단독이라 자동 구성 불가 (골격은 생성됨)
   - 오류 사전: `codex.refresh_token_reused` 등록
 
 - **Codex CLI GPT-6 Astra 운영 반영 확인 및 CLI 업데이트** (2026-09-07 07:55 KST)
