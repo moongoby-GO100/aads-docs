@@ -26,6 +26,54 @@
 
 ## 최근 운영 변경사항 (2026-06-02)
 
+- **LLM 계정 런타임 바인딩 — 코덱스 계정 홈 도입 + 사용량 가시화** (2026-09-16, 서버 116)
+  - 설계서: `aads-docs/docs/PRD-LLM-ACCOUNT-RUNTIME-BINDING-v1.0.md`
+  - **문제**: 2026-09-15 진아서버(244) 계정 반영 지시가 **DB 등록까지만** 되고 CLI 에 닿지
+    않았다. `llm_api_keys` 에 `CODEX_OAUTH_JINAH`(jswworld@gmail.com)·`ANTHROPIC_AUTH_TOKEN_3`
+    가 있는데도, 릴레이는 `auth.json` 을 `/root/.codex/auth.json` 한 곳으로 하드코딩
+    심볼릭 링크하고 있었다(릴레이 세션 35개 전수 동일). 계정 1개에 전량이 쏠려
+    주간 한도 100% 소진 — 최근 72시간 한도초과 실패 19건, 복귀 예정 09-19 17:13 KST.
+  - **용어**: 릴레이 세션(`/root/.codex-relay/<session_id>`, 작업 격리)과 계정 홈
+    (`/root/.codex-accounts/<key_name>`, 자격증명 격리)은 다른 층이다. 클로드의
+    "슬롯"에 대응하는 것은 계정 홈이다.
+  - **반영**
+    - `/root/.codex-accounts/` 신설. MAIN 은 `/root/.codex/auth.json` 링크
+    - `claude_relay_server.py` — `_codex_accounts()`/`_pick_codex_account()` 추가.
+      세션마다 우선순위·한도 상태를 보고 계정을 골라 고정 배정(sticky)
+    - `_build_claude_env()` 슬롯 조건을 1/2 한정에서 자격증명 파일 보유 슬롯 전체로 확장
+    - `scripts/codex_usage.py` — 계정별 사용량 수집·한도 반영(cron 10분)
+    - `scripts/check_account_binding.py` — 등록만 되고 런타임에 닿지 않은 계정 검출(cron 일 1회)
+    - `scripts/materialize_codex_accounts.py` — DB 씨앗으로 계정 홈 구성
+    - `migrations/20260916_codex_usage_snapshots.sql` (적용 완료)
+    - API `GET /llm-keys/codex-usage`, `/account-bindings`, `POST /account-login` 외 3종
+    - 대시보드 설정>LLM 관리 — "코덱스 사용량" 카드, "구독 계정 로그인 상태" 카드(재로그인 버튼)
+  - **사용량은 실시간 조회가 원본이다.** `codex app-server` JSON-RPC
+    `account/rateLimits/read` 를 계정별 `CODEX_HOME` 으로 묻는다. rollout 파일 수집은
+    폴백이다 — 한도에 걸린 호출은 사용률을 갱신해주지 않아 값이 50~121시간까지 낡는다.
+  - **화면에서 재로그인.** 자격증명 파일은 호스트에 있고 API 컨테이너에는 마운트돼
+    있지 않다. 호스트의 릴레이가 CLI 를 pty 로 띄우고 화면은 진행 상태만 받는다.
+    코덱스는 `login --device-auth`(URL+일회용 코드, CLI 가 스스로 종료),
+    클로드는 `auth login`(인증 후 받은 코드를 stdin 으로 돌려줘야 종료) — `needs_code` 로 가른다.
+    성공 판정은 출력 문구가 아니라 파일로 한다(문구는 CLI 버전마다 바뀐다).
+  - **시각은 전부 KST.** 이 서버 로컬이 Europe/Berlin 이라 기본값을 쓰면 8~9시간 어긋난다.
+    TIMESTAMPTZ 에 넣는 문자열에는 오프셋을 반드시 붙인다 — 안 붙이면 DB 값이 통째로 틀어진다.
+  - **배포 완료** (2026-09-16 KST): 릴레이 재기동, aads-server `86bde7dc` bluegreen
+    (deploy_run_id=2534, P0/P1 모니터링 통과), 대시보드 배포.
+    신규 라우트 5종 OpenAPI 등재 확인.
+  - **남은 것 — 대표님 조치 필요.** 이제 대시보드 설정>LLM 관리에서 버튼으로 진행하실 수 있다.
+    1. 코덱스 진아 계정 로그인: DB 의 refresh_token 이 `refresh_token_reused` 로 무효
+       (1회용·회전). 244 서버에서 현재 `auth.json` 재추출도 대안이다
+    2. 클로드 slot3 로그인: 저장값이 access token 단독이라 자동 구성 불가 (골격은 생성됨)
+  - 오류 사전: `codex.refresh_token_reused` 등록
+
+- **Codex CLI GPT-6 Astra 운영 반영 확인 및 CLI 업데이트** (2026-09-07 07:55 KST)
+  - 공식 OpenAI Codex 모델 문서 기준 `codex -m gpt-6-astra`가 지원 명령으로 확인됐다. Codex changelog 기준 Astra 모델 피커 표시 보정은 Codex CLI `0.153.4`에 포함된다.
+  - AADS 운영 DB `llm_models`에는 `provider='codex'`, `model_id='gpt-6-astra'`, `is_active=true`, `is_selectable=true`, `is_executable=true`, `execution_model_id='gpt-6-astra'`, `metadata.execution_backend='codex_cli'`로 등록되어 있다. `provider='openai'` row는 직접 API 경로 오인 방지를 위해 비활성 상태다.
+  - AADS `model_routing_preferences`에는 `llm`, `runner_llm`, `code_exec` 3개 route가 `provider='codex'`, `model_id='gpt-6-astra'`, `is_enabled=true`, `is_default=false`로 등록되어 있다.
+  - 로컬 Codex CLI는 `0.148.0`에서 `0.153.4`로 업데이트했다. 실사용 smoke: `codex exec --ephemeral -m gpt-6-astra -s read-only 'Return exactly AADS_ASTRA_OK and nothing else.'`가 `AADS_ASTRA_OK`를 반환했다.
+  - 검증: `docker exec aads-server pytest -q tests/unit/test_model_selector_dynamic_routing.py tests/unit/test_model_registry.py` 결과 44 passed.
+  - 주의: `runner_model_config`의 size별 기본 fallback 배열에는 `codex:gpt-6-astra`를 자동 삽입하지 않았다. CEO가 직접 지정한 size별 우선순위를 덮어쓰지 않기 위해 현재 상태는 "AADS 선택 가능 + Codex CLI 실제 실행 가능 + 기본 자동 선택은 아님"이다.
+
 - **FOOD 신한 자동수집 배포 및 재시도 결과** (2026-09-04 06:13 KST)
   - CEO 지시로 AADS API를 `deploy.sh bluegreen` 경로로 배포했다. 릴리스 커밋은 `16ba911adc1d88a41208dadcd308cf677ee0d678`이며 active `aads-server:8100`과 standby `aads-server-green:8102`가 모두 `aads-server:16ba911adc1d` 이미지와 동일 digest `sha256:1593c06df6e12ad88d14b25cc7c542e682e9fd9dd223c6c2e73c9b84ae4886b2`로 healthy 상태임을 확인했다.
   - 배포 중 active stream 대기 구간은 CEO 승인에 따라 `AADS_DEPLOY_ALLOW_BUSY_TARGET=true`로 진행했다. 외부 `/health`는 로그인 보호로 `307 /login?redirect=%2Fhealth`를 반환하므로 내부 슬롯 `/health`로 배포 정상성을 검증했다.
@@ -1329,6 +1377,14 @@ STATUS.md: https://raw.githubusercontent.com/moongoby-GO100/aads-docs/main/STATU
 - 검증: `npx tsc --noEmit`, 변경 파일 eslint, `npm run build`, 컴파일된 `documentLinks.selftest.js` 통과. 전체 `npm run lint`는 기존 전역 부채 249 errors/63 warnings로 실패했으나 이번 변경 파일 3개는 오류 0건.
 - 운영 확인: 외부 `/login` HTTP 200, 구형 `/docs?...` 비로그인 요청은 `/login?redirect=...` 307 후 200. E2E 토큰 기반 API 폴백에서 `GO100 + /root/kis-autotrade-v4/docs + reports/GO100-303-STRATEGY-CARD-FULL-SYNC-20260825.md` 문서 본문 1,272자 반환 확인.
 - 제한: Browser Bridge `browser_navigate`, `browser_connect`, `capture_screenshot`가 timeout되어 실제 로그인 화면 렌더 캡처는 미검증. API/HTTP/컨테이너 검증으로 대체함.
+
+## 2026-09-07 AADS API blue/green standby sync 장기 스트림 보강
+
+- 증상: 배포 run `48`이 최신 SHA `45a22648eb55`를 active `aads-server:8100`까지 라우팅했지만, `standby_same_digest_sync`에서 이전 `aads-server-green:8102` 장기 채팅 스트림 3건이 300초 안에 종료되지 않아 `failed` 처리됨. API health는 정상이나 active/standby digest 인증이 미완 상태로 남음.
+- 원인: `deploy.sh`의 기본 target drain 180초, standby sync 300초가 장기 LLM/채팅 스트림 운영 현실보다 짧아, 응답 소실을 피하면 릴리스 인증이 반복 실패하는 구조였음.
+- 조치: `deploy.sh` 기본값을 `AADS_DEPLOY_TARGET_DRAIN_MAX_WAIT:-1800`, `AADS_DEPLOY_STANDBY_SYNC_MAX_WAIT:-1800`으로 상향. 환경변수 override 구조는 유지. `scripts/verify-bluegreen-release-contract.sh`와 `tests/unit/test_deploy_observability.py`도 새 bounded timeout 정책으로 갱신.
+- 검증: `python3 -m py_compile app/services/deploy_observability.py` 통과, `python3 -m pytest tests/unit/test_deploy_observability.py -q` 5 passed, `bash scripts/verify-bluegreen-release-contract.sh /root/aads/aads-server` PASS.
+- 배포 상태: 코드 보강은 커밋/푸시 후 blue/green 배포 필요. 배포 시 active 슬롯 직접 재시작 금지, `deploy.sh bluegreen`로 one SHA image build, candidate health, routed health, same-digest standby, 5분 P0/P1 monitoring까지 확인해야 완료.
 
 ---
 
