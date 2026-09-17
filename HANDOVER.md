@@ -26,6 +26,28 @@
 
 ## 최근 운영 변경사항 (2026-06-02)
 
+- **러너 진행 표시 — 32분 침묵의 원인** (2026-09-17, 서버 116)
+  - 설계서: `PRD-INSTRUCTION-RECOVERY-v1.0.md` 3부 / 오류 사전 `chat.runner_progress_invisible`
+  - **증상**: 대표님 — "이건 왜 응답을 못하지?"(세션 `9fa305c5`). 08:14 지시 후 **32분간
+    화면에 보인 것은 본인 메시지 하나뿐**. 그동안 AI 리뷰 경고(1,209자)·작업 완료
+    보고(3,888자)·배포 시작이 전부 숨겨져 있었다. 일은 계속 되고 있었다.
+  - **실측**: 최근 7일 Pipeline Runner 메시지 **525건 / 21개 세션, 숨김률 100%**
+    (intent 없음 500 + `runner_notification` 25).
+  - **원인 세 겹**: ① DB 트리거가 본문 마커로 `is_hidden=true` ② `_visible_message_filter`
+    의 `is_hidden = FALSE` ③ **러너가 `scripts/pipeline-runner.sh` 의 `post_to_chat` 에서
+    직접 INSERT 하며 intent 를 비워 뒀다** — intent 가 없으니 `include_streaming=true` 의
+    허용 목록에도 안 걸려 **어떤 조회 방식으로도 나오지 않았다**.
+  - **조치(①안 접힌 진행줄)**: 러너 INSERT 가 `intent='pipeline_runner'` 를 찍는다(본문
+    문자열 판정 금지 — 같은 날 추가지시 회수에서 접두 판정으로 대표님 지시 7건을 놓쳤다).
+    조회 필터가 **라이브·이력 양쪽**에서 통과시킨다(한쪽만 열면 "아까 있던 것이 없어졌다").
+    `is_hidden` 은 true 로 남겨 메시지 수·목록 미리보기를 안 건드린다. 화면은 연속 구간을
+    `🤖 러너 진행 n건 — <마지막 요약>` 한 줄로 접고 누르면 펼친다.
+  - **길이 필터도 열었다**: `isHiddenSystemChatMessage` 가 50자 이하 어시스턴트를 잡는데
+    "🚀 [Pipeline Runner] 배포 시작"(42자) 같은 핵심 진행이 그 선 아래였다.
+  - **과거 보정**: `intent NULL` + 러너 마커는 전체 1,280건/43세션이지만 **최근 7일 500건만**
+    보정했다 — 지금 쓰시는 세션을 덮고 이미 읽으신 지난 대화 모양은 바꾸지 않는다.
+  - **커밋**: 서버 `b1cc0d59` · 대시보드 `6e3dc0f` — 배포 완료, 양쪽 슬롯 반영 확인
+
 - **지시 회수 — 미반영 추가지시 3구간 + 잘못 보낸 지시 되회수** (2026-09-17, 서버 116)
   - 설계서: `aads-docs/docs/PRD-INSTRUCTION-RECOVERY-v1.0.md`
   - 오류 사전: `chat.interrupt_never_recovered`, `chat.retract_only_hid_the_row`
