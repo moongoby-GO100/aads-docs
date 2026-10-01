@@ -1,3 +1,19 @@
+> ## ⚠️ 과거 자료 (historical) — 2026-06-19 이전 기록이다
+>
+> - 이 문서는 **2026-06-19 당시의 서버 이전 기록**이다. 6월 사건 자체는 역사 기록으로 보존하며 본문을 치환하지 않았다.
+> - 이 기록의 결론(`GO100 → contabo14 / 5.104.86.14`)은 2026-10-01 05:43 KST 현재 원장과 **일치한다**.
+>   다만 현재 사실의 근거는 이 문서가 아니라 운영 원장 API `/api/v1/ops/servers`(`/ops/status` 와 동일한
+>   `list_ledger_servers()`)와 `aads-server/app/services/server_registry.py` 의 `LEDGER_SERVER_IDS`, DB `server_registry` 다.
+> - **현재 담당 원장은 4대**다: contabo116(AADS) · contabo14(GO100·KIS) · cafe24_114(SF·NTV2·NAS) ·
+>   jinah244 / 진아실장 서버(ACCT). 건강 감시 대상은 앞의 3대뿐이며 jinah244 의 `unknown` 은 장애가 아니다.
+>   "운영 3대" 로 읽지 마라.
+> - **후속 정본 링크**: AADS 프로젝트 문서 `/projects/AADS/documents/aads-current-authority-context`
+>   — "AADS 현재 정본·운영 근거 제공 PRD v1.0.0" (revision 1, hash `c6e3105c…`).
+>   2026-10-01 05:43 KST 실측 기준 **draft** 다(`approved_revision_id` 비어 있음). 구현 승인을 정본 승인·배포 완료와 혼동하지 마라.
+> - 아래 "AADS Update Scope" 의 파일 목록은 **2026-06-19 시점 스냅샷**이다. 현재 코드 위치·내용의 근거로 쓰지 말고
+>   해당 파일을 직접 확인하라. legacy `211.188.51.113` 은 현재 폐기 별칭(`legacy_ids`)이며 운영 주소가 아니다.
+> - 파일 변경시각(2026-06-19)과 운영 실측시각은 다른 값이다.
+
 # GO100 Server Migration Record - 2026-06-19
 
 ## Summary
